@@ -8,8 +8,6 @@ var Response = oauthServer.Response;
 const oauth=require('./OAuth-initilialize');   
 // const licenseApi = require('../api/license.api');
 const models = require('../models');
-const doctorModel = models.Doctor;
-const userModel = models.User;
 const Login = models.Login;
 const lodash = require('lodash');
 const { stubFalse } = require('lodash');
@@ -40,7 +38,7 @@ module.exports = function(options){
         (async() =>{
           let [userErr,user] = await handle(Login.findOne({'user':req.user.user}));
           if(userErr) res.status(500).json({"status":500,"message":"Internal Server Error"});
-          else if(user.status != 1) res.status(901).json({'status':901,'message':'User has been deleted or deactivated'});
+          else if(user.status != 0) res.status(901).json({'status':901,'message':'User has been deleted or deactivated'});
           else next();
         })();
         // }

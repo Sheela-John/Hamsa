@@ -309,5 +309,6 @@ module.exports = {
     UpdateStaff: UpdateStaff,
     getStaffDataById: getStaffDataById,
     getAllStaffDetails: getAllStaffDetails,
-    enableDisableStaff: enableDisableStaff
+    enableDisableStaff: enableDisableStaff,
+    checkLoginAvailablity: checkLoginAvailablity
 }

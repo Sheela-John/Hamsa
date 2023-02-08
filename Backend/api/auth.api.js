@@ -28,8 +28,7 @@ async function login(loginCred, password, role) {
     log.debug(component, 'Inside Login Functionality', role);
     log.close();
     let data = {
-        email: loginCred,
-        phone: loginCred,
+        empId: loginCred,
         password: password,
         role: role
     }
@@ -38,7 +37,7 @@ async function login(loginCred, password, role) {
     return new Promise((resolve, reject) => {
         if (err) return reject(err);
         if (!lodash.isEmpty(user)) {
-            if (!(user[0].password == security.hash(user[0].createdAt, password)) || !user[0].user || user[0].status != 1) {
+            if (!(user[0].password == security.hash(user[0].createdAt, password))) {
                 return reject(ERR.INVALID_CREDENTIALS);
             }
             return resolve(user[0]);
