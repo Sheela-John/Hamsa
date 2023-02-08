@@ -37,6 +37,7 @@ app.get('/', (req, res) => {
 
 // routes
 app.use('/staff', require('./routes/staff.route'));
+app.use('/role', require('./routes/role.route'));
 app.use(errorHandler);
 
 
