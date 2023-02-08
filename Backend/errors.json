@@ -1,0 +1,253 @@
+{
+    "ERROR_APPLICATION": {
+        "code": 101,
+        "message": "application error"
+    },
+    "INVALID_CREDENTIALS": {
+        "code": 102,
+        "message": "Invalid Credentials"
+    },
+    "MANDATORY_FIELD_MISSING": {
+        "code": 103,
+        "message": "Required Fields Missing"
+    },
+    "ACCOUNT_ALREADY_REGISTERED": {
+        "code": 104,
+        "message": "Account Already Registered"
+    },
+    "NO_SUCH_EMAIL": {
+        "code": 105,
+        "message": "Invalid Credentials"
+    },
+    "NO_SUCH_ID": {
+        "code": 106,
+        "message": "No Such Record Found"
+    },
+    "INVALID_RESET_TOKEN": {
+        "code": 107,
+        "message": "Invalid Reset Token"
+    },
+    "RESET_TOKEN_EXPIRED": {
+        "code": 108,
+        "message": "Reset Password Token Has Expired"
+    },
+    "ACCOUNT_DISABLED": {
+        "code": 109,
+        "message": "Your Account Has Been Disabled."
+    },
+    "WAITING_FOR_APPROVAL": {
+        "code": 110,
+        "message": "Your Account is Waiting for Institution Approval."
+    },
+    "DUPLICATE_RECORD": {
+        "code": 111,
+        "message": "Document Contains Duplicate Records."
+    },
+    "POSSIBLE_ERROR": {
+        "code": 112,
+        "message": "Possible Error Found In Records"
+    },
+    "HEADER_NOT_FOUND_ERROR": {
+        "code": 113,
+        "message": "Please check your file having proper header or refer the sample document. Each Row Must Contain TranscriptID, Term, CourseID"
+    },
+    "EMPTY_ROWS": {
+        "code": 114,
+        "message": "Document Contains Empty Rows"
+    },
+    "INVALIDCREDITCARD": {
+        "code": 115,
+        "message": "Invalid Card Number"
+    },
+    "TEMPORARY_PASSWORD_EXPIRED": {
+        "code": 116,
+        "message": "Temporary password has expired, please generate a new password."
+    },
+    "NO_SHARED_EMAIL": {
+        "code": 117,
+        "message": "No Transcript files link shared for this EMAIL ID."
+    },
+    "INVALID_OLD_PASSWORD": {
+        "code": 118,
+        "message": "Old Password provided is invalid."
+    },
+    "EMAIL_NOT_REGISTERED": {
+        "code": 119,
+        "message": "Email ID is not registered with us."
+    },
+    "USER_NOT_ALLOWED": {
+        "code": 120,
+        "message": "User Not Allowed to Access"
+    },
+    "Duplicate_Review": {
+        "code": 121,
+        "message": "Only One Review is Allowed For Each Consultation."
+    },
+    "APPOINTMENT_ALREADY_BOOKED": {
+        "code": 122,
+        "message": "Appointment Already Booked."
+    },
+    "SESSION_COLLIDED":{
+        "code":123,
+        "message":"There is already session available in given time."
+    },
+    "RESCHEDULE_ERROR":{
+        "code":124,
+        "message":"Rescheduling only allowed 6hrs before the appointment."
+    },
+    "NO_RECORDS_FOUND":{
+        "code":125,
+        "message":"No Records Found."
+    },
+    "MAX_LIMIT_REACHED":{
+        "code":126,
+        "message":"Max attempts exceeded please try again after 10 minutes."
+    },
+    "MAX_ATTEMPTS_EXCEEDED":{
+        "code":127,
+        "message":"Max attempts exceeded please generate a new OTP."
+    },
+    "INVALID_OTP":{
+        "code":128,
+        "message":"OTP Verification failed, Please check the verification code entered."
+    },
+    "OTP_EXPIRED":{
+        "code":129,
+        "message":"Verfication code expired, Please generate a new one."
+    },
+    "INVALID_LICENSE_KEY":{
+        "code":130,
+        "message":"The License Key is Invalid."
+    },
+    "PLAN_EXISTS":{
+        "code":131,
+        "message":"you have already purchased an plan, Please create a account to start using telemedicine."
+    },
+    "MAX_LICENSES_REACHED":{
+        "code":132,
+        "message":"You have already created maximum number of licenses allowed as per your plan."
+    },
+    "MOBILE_ALREADY_REGISTERED": {
+        "code": 133,
+        "message": "Mobile Number Already Registered"
+    },
+    "TOO_MANY_REQUESTS": {
+        "code": 134,
+        "message": "Too many requests please try again later"
+    },
+    "RESCHEDULE_COUNT_REACHED":{
+        "code":135,
+        "message":"The maximum count for rescheduing has been reached."
+    },
+    "TIMEZONE_NOT_UPDATED":{
+        "code":136,
+        "message":"Timezone not updated, Please update timezone"
+    },"MEDICATION_ALREADY_EXCISTS":{
+        "code":137,
+        "message":"Medication Already Excists"
+    },
+    "ALLOCATED_SLOT_REACHED":{
+        "code":138,
+        "message":"Slots count exceeds the allocated slot per day"
+    },
+    "CONSULTATION_NOT_COMPLETED":{
+        "code":139,
+        "message":"Consultation Not Completed. Once Consulation Completed You Can Start Chat"
+    },
+    "CHAT_TIME_COMPLETED":{
+        "code":140,
+        "message":"For this Consultation Chat Time Completed."
+    },
+    "INCOMPLETE_MEETINGS":{
+        "code":141,
+        "message":"You have incomplete Meetings."
+    },
+    "MEETING_LIMIT_EXCEEDED":{
+        "code":142,
+        "message":"You have reached the limit to create Meetings."
+    },
+    "NO_MORE_APPOINTMENTS":{
+        "code":143,
+        "message":"This doctor doesn't take anymore appointments for today."
+    },
+    "NO_NEED_TO_UPDATE_SESSION":{ 
+        "code": 144, 
+        "message": "No need to update session."
+    },
+    "APPOINTMENTS_AVAILABLE":{ 
+        "code": 145, 
+        "message": "Appointments available for this user."
+    },
+    "CONSULTATION_AVAILABLE":{ 
+        "code": 146, 
+        "message": "Consultation already available for this appointment."
+    },
+    "SESSION_NOT_AVAILABLE":{ 
+        "code": 147, 
+        "message": "Session Not Available."
+    },
+    "CONSULTATION_ENDED":{
+        "code":148,
+        "message":"Consultation has Ended"
+    },
+    "NO_CUSTOMER_ID":{
+        "code":149,
+        "message":"No Customer Id was found for this User."
+    },
+    "API_RESTRICTED": {
+        "code":403,
+        "message":"Insufficient scope: authorized scope is insufficient"
+    },
+    "NOT_FOUND": {
+        "code": 998,
+        "message": "Service Not Found"
+    },
+    "UNKNOWN": {
+        "code": 999,
+        "message": "Unknown app error"
+    },
+    "RESTRICT_BLOCK_APPOINTMENT": {
+        "code": 150,
+        "message": "Blocking Appointments For Other Clinician is Restricted"
+    },
+    "SESSION_BLOCKED": {
+        "code": 151,
+        "message": "Selected Session is Blocked"
+    },
+    "VIEDO_ALREADY_PURCHASED": {
+        "code": 152,
+        "message": "These videos are already Purchased"
+    },
+    "DUPLICTAE_SECONDARY_EMAIL": {
+        "code": 153,
+        "message": "Duplicate Secondary Email Found"
+    },
+    "DUPLICTAE_EMAIL": {
+        "code": 154,
+        "message": "Email is Already Registered"
+    },
+    "NO_REASON_FOUND": {
+        "code": 155,
+        "message": "Enter Reason to Cancel Group Class"
+    },
+    "NO_CANCEL_REASON_FOUND": {
+        "code": 156,
+        "message": "Enter Reason to Cancel Appointment"
+    },
+    "NO_AMOUNT_FOUND": {
+        "code": 156,
+        "message": "Enter Valid Amount to Upload Video"
+    },
+    "UNABLE_TO_EDIT": {
+        "code": 157,
+        "message": "This Clinician Doesn't have Edit Option - Only Host can Edit the Group class"
+    },
+    "ONLY_POST_PAID": {
+        "code": 158,
+        "message": "The Group Class is Only Post Paid"
+    },
+    "TIME_DIFFERENCE": {
+        "code": 159,
+        "message": "The Appointment can be cancelled only after Certain Hours"
+    }
+}

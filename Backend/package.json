@@ -1,0 +1,42 @@
+{
+  "name": "hamsabackend",
+  "version": "1.0.0",
+  "description": "Hamsa Backend",
+  "main": "server.js",
+    "dependencies": {
+    "async": "^3.2.2",
+    "aws-sdk": "^2.1028.0",
+    "config": "^3.3.6",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "handlebars": "^4.7.7",
+    "helmet": "^4.6.0",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.1",
+    "moment-timezone": "^0.5.33",
+    "mongoose": "^6.0.12",
+    "multer": "^1.4.3",
+    "multer-s3": "^2.10.0",
+    "nodemailer": "^6.7.0",
+    "nodemon": "^2.0.14",
+    "oauth2-server": "^3.1.1",
+    "request": "^2.88.2",
+    "rrule": "^2.6.9",
+    "storyboard": "^3.3.2",
+    "storyboard-preset-console": "^3.3.2",
+    "stripe": "^8.190.0",
+    "uuid": "^8.3.2"
+  },
+  "scripts": {
+    "test": "echo \\\\\\\"Error: no test specified\\\\\\\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "keywords": [
+    "Hamsa",
+    "Rehab"
+  ],
+  "author": "Deemsys Inc",
+  "license": "ISC"
+}
