@@ -4,15 +4,15 @@
 
 var _ = require('lodash');
 var mongodb = require('../models');
-var authApi=require('../api/auth.api');
+var authApi = require('../api/auth.api');
 var OAuthAccessToken = mongodb.OAuthAccessToken;
 var OAuthRefreshToken = mongodb.OAuthRefreshToken;
 
 /* Gets called during  authentication */
 function getAccessToken(bearerToken) {
   return OAuthAccessToken
-  //User,OAuthClient
-    .findOne({access_token: bearerToken})
+    //User,OAuthClient
+    .findOne({ access_token: bearerToken })
     .then(function (accessToken) {
       if (!accessToken) return false;
       var token = accessToken;
@@ -28,24 +28,25 @@ function getAccessToken(bearerToken) {
 
 /* Gets called on issuing token during login*/
 function getClient(clientId, clientSecret) {
-      var clientWithGrants = { 
-        client_id: 'democlient',
-        client_secret: 'democlientsecret',
-        redirect_uri: 'http://localhost/cb' };
-      clientWithGrants.grants = ['password', 'refresh_token']
-      clientWithGrants.redirectUris = [clientWithGrants.redirect_uri]
-      delete clientWithGrants.redirect_uri
-      return clientWithGrants;
+  var clientWithGrants = {
+    client_id: 'democlient',
+    client_secret: 'democlientsecret',
+    redirect_uri: 'http://localhost/cb'
+  };
+  clientWithGrants.grants = ['password', 'refresh_token']
+  clientWithGrants.redirectUris = [clientWithGrants.redirect_uri]
+  delete clientWithGrants.redirect_uri
+  return clientWithGrants;
 }
 
 /* Gets called during login */
 function getUser(loginCred, passwordwithRole) {
-  let [password,role] = passwordwithRole.split(',');
+  let [password, role] = passwordwithRole.split(',');
   /* login Logic */
-  return new Promise((resolve,reject)=>{
-    authApi.login(loginCred,password,role).then(data=>{
-       resolve(data);
-    }).catch(err=>{
+  return new Promise((resolve, reject) => {
+    authApi.login(loginCred, password, role).then(data => {
+      resolve(data);
+    }).catch(err => {
       reject(err);
     })
   })
@@ -68,30 +69,30 @@ function revokeToken(token) {
     expiredToken.refreshTokenExpiresAt = new Date('2015-05-28T06:59:53.000Z')
     return expiredToken
   }).catch(function (err) {
-  }); 
+  });
 }
 
 /* Gets called on login functionality which saves token */
 function saveToken(token, client, user) {
- /*  Setting up scope in token */
-  token.scope=token.scope==undefined?user.role:token.scope;
+  /*  Setting up scope in token */
+  token.scope = token.scope == undefined ? user.role : token.scope;
   return Promise.all([
-      OAuthAccessToken.create({
-        access_token: token.accessToken,
-        accessTokenExpires: token.accessTokenExpiresAt,
-        user: user.user,
-        scope: token.scope
-      }),
-      token.refreshToken ? OAuthRefreshToken.create({ // no refresh token for client_credentials
-        refresh_token: token.refreshToken,
-        refreshTokenExpires: token.refreshTokenExpiresAt,
-        user: user.user,
-        scope: token.scope
-      }) : [],
+    OAuthAccessToken.create({
+      access_token: token.accessToken,
+      accessTokenExpires: token.accessTokenExpiresAt,
+      user: user.user,
+      scope: token.scope
+    }),
+    token.refreshToken ? OAuthRefreshToken.create({ // no refresh token for client_credentials
+      refresh_token: token.refreshToken,
+      refreshTokenExpires: token.refreshTokenExpiresAt,
+      user: user.user,
+      scope: token.scope
+    }) : [],
 
-    ])
+  ])
     .then(function (resultsArray) {
-      return _.assign( 
+      return _.assign(
         {
           client: client,
           user: user,
@@ -106,13 +107,13 @@ function saveToken(token, client, user) {
 /* Gets called on getting new access token */
 function getRefreshToken(refreshToken) {
   if (!refreshToken || refreshToken === 'undefined') return false
-//[OAuthClient, User]
+  //[OAuthClient, User]
   return OAuthRefreshToken
-    .findOne({refresh_token: refreshToken})
+    .findOne({ refresh_token: refreshToken })
     .then(function (savedRT) {
-      if(savedRT){
+      if (savedRT) {
         var tokenTemp = {
-          user: savedRT ? savedRT.User : {},
+          user: savedRT ? savedRT.user : {},
           client: {},
           refreshTokenExpiresAt: savedRT ? new Date(savedRT.refreshTokenExpires) : null,
           refreshToken: refreshToken,
@@ -127,10 +128,10 @@ function getRefreshToken(refreshToken) {
 
 /* Verify scope before accessing protected Api's */
 function verifyScope(token, scope) {
-  if(scope.indexOf(',')>0)
-  scope = scope.split(',');
+  if (scope.indexOf(',') > 0)
+    scope = scope.split(',');
   else
-  scope=[scope];
+    scope = [scope];
   return scope.includes(token.scope);
 }
 module.exports = {
