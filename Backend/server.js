@@ -39,6 +39,7 @@ app.get('/', (req, res) => {
 app.use('/auth', require('./routes/auth.route'));
 app.use('/staff', require('./routes/staff.route'));
 app.use('/role', require('./routes/role.route'));
+app.use('/branch', require('./routes/branch.route'));
 app.use(errorHandler);
 
 

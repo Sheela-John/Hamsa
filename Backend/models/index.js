@@ -5,5 +5,6 @@ db.Login = require('./login');
 db.Role = require('./role');
 db.OAuthAccessToken = require('./OAuthAccessToken.js');
 db.OAuthRefreshToken = require('./OAuthRefreshToken.js');
+db.Branch = require('./branch');
 
 module.exports = db;
