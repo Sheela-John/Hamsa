@@ -48,7 +48,7 @@ router.post('/', async (req, res, next) => {
     })
 
     /* Get all Role detail*/
-    .get('/get/allStaff', async (req, res, next) => {
+    .get('/get/allRole', async (req, res, next) => {
         log.debug(COMPONENT, 'Searching for all Role'); log.close();
         let [err, roleData] = await handle(RoleAPI.getAllRoleDetails())
         if (err) {

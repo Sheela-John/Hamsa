@@ -1,7 +1,7 @@
-const COMPONENT = "Branch Router";
+const COMPONENT = "Settings Router";
 const router = require('express').Router();
 const lodash = require('lodash');
-const BranchAPI = require('../api/branch.api');
+const SettingsAPI = require('../api/settings.api');
 const ERR = require('../errors.json');
 const config = require('config');
 const authenticate = require('../middleware/OAuth-Authentication');
@@ -14,58 +14,58 @@ const handle = (promise) => {
         .catch(error => Promise.resolve([error, undefined]));
 }
 
-/* Created Branch API */
+/* Created Settings API */
 router.post('/', async (req, res, next) => {
     if (lodash.isEmpty(req.body)) return next(ERR.MANDATORY_FIELD_MISSING);
-    let [err, branchData] = await handle(BranchAPI.create(req.body));
+    let [err, settingsData] = await handle(SettingsAPI.create(req.body));
     if (err) return next(err);
-    else return res.status(200).json({ status: true, data: branchData });
+    else return res.status(200).json({ status: true, data: settingsData });
 })
 
-    /* Update Branch API */
+    /* Update Settings API */
     .put('/:_id', async (req, res, next) => {
         if (lodash.isEmpty(req.body)) return next(ERR.MANDATORY_FIELD_MISSING)
         req.body._id = req.params._id;
-        let [err, branchData] = await handle(BranchAPI.UpdateBranch(req.body));
+        let [err, settingsData] = await handle(SettingsAPI.UpdateSettings(req.body));
         if (err) return next(err);
-        else return res.status(200).json({ status: true, data: branchData, message: "Branch Updated Successfully!" });
+        else return res.status(200).json({ status: true, data: settingsData, message: "Settings Updated Successfully!" });
     })
 
     /* Get By Id */
     .get('/:id', async (req, res, next) => {
-        log.debug(COMPONENT, 'Search for Branch by ID'); log.close();
-        let [err, branchData] = await handle(BranchAPI.getBranchDataById(req.params.id));
+        log.debug(COMPONENT, 'Search for Settings by ID'); log.close();
+        let [err, settingsData] = await handle(SettingsAPI.getSettingsDataById(req.params.id));
         if (err) {
-            log.error(COMPONENT, 'Get Branch by Id error', { attach: err });
+            log.error(COMPONENT, 'Get Settings by Id error', { attach: err });
             log.close();
             return res.json({ status: false, err: Object.assign(ERR.UNKNOWN, { message: err.message }) });
         }
         else {
-            log.debug(COMPONENT, 'Branch found');
+            log.debug(COMPONENT, 'Settings found');
             log.close();
-            return res.json({ status: true, data: branchData });
+            return res.json({ status: true, data: settingsData });
         }
     })
 
-    /* Get all Branch detail*/
-    .get('/get/allBranch', async (req, res, next) => {
-        log.debug(COMPONENT, 'Searching for all Branch'); log.close();
-        let [err, branchData] = await handle(BranchAPI.getAllBranchDetails())
+    /* Get all Settings detail*/
+    .get('/get/allSettings', async (req, res, next) => {
+        log.debug(COMPONENT, 'Searching for all Settings'); log.close();
+        let [err, settingsData] = await handle(SettingsAPI.getAllSettingsDetails())
         if (err) {
-            log.error(COMPONENT, 'find all Branch error', { attach: err });
+            log.error(COMPONENT, 'find all Settings error', { attach: err });
             log.close();
             return res.json({ status: false, err: Object.assign(ERR.UNKNOWN, { message: err.message }) });
         }
         else {
-            log.debug(COMPONENT, 'All Branch fetch Successful');
+            log.debug(COMPONENT, 'All Settings fetch Successful');
             log.close();
-            return res.json({ status: true, data: branchData, message: 'Get all Branch Data Successfully!' });
+            return res.json({ status: true, data: settingsData, message: 'Get all Settings Data Successfully!' });
         }
     })
 
-    /* Enable or Disable By Branch Id */
+    /* Enable or Disable By Settings Id */
     .get('/enableanddisable/:id', async (req, res, next) => {
-        let [enableDisableErr, enableDisableData] = await handle(BranchAPI.enableDisableBranch(req.params.id));
+        let [enableDisableErr, enableDisableData] = await handle(SettingsAPI.enableDisableSettings(req.params.id));
         if (enableDisableErr) return res.status(200).json(lodash.merge({ status: false }, enableDisableErr));
         else return res.status(200).json({ status: true, "data": enableDisableData });
     })
