@@ -58,7 +58,7 @@ router.post('/refreshToken', (req, res) => {
 });
 
 
-router.post('/change-password', authenticate("PORTAL_STAFF"), async (req, res) => {
+router.post('/change-password', authenticate("PORTAL_STAFF,PORTAL_ADMIN"), async (req, res) => {
     if (lodash.isEmpty(req.body)) return res.status(200).json(lodash.merge({ status: false }, ERR.MANDATORY_FIELD_MISSING));
     let [err, status] = await (handle(AuthAPI.changePassword(req)));
     if (err) res.status(200).json(lodash.merge({ status: false }, err));

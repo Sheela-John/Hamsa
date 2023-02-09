@@ -94,6 +94,11 @@ async function changePassword(request) {
                     if (usererr) return reject(usererr);
                     userData.user = usrData;
                 }
+                if (userData.role == "PORTAL_ADMIN") {
+                    var [usererr, usrData] = await handle(Staff.findOne({ 'empId': userData['empId'] }))
+                    if (usererr) return reject(usererr);
+                    userData.user = usrData;
+                }
                 if (security.hash(userData.createdAt, oldPassword) == userData.password) {
                     userData.password = security.hash(userData.createdAt, newPassword);
                     let [err, updated] = await handle(LoginModel.findOneAndUpdate({ 'user': request.user.user }, userData, { new: true, useFindAndModify: false }));
