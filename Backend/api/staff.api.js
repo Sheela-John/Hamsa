@@ -198,21 +198,17 @@ async function userLogin(loginCred, password, role) {
 
 async function checkLoginAvailablity(loginCred) {
     let query = [];
+    console.log("loginCred", loginCred);
     if (loginCred.role == 'PORTAL_ADMIN') {
         query =
-            [{
-                $match: {
-                    $and: [{
-                        $or: [
-                            { 'email': loginCred.email },
-                            { 'phoneNumber': loginCred.phone }]
-                    }, {
-                        $or: [
-                            { 'role': 'PORTAL_ADMIN' }]
-                    }]
-                }
-            }
+            [
+                {
+                    $match: {
+                        $and: [{ 'empId': loginCred.empId },
+                        { 'role': loginCred.role }]
 
+                    }
+                }
             ]
     }
     else {
@@ -229,6 +225,7 @@ async function checkLoginAvailablity(loginCred) {
     }
     return new Promise((resolve, reject) => {
         Login.aggregate(query).collation({ locale: "en", strength: 2 }).exec((err, staff) => {
+            console.log("staff", staff);
             if (err) {
                 log.error(component, { attach: err });
                 log.close();
@@ -357,6 +354,89 @@ function removeSecuredKeys(data) {
     return data;
 }
 
+/* Create Admin */
+async function createAdmin(adminData) {
+    log.debug(component, 'Creating Admin functionality1', adminData);
+    log.close();
+    if (adminData.gender) {
+        adminData.defaultImageUrl = genrateDefaultImage(adminData.gender);
+    }
+
+    if (adminData.dob) {
+        adminData.dob = new Date(adminData.dob);
+        let copiedDate = new Date(adminData.dob.getTime());
+        adminData['dob'] = copiedDate;
+    }
+    let [adminErr, admin] = await handle(checkForExistingUser(adminData));
+    if (adminErr) return Promise.reject(adminErr);
+    if (!(lodash.isEmpty(admin))) return Promise.reject(ERR.DUPLICATE_RECORD);
+    return new Promise((resolve, reject) => {
+        if (!lodash.isEmpty(admin)) {
+            return reject(ERR.ACCOUNT_ALREADY_REGISTERED);
+        }
+        else {
+            async.waterfall([
+                saveAdmin,
+                createLoginCredentials
+            ], function (err, result) {
+                if (err) return reject(err);
+                return resolve(result);
+            });
+            function saveAdmin(cb) {
+                (async () => {
+                    adminData.role = "PORTAL_ADMIN";
+                    var saveModel = new Staff(adminData);
+                    let [err, adminSave] = await handle(saveModel.save())
+                    if (err) cb(err, null);
+                    else {
+                        adminSave.password = adminData.password;
+                        adminSave.savepassword = adminData.password;
+                        cb(null, adminSave);
+                    }
+                })();
+            }
+            function createLoginCredentials(adminDatafromFunction, cb) {
+                log.debug(component, 'Inside Create Login Functionality', { attach: adminDatafromFunction });
+                (async () => {
+                    let staffDataModel = {};
+                    staffDataModel['empId'] = adminDatafromFunction.empId;
+                    staffDataModel['email'] = adminDatafromFunction.email;
+                    staffDataModel['role'] = "PORTAL_ADMIN";
+                    staffDataModel['staffRole'] = adminDatafromFunction.staffRole;
+                    staffDataModel['password'] = Security.hash(adminDatafromFunction.createdAt, adminDatafromFunction.password);
+                    staffDataModel['phone'] = adminDatafromFunction.phone;
+                    staffDataModel['user'] = adminDatafromFunction._id;
+                    staffDataModel['createdAt'] = adminDatafromFunction.createdAt;
+                    const loginModel = new Login(staffDataModel);
+                    let [loginerr, loginData] = await handle(loginModel.save());
+                    if (loginerr) cb(loginerr, null);
+                    else {
+                        cb(null, adminDatafromFunction);
+                    }
+                })();
+            }
+        }
+    })
+}
+
+/* Get All Admin Detail */
+async function findAllAdmin() {
+    log.debug(component, 'Get All Admin Detail'); log.close();
+    let [err, adminData] = await handle(Staff.find({ "role": "PORTAL_ADMIN" }).lean());
+    if (err) return Promise.reject(err);
+    if (lodash.isEmpty(adminData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+    return Promise.resolve(adminData);
+}
+
+/* Get Admin By Id */
+async function findAdminById(adminId) {
+    log.debug(component, 'Get Admin By Id'); log.close();
+    let [err, adminData] = await handle(Staff.findOne({ "_id": adminId }).lean());
+    if (err) return Promise.reject(err);
+    if (lodash.isEmpty(adminData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+    return Promise.resolve(adminData);
+}
+
 module.exports = {
     create: create,
     UpdateStaff: UpdateStaff,
@@ -365,5 +445,8 @@ module.exports = {
     enableDisableStaff: enableDisableStaff,
     checkLoginAvailablity: checkLoginAvailablity,
     checkForExistingUserForSendingEmail: checkForExistingUserForSendingEmail,
-    updateUserforForgotPassword: updateUserforForgotPassword
+    updateUserforForgotPassword: updateUserforForgotPassword,
+    createAdmin: createAdmin,
+    findAllAdmin: findAllAdmin,
+    findAdminById: findAdminById
 }

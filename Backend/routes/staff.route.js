@@ -70,4 +70,26 @@ router.post('/', async (req, res, next) => {
         else return res.status(200).json({ status: true, "data": enableDisableData });
     })
 
+    /* Created Admin API */
+    .post('/createAdmin', async (req, res, next) => {
+        if (lodash.isEmpty(req.body)) return next(ERR.MANDATORY_FIELD_MISSING);
+        let [err, adminData] = await handle(StaffAPI.createAdmin(req.body));
+        if (err) return next(err);
+        else return res.status(200).json({ status: true, data: adminData });
+    })
+
+    /* Find Admin API */
+    .get('/find/allAdmin', async (req, res, next) => {
+        let [err, adminData] = await handle(StaffAPI.findAllAdmin());
+        if (err) return next(err);
+        else return res.status(200).json({ status: true, data: adminData });
+    })
+
+    /* Find Admin by Id API */
+    .get('/find/adminById/:id', async (req, res, next) => {
+        let [err, adminData] = await handle(StaffAPI.findAdminById(req.params.id));
+        if (err) return next(err);
+        else return res.status(200).json({ status: true, data: adminData });
+    })
+
 module.exports = router;
