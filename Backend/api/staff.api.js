@@ -304,11 +304,66 @@ const enableDisableStaff = async (contactId) => {
     else return Promise.resolve(enableDisableValue);
 }
 
+async function checkForExistingUserForSendingEmail(loginCred) {
+    let query =
+        [{
+            $match: {
+                $and: [{
+                    $or: [
+                        { 'email': loginCred.email },
+                    ]
+                }]
+            }
+        }]
+    return new Promise((resolve, reject) => {
+        Login.aggregate(query).collation({ locale: "en", strength: 2 }).exec((err, user) => {
+            if (err) {
+                log.error(component, { attach: err });
+                log.close();
+                return reject(err);
+            }
+            if (user.length > 0) {
+                return resolve(user);
+            }
+            return resolve([]);
+        })
+    })
+}
+
+async function updateUserforForgotPassword(userData) {
+    log.debug(component, 'updating user');
+    log.close();
+    return new Promise((resolve, reject) => {
+        /*   Deleting Email before update as there is possibility for new email*/
+        delete userData.email;
+        delete userData.role;
+        delete userData.phone;
+        Staff.findOneAndUpdate({ '_id': userData._id }, userData, { new: true, useFindAndModify: false }).lean().then(updatedUser => {
+            return resolve(removeSecuredKeys(updatedUser));
+        }).catch(err => {
+            log.error(component, { attach: err });
+            log.close();
+            return reject(err);
+        })
+    })
+}
+
+function removeSecuredKeys(data) {
+    delete data.resetPasswordExpire;
+    delete data.resetPasswordToken;
+    delete data.emailVerificationCode;
+    delete data.emailCodeExpiry;
+    delete data.s_customer_id;
+    return data;
+}
+
 module.exports = {
     create: create,
     UpdateStaff: UpdateStaff,
     getStaffDataById: getStaffDataById,
     getAllStaffDetails: getAllStaffDetails,
     enableDisableStaff: enableDisableStaff,
-    checkLoginAvailablity: checkLoginAvailablity
+    checkLoginAvailablity: checkLoginAvailablity,
+    checkForExistingUserForSendingEmail: checkForExistingUserForSendingEmail,
+    updateUserforForgotPassword: updateUserforForgotPassword
 }

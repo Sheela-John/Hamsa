@@ -11,6 +11,10 @@ const staffSchema = new mongoose.Schema({
     Branch: { type: String },
     gender: { type: Number },
     dob: { type: Date },
+    defaultImageUrl: { type: String },
+    userProfileImage: { type: String },
+    resetPasswordToken: { type: String },
+    resetPasswordExpire: { type: Date },
     status: { type: Number, default: 0 } /* 0 - Active ,  1 - Deleted , 2 - Disabled */
 }, {
     collection: 'staff',

@@ -21,7 +21,7 @@ const handle = (promise) => {
         .then(data => ([undefined, data]))
         .catch(error => Promise.resolve([error, undefined]));
 }
-const log = require('../util/logger').log(component, ___filename);
+const log = require('../util/logger').log(component, __filename);
 
 /* Login functionality */
 async function login(loginCred, password, role) {
@@ -83,19 +83,19 @@ async function changePassword(request) {
     let oldPassword = request.body.oldPassword;
     let newPassword = request.body.newPassword;
     /* Getting user details */
-    let [userError, userData] = await handle(LoginModel.findOne({ user: request.user.user }).lean());
+    let [userError, userData] = await handle(LoginModel.findOne({ 'user': request.user.user }).lean());
     return new Promise((resolve, reject) => {
         if (userError) return reject(userError);
         else if (userData) {
             (async () => {
-                if (userData.role == "PORTAL_USER") {
-                    var [usererr, usrData] = await handle(Staff.findOne({ email: userData['email'] }))
+                if (userData.role == "PORTAL_STAFF") {
+                    var [usererr, usrData] = await handle(Staff.findOne({ 'empId': userData['empId'] }))
                     if (usererr) return reject(usererr);
                     userData.user = usrData;
                 }
                 if (security.hash(userData.createdAt, oldPassword) == userData.password) {
                     userData.password = security.hash(userData.createdAt, newPassword);
-                    let [err, updated] = await handle(LoginModel.findOneAndUpdate({ user: request.user.user }, userData, { new: true, useFindAndModify: false }));
+                    let [err, updated] = await handle(LoginModel.findOneAndUpdate({ 'user': request.user.user }, userData, { new: true, useFindAndModify: false }));
                     if (err) return reject(err);
                     else {
                         var changePasswordData = {
@@ -103,14 +103,15 @@ async function changePassword(request) {
                             role: updated.role,
                             createdAt: updated.createdAt,
                             phone: updated.phone,
-                            email: updated.email
+                            email: updated.email,
+                            empId: updated.empId
                         }
                         var changePassword = new LoginModel(changePasswordData);
                         let [newErr, valueData] = await handle(changePassword.save());
                         if (newErr) return Promise.reject(newErr);
                         const subject = "Change Password Success";
                         let userName = '';
-                        userName = userData.role == 'PORTAL_CLINICIAN' ? userData.user.fullName : userData.user.name;
+                        userName = userData.user.staffName;
                         html.create({
                             data: {
                                 userName: `${userName}`,
@@ -143,7 +144,7 @@ async function changePassword(request) {
 async function forgotPassword(data) {
     const subject = "Password Reset";
     /* checking email availability */
-    let [err, user] = await handle(StaffAPI.checkForExistingUser(data));
+    let [err, user] = await handle(StaffAPI.checkForExistingUserForSendingEmail(data));
     return new Promise((resolve, reject) => {
         if (err) return reject(err);
         if (lodash.isEmpty(user)) return reject(ERR.EMAIL_NOT_REGISTERED);
@@ -172,7 +173,7 @@ async function forgotPassword(data) {
             },
             function sendMail(token, updatedProfile, cb) {
                 let userName = '';
-                userName = updatedProfile.role == 'PORTAL_USER' ? updatedProfile.name : updatedProfile.fullName;
+                userName = updatedProfile.staffName;
                 /* Creating HTML template */
                 html.create({
                     data: {
@@ -233,7 +234,8 @@ function resetPassword(data) {
                         role: updated.role,
                         createdAt: updated.createdAt,
                         phone: updated.phone,
-                        email: updated.email
+                        email: updated.email,
+                        empId: updated.empId
                     };
                     var resetPasswordData = new LoginModel(resetPassword);
                     let [newErr, valueData] = await handle(resetPasswordData.save());
@@ -253,7 +255,7 @@ function resetPassword(data) {
             },
             function sendSuccessMail(userProfile, cb) {
                 let userName = '';
-                userName = userProfile.role == 'PORTAL_CLINICIAN' ? userProfile.fullName : userProfile.name;
+                userName = userProfile.staffName;
                 log.debug(component, 'Send Reset password successfull mail sent');
                 log.close();
                 /* Creating HTML template */

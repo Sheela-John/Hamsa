@@ -7,7 +7,7 @@ const nodemailer = require('nodemailer');
 const config = require('config');
 
 function send(to,subject, html,attachment, cb) {
-    const log = require('./logger').log(component, ___filename);
+    const log = require('./logger').log(component, __filename);
     var transporterOpts = {
         host: config.smtp.host,
         port: config.smtp.port,
