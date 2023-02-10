@@ -198,7 +198,6 @@ async function userLogin(loginCred, password, role) {
 
 async function checkLoginAvailablity(loginCred) {
     let query = [];
-    console.log("loginCred", loginCred);
     if (loginCred.role == 'PORTAL_ADMIN') {
         query =
             [
@@ -225,7 +224,6 @@ async function checkLoginAvailablity(loginCred) {
     }
     return new Promise((resolve, reject) => {
         Login.aggregate(query).collation({ locale: "en", strength: 2 }).exec((err, staff) => {
-            console.log("staff", staff);
             if (err) {
                 log.error(component, { attach: err });
                 log.close();

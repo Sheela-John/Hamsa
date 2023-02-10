@@ -34,7 +34,6 @@ async function login(loginCred, password, role) {
     }
     /* checking email availability */
     let [err, user] = await handle(StaffAPI.checkLoginAvailablity(data));
-    console.log("user", user);
     return new Promise((resolve, reject) => {
         if (err) return reject(err);
         if (!lodash.isEmpty(user)) {
