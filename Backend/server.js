@@ -42,6 +42,7 @@ app.use('/role', require('./routes/role.route'));
 app.use('/branch', require('./routes/branch.route'));
 app.use('/settings', require('./routes/settings.route'));
 app.use('/assignService', require('./routes/assignService.route'));
+app.use('/services', require('./routes/services.route'));
 app.use(errorHandler);
 
 

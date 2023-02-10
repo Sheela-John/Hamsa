@@ -10,5 +10,6 @@ db.Settings = require('./settings');
 db.AssignServiceForClient = require('./assignServiceforClient');
 db.AssignServiceForBranch = require('./assignServiceforBranch');
 db.Client = require('./client');
+db.Services = require('./services');
 
 module.exports = db;
