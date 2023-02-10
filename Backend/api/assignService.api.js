@@ -326,7 +326,9 @@ const getAllAssignedServicesforStaff = async (inputData) => {
         }
     ];
     var [clientServicesAllDataErr, clientServicesAllData] = await handle(AssignServiceForClient.aggregate(query));
-    data.push(clientServicesAllData);
+    for (let i = 0; i < clientServicesAllData.length; i++) {
+        data.push(clientServicesAllData[i]);
+    }
     if (clientServicesAllDataErr) return Promise.reject(clientServicesAllDataErr);
 
     var query = [
@@ -361,8 +363,9 @@ const getAllAssignedServicesforStaff = async (inputData) => {
         }
     ];
     var [clientBranchAllDataErr, clientBranchAllData] = await handle(assignServiceForBranch.aggregate(query));
-    data.push(clientBranchAllData);
-    if (clientBranchAllDataErr) return Promise.reject(clientBranchAllDataErr);
+    for (let i = 0; i < clientBranchAllData.length; i++) {
+        data.push(clientBranchAllData[i]);
+    } if (clientBranchAllDataErr) return Promise.reject(clientBranchAllDataErr);
     else return Promise.resolve(data);
 }
 
