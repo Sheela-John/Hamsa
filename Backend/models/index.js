@@ -7,5 +7,8 @@ db.OAuthAccessToken = require('./OAuthAccessToken.js');
 db.OAuthRefreshToken = require('./OAuthRefreshToken.js');
 db.Branch = require('./branch');
 db.Settings = require('./settings');
+db.AssignServiceForClient = require('./assignServiceforClient');
+db.AssignServiceForBranch = require('./assignServiceforBranch');
+db.Client = require('./client');
 
 module.exports = db;
