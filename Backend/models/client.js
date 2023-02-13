@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const clientSchema = new mongoose.Schema({
     clientName: { type: String },
     clientAddress: { type: String },
+    latitude: { type: Number },
+    longitude: { type: Number },
     phone: { type: String },
     status: { type: Number, default: 0 } /* 0 - Active ,  1 - Deleted , 2 - Disabled */
 }, {

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const settingsSchema = new mongoose.Schema({
-    averageDistance: { type: String },
+    averageDistance: { type: Number },
     TravelExpenseCost: { type: Number },
     status: { type: Number, default: 0 } /* 0 - Active ,  1 - Deleted , 2 - Disabled */
 }, {

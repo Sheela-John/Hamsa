@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const assignServiceForClientSchema = new mongoose.Schema({
     staffId: { type: String },
     date: { type: Date },
+    clientId: { type: String },
     clientName: { type: String },
     address: { type: String },
     phone: { type: String },

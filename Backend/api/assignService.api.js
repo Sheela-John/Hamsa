@@ -6,6 +6,8 @@ const Staff = models.Staff;
 const AssignServiceForClient = models.AssignServiceForClient;
 const assignServiceForBranch = models.AssignServiceForBranch;
 const Client = models.Client;
+const ClientDistance = models.clientDistance;
+const Settings = models.Settings;
 const lodash = require('lodash');
 const ERR = require('../errors.json');
 const uuid = require('../util/misc');
@@ -27,7 +29,8 @@ const momentTz = require('moment-timezone');
 const { AssignServiceForBranch } = require('../models');
 const generateRandomPassword = require('../util/generateCode').randomString;
 const genrateDefaultImage = require('../util/generateCode').genrateDefaultImage;
-
+const request = require('request');
+const NodeGeocoder = require('node-geocoder');
 
 const s3 = new AWS.S3({
     accessKeyId: config.AWSCredentails.AWS_ACCESS_KEY,
@@ -61,31 +64,56 @@ const assignServiceClient = async (assignServiceData) => {
     assignServiceData['time'] = assignServiceData.time;
 
     delete assignServiceData._id;
-    var saveData = new AssignServiceForClient(assignServiceData);
     return new Promise((resolve, reject) => {
-        saveData.save().then((assignService) => {
-            log.debug(component, 'Saved Assign Service successfully');
-            log.close();
-            (async () => {
-                let [findClientErr, findClientData] = await handle(Client.findOne({ 'clientName': assignService.clientName }));
-                if (findClientErr) return Promise.reject(findClientErr);
-                if (findClientData == undefined) {
-                    let clientData = {
-                        clientName: assignService.clientName,
-                        clientAddress: assignService.address,
-                        phone: assignService.phone
-                    }
-                    var saveModel = new Client(clientData);
-                    let [err, clientDataSaved] = await handle(saveModel.save())
-                    if (err) return Promise.reject(err);
+        (async () => {
+            let [findClientErr, findClientData] = await handle(Client.findOne({ 'clientName': assignServiceData.clientName, 'phone': assignServiceData.phone }));
+            if (findClientErr) return Promise.reject(findClientErr);
+            if (findClientData == undefined) {
+                const options = {
+                    provider: 'google',
+                    httpAdapter: 'https',
+                    // Optional depending on the providers
+                    // fetch: customFetchImplementation,
+                    apiKey: 'AIzaSyCX_9dtirFHcsQY8zjjR86cettocdHOT50', // for Mapquest, OpenCage, Google Premier
+                    formatter: null // 'gpx', 'string', ...
+                };
+                const geocoder = NodeGeocoder(options);
+                const res = await geocoder.geocode(assignServiceData.address);
+                let clientData = {
+                    clientName: assignServiceData.clientName,
+                    clientAddress: assignServiceData.address,
+                    phone: assignServiceData.phone,
+                    latitude: res[0].latitude,
+                    longitude: res[0].longitude
                 }
-            })();
-            return resolve(assignService);
-        }).catch((err) => {
-            log.error(component, 'Error while saving Assign Service data', { attach: err });
-            log.close();
-            return reject(err);
-        })
+                var saveModel = new Client(clientData);
+                let [err, clientDataSaved] = await handle(saveModel.save())
+                if (err) return Promise.reject(err);
+                assignServiceData['clientId'] = clientDataSaved._id;
+                var saveData = new AssignServiceForClient(assignServiceData);
+                saveData.save().then((assignService) => {
+                    log.debug(component, 'Saved Assign Service successfully');
+                    log.close();
+                    return resolve(assignService);
+                }).catch((err) => {
+                    log.error(component, 'Error while saving Assign Service data', { attach: err });
+                    log.close();
+                    return reject(err);
+                })
+            }
+            else {
+                var saveData = new AssignServiceForClient(assignServiceData);
+                saveData.save().then((assignService) => {
+                    log.debug(component, 'Saved Assign Service successfully');
+                    log.close();
+                    return resolve(assignService);
+                }).catch((err) => {
+                    log.error(component, 'Error while saving Assign Service data', { attach: err });
+                    log.close();
+                    return reject(err);
+                })
+            }
+        })();
     })
 }
 
@@ -650,6 +678,104 @@ const getAssignedServicesofStaffbyIdinAllServices = async (inputData) => {
     else return Promise.resolve(clientServiceData);
 }
 
+const onBranchStartToClientPlace = async (inputData) => {
+    console.log("inputData", inputData);
+
+    return new Promise((resolve, reject) => {
+        const options = {
+            method: 'POST',
+            body: {
+                "origin": {
+                    "location": {
+                        "latLng": {
+                            "latitude": inputData.latitude1, // Home Branch Latitude 
+                            "longitude": inputData.longitude1  // Home Branch Longitude
+                        }
+                    }
+                },
+                "destination": {
+                    "location": {
+                        "latLng": {
+                            "latitude": inputData.latitude2,
+                            "longitude": inputData.longitude2
+                        }
+                    }
+                },
+                // "travelMode": "DRIVE",
+                // "routingPreference": "TRAFFIC_AWARE",
+                // "departureTime": "2023-10-15T15:01:23.045123456Z",
+                // "computeAlternativeRoutes": false,
+                // "routeModifiers": {
+                //     "avoidTolls": false,
+                //     "avoidHighways": false,
+                //     "avoidFerries": false
+                // },
+                // "languageCode": "en-US",
+                // "units": "IMPERIAL"
+            },
+            url: 'https://routes.googleapis.com/directions/v2:computeRoutes',
+            headers: {
+                'X-Goog-Api-Key': 'AIzaSyCX_9dtirFHcsQY8zjjR86cettocdHOT50',
+                'Content-Type': 'application/json',
+                'X-Goog-FieldMask': 'routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline'
+            },
+            json: true //Parse the JSON string in the response
+        };
+        request(options, function (error, response, body) {
+            if (error) return reject(error);
+            log.debug('metting response', { attach: response.body }); log.close();
+            console.log("response", response.body);
+            return resolve(response.body);
+        });
+    });
+}
+
+const serviceOnStart = async (inputData) => {
+    let [clientErr, clientData] = await handle(Client.findOne({ '_id': inputData.clientId }));
+    if (clientErr) return Promise.reject(clientErr);
+    return new Promise((resolve, reject) => {
+        const options = {
+            method: 'GET',
+            url: 'https://maps.googleapis.com/maps/api/distancematrix/json?destinations=' + clientData.latitude + ',' + clientData.longitude + '&origins=' + inputData.latitude + ',' + inputData.longitude + '&key=AIzaSyCX_9dtirFHcsQY8zjjR86cettocdHOT50',
+            headers: {
+                'key': 'AIzaSyCX_9dtirFHcsQY8zjjR86cettocdHOT50',
+                'Content-Type': 'application/json'
+            },
+            json: true //Parse the JSON string in the response
+        };
+        request(options, function (error, response, body) {
+            if (error) return reject(error);
+            log.debug('metting response', { attach: response.body }); log.close();
+            console.log("response", response.body);
+            (async () => {
+                let [settingsErr, settingsData] = await handle(Settings.findOne({}));
+                if (settingsErr) return Promise.reject(settingsErr);
+                var status;
+                if (settingsData.averageDistance > response.body.rows[0].elements[0].distance.value) {
+                    status = true;
+                }
+                else {
+                    status = false;
+                }
+                let clientDistanceData = {
+                    staffId: inputData.clientName,
+                    assignedServiceId: inputData.assignedServiceId,
+                    startStatus: status,
+                    startDistance: response.body.rows[0].elements[0].distance.text,
+                    startDistanceValue: response.body.rows[0].elements[0].distance.value
+                }
+                var saveModel = new ClientDistance(clientDistanceData);
+                let [err, clientDataSaved] = await handle(saveModel.save())
+                if (err) return Promise.reject(err);
+            })();
+            return resolve(response.body);
+        });
+    });
+}
+
+const serviceOnEnd = async (inputData) => {
+}
+
 module.exports = {
     assignServiceClient: assignServiceClient,
     assignServiceBranch: assignServiceBranch,
@@ -662,5 +788,8 @@ module.exports = {
     getAllAssignedServicesofAllBranches: getAllAssignedServicesofAllBranches,
     getAllAssignedServicesofAllServices: getAllAssignedServicesofAllServices,
     getAssignedServicesofStaffbyIdinAllBranches: getAssignedServicesofStaffbyIdinAllBranches,
-    getAssignedServicesofStaffbyIdinAllServices: getAssignedServicesofStaffbyIdinAllServices
+    getAssignedServicesofStaffbyIdinAllServices: getAssignedServicesofStaffbyIdinAllServices,
+    onBranchStartToClientPlace: onBranchStartToClientPlace,
+    serviceOnStart: serviceOnStart,
+    serviceOnEnd: serviceOnEnd
 }

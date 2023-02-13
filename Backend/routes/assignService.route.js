@@ -105,4 +105,25 @@ router.get('/allAssignedServices/byStaffId/allServices', async (req, res, next) 
     else return res.status(200).json({ status: true, data: assignServiceData });
 })
 
+/* Start Services from Branch */
+router.post('/onBranchStartToClientPlace', async (req, res, next) => {
+    let [err, onBranchStartData] = await handle(AssignServiceAPI.onBranchStartToClientPlace(req.body));
+    if (err) return next(err);
+    else return res.status(200).json({ status: true, data: onBranchStartData });
+})
+
+/* Start Services from Client Place */
+router.post('/serviceOnStart/client', async (req, res, next) => {
+    let [err, startData] = await handle(AssignServiceAPI.serviceOnStart(req.body));
+    if (err) return next(err);
+    else return res.status(200).json({ status: true, data: startData });
+})
+
+/* End Services from Client Place */
+router.post('/serviceOnEnd/client', async (req, res, next) => {
+    let [err, endData] = await handle(AssignServiceAPI.serviceOnEnd(req.body));
+    if (err) return next(err);
+    else return res.status(200).json({ status: true, data: endData });
+})
+
 module.exports = router;
