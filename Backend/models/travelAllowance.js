@@ -4,7 +4,7 @@ const travelAllowanceSchema = new mongoose.Schema({
     staffId: { type: String },
     clientId: { type: String },
     assignedServiceId: { type: String },
-    date: { type: String },
+    date: { type: Date },
     distanceInMeters: { type: Number },
     distanceInKiloMeters: { type: Number },
     durationInSeconds: { type: Number },

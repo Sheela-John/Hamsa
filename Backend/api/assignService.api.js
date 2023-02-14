@@ -733,9 +733,7 @@ const onBranchStartToClientPlace = async (inputData) => {
                 if (settingsErr) return Promise.reject(settingsErr);
                 let [serviceErr, servicesData] = await handle(AssignServiceForClient.findOne({ '_id': inputData.assignedServiceId }));
                 if (serviceErr) return Promise.reject(serviceErr);
-                console.log(settingsData, "response.body", response.body);
                 let amountForOneMetre = (settingsData.TravelExpenseCost / settingsData.averageDistance)
-                console.log("amountForOneMetre", amountForOneMetre);
                 let durationforMinutes = parseFloat(response.body.routes[0].duration)
                 let travelAllowanceData = {
                     clientId: servicesData.clientId,
