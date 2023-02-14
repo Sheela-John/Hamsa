@@ -4,10 +4,12 @@ const models = require('../models');
 const Security = require("../util/security");
 const Staff = models.Staff;
 const AssignServiceForClient = models.AssignServiceForClient;
-const assignServiceForBranch = models.AssignServiceForBranch;
+const AssignServiceForBranch = models.AssignServiceForBranch;
 const Client = models.Client;
 const ClientDistance = models.clientDistance;
 const Settings = models.Settings;
+const Branch = models.Branch;
+const TravelAllowance = models.TravelAllowance;
 const lodash = require('lodash');
 const ERR = require('../errors.json');
 const uuid = require('../util/misc');
@@ -26,7 +28,7 @@ const multer = require('multer')
 const multerS3 = require('multer-s3');
 const moment = require('moment');
 const momentTz = require('moment-timezone');
-const { AssignServiceForBranch } = require('../models');
+const { assignServiceForBranch } = require('../models');
 const generateRandomPassword = require('../util/generateCode').randomString;
 const genrateDefaultImage = require('../util/generateCode').genrateDefaultImage;
 const request = require('request');
@@ -136,7 +138,7 @@ const assignServiceBranch = async (assignServiceData) => {
     assignServiceData['endTime'] = assignServiceData.endTime;
 
     delete assignServiceData._id;
-    var saveData = new assignServiceForBranch(assignServiceData);
+    var saveData = new AssignServiceForBranch(assignServiceData);
     return new Promise((resolve, reject) => {
         saveData.save().then((assignService) => {
             log.debug(component, 'Saved Assign Service successfully');
@@ -229,7 +231,7 @@ const getAssignedServicesbyStaff = async (data) => {
                 "$unwind": "$branchData"
             }
         ];
-    let [branchServiceErr, branchServiceData] = await handle(assignServiceForBranch.aggregate(query2));
+    let [branchServiceErr, branchServiceData] = await handle(AssignServiceForBranch.aggregate(query2));
     array.push(branchServiceData[0]);
     if (branchServiceErr) return Promise.reject(branchServiceErr);
     else return Promise.resolve(array);
@@ -277,7 +279,7 @@ const getAllAssignedServices = async () => {
     if (err) return Promise.reject(err);
     else if (lodash.isEmpty(clientServicesData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
 
-    let [clientBranchErr, clientBranchData] = await handle(assignServiceForBranch.find({}).lean());
+    let [clientBranchErr, clientBranchData] = await handle(AssignServiceForBranch.find({}).lean());
     for (let i = 0; i < clientBranchData.length; i++) {
         var query = [
             { $match: { '_id': mongoose.Types.ObjectId(clientBranchData[i]._id) } },
@@ -310,7 +312,7 @@ const getAllAssignedServices = async () => {
                 "$unwind": "$branchData"
             }
         ];
-        var [clientBranchAllDataErr, clientBranchAllData] = await handle(assignServiceForBranch.aggregate(query));
+        var [clientBranchAllDataErr, clientBranchAllData] = await handle(AssignServiceForBranch.aggregate(query));
         data.push(clientBranchAllData[0]);
         if (clientBranchAllDataErr) return Promise.reject(clientBranchAllDataErr);
     }
@@ -390,7 +392,7 @@ const getAllAssignedServicesforStaff = async (inputData) => {
             "$unwind": "$branchData"
         }
     ];
-    var [clientBranchAllDataErr, clientBranchAllData] = await handle(assignServiceForBranch.aggregate(query));
+    var [clientBranchAllDataErr, clientBranchAllData] = await handle(AssignServiceForBranch.aggregate(query));
     for (let i = 0; i < clientBranchAllData.length; i++) {
         data.push(clientBranchAllData[i]);
     } if (clientBranchAllDataErr) return Promise.reject(clientBranchAllDataErr);
@@ -430,7 +432,7 @@ const getAllAssignedServicesbySingleBranch = async (inputData) => {
             "$unwind": "$branchData"
         }
     ];
-    var [clientBranchAllDataErr, clientBranchAllData] = await handle(assignServiceForBranch.aggregate(query));
+    var [clientBranchAllDataErr, clientBranchAllData] = await handle(AssignServiceForBranch.aggregate(query));
     if (clientBranchAllDataErr) return Promise.reject(clientBranchAllDataErr);
     else return Promise.resolve(clientBranchAllData);
 }
@@ -513,7 +515,7 @@ const getAllAssignedServicesbyServiceId = async (inputData) => {
 
 const getAllAssignedServicesofAllBranches = async () => {
     var data = [];
-    let [clientBranchErr, clientBranchData] = await handle(assignServiceForBranch.find({}).lean());
+    let [clientBranchErr, clientBranchData] = await handle(AssignServiceForBranch.find({}).lean());
     for (let i = 0; i < clientBranchData.length; i++) {
         var query = [
             { $match: { '_id': mongoose.Types.ObjectId(clientBranchData[i]._id) } },
@@ -546,7 +548,7 @@ const getAllAssignedServicesofAllBranches = async () => {
                 "$unwind": "$branchData"
             }
         ];
-        var [clientBranchAllDataErr, clientBranchAllData] = await handle(assignServiceForBranch.aggregate(query));
+        var [clientBranchAllDataErr, clientBranchAllData] = await handle(AssignServiceForBranch.aggregate(query));
         data.push(clientBranchAllData[0]);
         if (clientBranchAllDataErr) return Promise.reject(clientBranchAllDataErr);
     }
@@ -631,7 +633,7 @@ const getAssignedServicesofStaffbyIdinAllBranches = async (inputData) => {
             "$unwind": "$branchData"
         }
     ];
-    var [clientBranchAllDataErr, clientBranchAllData] = await handle(assignServiceForBranch.aggregate(query));
+    var [clientBranchAllDataErr, clientBranchAllData] = await handle(AssignServiceForBranch.aggregate(query));
     if (clientBranchAllDataErr) return Promise.reject(clientBranchAllDataErr);
     else return Promise.resolve(clientBranchAllData);
 }
@@ -679,7 +681,10 @@ const getAssignedServicesofStaffbyIdinAllServices = async (inputData) => {
 }
 
 const onBranchStartToClientPlace = async (inputData) => {
-
+    let [staffErr, staffData] = await handle(Staff.findOne({ '_id': inputData.staffId }));
+    if (staffErr) return Promise.reject(staffErr);
+    let [branchErr, branchData] = await handle(Branch.findOne({ '_id': staffData.branch }));
+    if (branchErr) return Promise.reject(branchErr);
     return new Promise((resolve, reject) => {
         const options = {
             method: 'POST',
@@ -687,16 +692,16 @@ const onBranchStartToClientPlace = async (inputData) => {
                 "origin": {
                     "location": {
                         "latLng": {
-                            "latitude": inputData.latitude1, // Home Branch Latitude 
-                            "longitude": inputData.longitude1  // Home Branch Longitude
+                            "latitude": branchData.latitude, // Home Branch Latitude 
+                            "longitude": branchData.longitude  // Home Branch Longitude
                         }
                     }
                 },
                 "destination": {
                     "location": {
                         "latLng": {
-                            "latitude": inputData.latitude2,
-                            "longitude": inputData.longitude2
+                            "latitude": inputData.latitude,
+                            "longitude": inputData.longitude
                         }
                     }
                 },
@@ -722,7 +727,31 @@ const onBranchStartToClientPlace = async (inputData) => {
         };
         request(options, function (error, response, body) {
             if (error) return reject(error);
-            log.debug('metting response', { attach: response.body }); log.close();
+            log.debug('Travel Distance response', { attach: response.body }); log.close();
+            (async () => {
+                let [settingsErr, settingsData] = await handle(Settings.findOne({}));
+                if (settingsErr) return Promise.reject(settingsErr);
+                let [serviceErr, servicesData] = await handle(AssignServiceForClient.findOne({ '_id': inputData.assignedServiceId }));
+                if (serviceErr) return Promise.reject(serviceErr);
+                console.log(settingsData, "response.body", response.body);
+                let amountForOneMetre = (settingsData.TravelExpenseCost / settingsData.averageDistance)
+                console.log("amountForOneMetre", amountForOneMetre);
+                let durationforMinutes = parseFloat(response.body.routes[0].duration)
+                let travelAllowanceData = {
+                    clientId: servicesData.clientId,
+                    staffId: inputData.staffId,
+                    date: servicesData.date,
+                    assignedServiceId: inputData.assignedServiceId,
+                    distanceInMeters: response.body.routes[0].distanceMeters,
+                    distanceInKiloMeters: (response.body.routes[0].distanceMeters / 1000),
+                    durationInSeconds: parseFloat(response.body.routes[0].duration),
+                    durationInMinutes: Math.floor(durationforMinutes / 60),
+                    travelAllowanceCost: amountForOneMetre * response.body.routes[0].distanceMeters
+                }
+                var saveModel = new TravelAllowance(travelAllowanceData);
+                let [err, clientDataSaved] = await handle(saveModel.save())
+                if (err) return Promise.reject(err);
+            })();
             return resolve(response.body);
         });
     });

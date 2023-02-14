@@ -8,7 +8,7 @@ const staffSchema = new mongoose.Schema({
     Address: { type: String },
     staffRole: { type: String },
     role: { type: String },
-    Branch: { type: String },
+    branch: { type: String },
     gender: { type: Number },
     dob: { type: Date },
     defaultImageUrl: { type: String },

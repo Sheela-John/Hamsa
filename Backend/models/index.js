@@ -12,5 +12,6 @@ db.AssignServiceForBranch = require('./assignServiceforBranch');
 db.Client = require('./client');
 db.Services = require('./services');
 db.clientDistance = require('./clientDistance');
+db.TravelAllowance = require('./travelAllowance');
 
 module.exports = db;

@@ -435,6 +435,27 @@ async function findAdminById(adminId) {
     return Promise.resolve(adminData);
 }
 
+const find = {
+    profile: function (userData) {
+        return new Promise((resolve, reject) => {
+            if (userData.role == 'PORTAL_STAFF') {
+                Staff.findOne({ '_id': userData.id }).lean().exec((err, user) => {
+                    if (err) {
+                        log.error(component, { attach: err });
+                        log.close();
+                        return reject(err);
+                    }
+                    else if (!lodash.isEmpty(user)) {
+                        /* Deleting location Key if it is empty */
+                        return resolve(removeSecuredKeys(user));
+                    }
+                    else return reject(ERR.NO_SUCH_ID)
+                })
+            }
+        })
+    }
+}
+
 module.exports = {
     create: create,
     UpdateStaff: UpdateStaff,
@@ -446,5 +467,6 @@ module.exports = {
     updateUserforForgotPassword: updateUserforForgotPassword,
     createAdmin: createAdmin,
     findAllAdmin: findAllAdmin,
-    findAdminById: findAdminById
+    findAdminById: findAdminById,
+    find: find
 }
