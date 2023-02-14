@@ -679,7 +679,6 @@ const getAssignedServicesofStaffbyIdinAllServices = async (inputData) => {
 }
 
 const onBranchStartToClientPlace = async (inputData) => {
-    console.log("inputData", inputData);
 
     return new Promise((resolve, reject) => {
         const options = {
@@ -724,7 +723,6 @@ const onBranchStartToClientPlace = async (inputData) => {
         request(options, function (error, response, body) {
             if (error) return reject(error);
             log.debug('metting response', { attach: response.body }); log.close();
-            console.log("response", response.body);
             return resolve(response.body);
         });
     });
@@ -745,8 +743,7 @@ const serviceOnStart = async (inputData) => {
         };
         request(options, function (error, response, body) {
             if (error) return reject(error);
-            log.debug('metting response', { attach: response.body }); log.close();
-            console.log("response", response.body);
+            log.debug('Start Service response', { attach: response.body }); log.close();
             (async () => {
                 let [settingsErr, settingsData] = await handle(Settings.findOne({}));
                 if (settingsErr) return Promise.reject(settingsErr);
@@ -757,8 +754,12 @@ const serviceOnStart = async (inputData) => {
                 else {
                     status = false;
                 }
+                let [serviceErr, serviceData] = await handle(AssignServiceForClient.findOne({ '_id': inputData.assignedServiceId }));
+                if (serviceErr) return Promise.reject(serviceErr);
                 let clientDistanceData = {
-                    staffId: inputData.clientName,
+                    clientId: inputData.clientId,
+                    staffId: serviceData.staffId,
+                    date: serviceData.date,
                     assignedServiceId: inputData.assignedServiceId,
                     startStatus: status,
                     startDistance: response.body.rows[0].elements[0].distance.text,
@@ -774,6 +775,55 @@ const serviceOnStart = async (inputData) => {
 }
 
 const serviceOnEnd = async (inputData) => {
+    let [clientErr, clientData] = await handle(Client.findOne({ '_id': inputData.clientId }));
+    if (clientErr) return Promise.reject(clientErr);
+    return new Promise((resolve, reject) => {
+        const options = {
+            method: 'GET',
+            url: 'https://maps.googleapis.com/maps/api/distancematrix/json?destinations=' + clientData.latitude + ',' + clientData.longitude + '&origins=' + inputData.latitude + ',' + inputData.longitude + '&key=AIzaSyCX_9dtirFHcsQY8zjjR86cettocdHOT50',
+            headers: {
+                'key': 'AIzaSyCX_9dtirFHcsQY8zjjR86cettocdHOT50',
+                'Content-Type': 'application/json'
+            },
+            json: true //Parse the JSON string in the response
+        };
+        request(options, function (error, response, body) {
+            if (error) return reject(error);
+            log.debug('End Service response', { attach: response.body }); log.close();
+            (async () => {
+                let [settingsErr, settingsData] = await handle(Settings.findOne({}));
+                if (settingsErr) return Promise.reject(settingsErr);
+                var updateStatus;
+                if (settingsData.averageDistance > response.body.rows[0].elements[0].distance.value) {
+                    updateStatus = true;
+                }
+                else {
+                    updateStatus = false;
+                }
+                let [distanceErr, distanceData] = await handle(ClientDistance.findOne({ "assignedServiceId": inputData.assignedServiceId }));
+                if (distanceErr) return Promise.reject(distanceErr);
+                var assignServiceStatus;
+                if (distanceData.startStatus == true && updateStatus == true) {
+                    assignServiceStatus = 0 // 0 - Completed
+                }
+                if (distanceData.startStatus == true && updateStatus == false) {
+                    assignServiceStatus = 2 // End Distance Mismatch
+                }
+                if (distanceData.startStatus == false && updateStatus == true) {
+                    assignServiceStatus = 1 // Start Distance Mismatch
+                }
+                let updatedData = {
+                    endStatus: updateStatus,
+                    endDistance: response.body.rows[0].elements[0].distance.text,
+                    endDistanceValue: response.body.rows[0].elements[0].distance.value,
+                    status: assignServiceStatus
+                }
+                let [updateDistanceValueErr, updateDistanceValue] = await handle(ClientDistance.findOneAndUpdate({ "assignedServiceId": inputData.assignedServiceId }, updatedData, { new: true, useFindAndModify: false }))
+                if (updateDistanceValueErr) return Promise.reject(updateDistanceValueErr);
+            })();
+            return resolve(response.body);
+        });
+    });
 }
 
 module.exports = {

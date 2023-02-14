@@ -2,10 +2,11 @@ const mongoose = require('mongoose');
 
 const clientDistanceSchema = new mongoose.Schema({
     staffId: { type: String },
+    clientId: { type: String },
     assignedServiceId: { type: String },
     date: { type: String },
-    startStatus: { type: String },
-    endStatus: { type: String },
+    startStatus: { type: Boolean },
+    endStatus: { type: Boolean },
     startDistance: { type: String },
     startDistanceValue: { type: Number },
     endDistance: { type: String },
