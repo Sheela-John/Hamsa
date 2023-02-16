@@ -43,7 +43,15 @@ const handle = (promise) => {
 /* Create Settings */
 async function create(settingsData) {
     log.debug(component, 'Creating a Settings', { 'attach': settingsData }); log.close();
+    var todayDate = new Date().toISOString().slice(0, 10);
+    settingsData.date = new Date(todayDate);
+    let someDate = settingsData.date
+    let copiedAppointmentDate = new Date(someDate.getTime());
+    settingsData['startDate'] = copiedAppointmentDate;
+    settingsData['endDate'] = copiedAppointmentDate;
     var saveModel = new Settings(settingsData);
+    saveModel.createdAt = copiedAppointmentDate;
+    saveModel.updatedAt = copiedAppointmentDate;
     let [err, settingsDataSaved] = await handle(saveModel.save())
     if (err) return Promise.reject(err);
     else return Promise.resolve(settingsDataSaved)
@@ -52,11 +60,30 @@ async function create(settingsData) {
 /* To Update Settings - API */
 const UpdateSettings = async function (datatoupdate) {
     log.debug(component, 'Updating a Settings', { 'attach': datatoupdate }); log.close();
-    let settingsId = datatoupdate._id;
-    delete datatoupdate._id
-    let [settingsErr, settingsData] = await handle(Settings.findOneAndUpdate({ "_id": settingsId }, datatoupdate, { new: true, useFindAndModify: false }))
-    if (settingsErr) return Promise.reject(settingsErr);
-    else return Promise.resolve(settingsData);
+    let [findSettingsErr, findSettingsData] = await handle(Settings.find({}));
+    if (findSettingsErr) return Promise.reject(findSettingsErr);
+    var last = findSettingsData[findSettingsData.length - 1]
+    var todayDate = new Date().toISOString().slice(0, 10);
+    datatoupdate.date = new Date(todayDate);
+    let someDate = datatoupdate.date
+    let copiedAppointmentDate = new Date(someDate.getTime());
+    if (last.endDate.getTime() == copiedAppointmentDate.getTime()) {
+        let [err, updateSettings] = await handle(Settings.findOneAndUpdate({ "_id": last._id }, datatoupdate, { new: true, useFindAndModify: false }))
+        if (err) return Promise.reject(err);
+        else return Promise.resolve(updateSettings);
+    }
+    else {
+        let [err, updateSettings] = await handle(Settings.findOneAndUpdate({ "_id": last._id }, { '$set': { 'endDate': copiedAppointmentDate } }, { new: true, useFindAndModify: false }))
+        if (err) return Promise.reject(err);
+        datatoupdate['startDate'] = copiedAppointmentDate;
+        datatoupdate['endDate'] = copiedAppointmentDate;
+        var saveModel = new Settings(datatoupdate);
+        saveModel.createdAt = copiedAppointmentDate;
+        saveModel.updatedAt = copiedAppointmentDate;
+        let [settingsErr, settingsData] = await handle(saveModel.save())
+        if (settingsErr) return Promise.reject(settingsErr);
+        else return Promise.resolve(settingsData);
+    }
 }
 
 /* Get Settings by Id */
@@ -75,7 +102,8 @@ async function getAllSettingsDetails() {
     let [err, settingsData] = await handle(Settings.find({}).lean());
     if (err) return Promise.reject(err);
     if (lodash.isEmpty(settingsData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
-    return Promise.resolve(settingsData);
+    var last = settingsData[settingsData.length - 1]
+    return Promise.resolve(last);
 }
 
 /* Enable / Disable Settings By Settings Id */

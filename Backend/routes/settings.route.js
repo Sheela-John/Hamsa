@@ -23,9 +23,8 @@ router.post('/', async (req, res, next) => {
 })
 
     /* Update Settings API */
-    .put('/:_id', async (req, res, next) => {
+    .put('/', async (req, res, next) => {
         if (lodash.isEmpty(req.body)) return next(ERR.MANDATORY_FIELD_MISSING)
-        req.body._id = req.params._id;
         let [err, settingsData] = await handle(SettingsAPI.UpdateSettings(req.body));
         if (err) return next(err);
         else return res.status(200).json({ status: true, data: settingsData, message: "Settings Updated Successfully!" });

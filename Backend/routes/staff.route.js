@@ -98,7 +98,6 @@ router.post('/', async (req, res, next) => {
             role: req.user.scope,
             id: req.user.user
         }
-        console.log("userData", userData);
         let [err, userdata] = await handle(StaffAPI.find.profile(userData));
         if (err) return next(err);
         else return res.status(200).json({ status: true, data: userdata });

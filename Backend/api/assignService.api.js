@@ -57,7 +57,7 @@ const assignServiceClient = async (assignServiceData) => {
     if (staffErr) return Promise.reject(staffErr);
     if (lodash.isEmpty(staffData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
 
-    assignServiceData.status = 1;
+    assignServiceData.status = 0;
     assignServiceData.date = new Date(assignServiceData.date);
     let someDate = assignServiceData.date
     let copiedAppointmentDate = new Date(someDate.getTime());
@@ -68,6 +68,9 @@ const assignServiceClient = async (assignServiceData) => {
     delete assignServiceData._id;
     return new Promise((resolve, reject) => {
         (async () => {
+            let [findStaffErr, staffNameData] = await handle(Staff.findOne({ '_id': mongoose.Types.ObjectId(assignServiceData.staffId) }));
+            if (findStaffErr) return Promise.reject(findStaffErr);
+            assignServiceData['staffName'] = staffNameData.staffName;
             let [findClientErr, findClientData] = await handle(Client.findOne({ 'clientName': assignServiceData.clientName, 'phone': assignServiceData.phone }));
             if (findClientErr) return Promise.reject(findClientErr);
             if (findClientData == undefined) {
@@ -127,7 +130,7 @@ const assignServiceBranch = async (assignServiceData) => {
     if (staffErr) return Promise.reject(staffErr);
     if (lodash.isEmpty(staffData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
 
-    assignServiceData.status = 1;
+    assignServiceData.status = 0;
     assignServiceData.date = new Date(assignServiceData.date);
     let copiedAppointmentDate = new Date(assignServiceData.date.getTime());
     assignServiceData['date'] = copiedAppointmentDate;
@@ -729,8 +732,10 @@ const onBranchStartToClientPlace = async (inputData) => {
             if (error) return reject(error);
             log.debug('Travel Distance response', { attach: response.body }); log.close();
             (async () => {
-                let [settingsErr, settingsData] = await handle(Settings.findOne({}));
+                let [settingsErr, settingsDataFind] = await handle(Settings.find({}).lean());
                 if (settingsErr) return Promise.reject(settingsErr);
+                if (lodash.isEmpty(settingsDataFind)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+                var settingsData = settingsDataFind[settingsDataFind.length - 1]
                 let [serviceErr, servicesData] = await handle(AssignServiceForClient.findOne({ '_id': inputData.assignedServiceId }));
                 if (serviceErr) return Promise.reject(serviceErr);
                 let amountForOneMetre = (settingsData.TravelExpenseCost / settingsData.averageDistance)
@@ -772,8 +777,10 @@ const serviceOnStart = async (inputData) => {
             if (error) return reject(error);
             log.debug('Start Service response', { attach: response.body }); log.close();
             (async () => {
-                let [settingsErr, settingsData] = await handle(Settings.findOne({}));
+                let [settingsErr, settingsDataFind] = await handle(Settings.find({}).lean());
                 if (settingsErr) return Promise.reject(settingsErr);
+                if (lodash.isEmpty(settingsDataFind)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+                var settingsData = settingsDataFind[settingsDataFind.length - 1]
                 var status;
                 if (settingsData.averageDistance > response.body.rows[0].elements[0].distance.value) {
                     status = true;
@@ -818,8 +825,10 @@ const serviceOnEnd = async (inputData) => {
             if (error) return reject(error);
             log.debug('End Service response', { attach: response.body }); log.close();
             (async () => {
-                let [settingsErr, settingsData] = await handle(Settings.findOne({}));
+                let [settingsErr, settingsDataFind] = await handle(Settings.find({}).lean());
                 if (settingsErr) return Promise.reject(settingsErr);
+                if (lodash.isEmpty(settingsDataFind)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+                var settingsData = settingsDataFind[settingsDataFind.length - 1]
                 var updateStatus;
                 if (settingsData.averageDistance > response.body.rows[0].elements[0].distance.value) {
                     updateStatus = true;
@@ -847,6 +856,17 @@ const serviceOnEnd = async (inputData) => {
                 }
                 let [updateDistanceValueErr, updateDistanceValue] = await handle(ClientDistance.findOneAndUpdate({ "assignedServiceId": inputData.assignedServiceId }, updatedData, { new: true, useFindAndModify: false }))
                 if (updateDistanceValueErr) return Promise.reject(updateDistanceValueErr);
+                let d = new Date();
+                let date2 = d.getTime() + (5.5 * 60 * 60 * 1000)
+                var updateStatusforAssignedService;
+                if (updateDistanceValue.status == 0) {
+                    updateStatusforAssignedService = 1
+                }
+                else if (updateDistanceValue.status == 1 || updateDistanceValue.status == 2) {
+                    updateStatusforAssignedService = 4
+                }
+                let [assignServiceForClientValueErr, assignServiceForClientValue] = await handle(AssignServiceForClient.findOneAndUpdate({ "_id": inputData.assignedServiceId }, { "$set": { "serviceEndTime": date2, 'status': updateStatusforAssignedService } }, { new: true, useFindAndModify: false }))
+                if (assignServiceForClientValueErr) return Promise.reject(assignServiceForClientValueErr);
             })();
             return resolve(response.body);
         });
