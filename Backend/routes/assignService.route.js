@@ -31,7 +31,7 @@ router.post('/branch', async (req, res, next) => {
 })
 
 /* Get All Assigned Services by Single Staff for Single Date */
-router.get('/assignedServicesbyStaff/date', async (req, res, next) => {
+router.post('/assignedServicesbyStaff/date', async (req, res, next) => {
     if (lodash.isEmpty(req.body)) return next(ERR.MANDATORY_FIELD_MISSING);
     let [err, assignServiceData] = await handle(AssignServiceAPI.getAssignedServicesbyStaff(req.body));
     if (err) return next(err);

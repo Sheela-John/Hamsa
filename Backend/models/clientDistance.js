@@ -4,7 +4,7 @@ const clientDistanceSchema = new mongoose.Schema({
     staffId: { type: String },
     clientId: { type: String },
     assignedServiceId: { type: String },
-    date: { type: String },
+    date: { type: Date },
     startStatus: { type: Boolean },
     endStatus: { type: Boolean },
     startDistance: { type: String },

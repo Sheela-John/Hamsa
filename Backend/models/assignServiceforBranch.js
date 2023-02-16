@@ -5,10 +5,10 @@ const assignServiceForBranchSchema = new mongoose.Schema({
     date: { type: Date },
     branchId: { type: String },
     branchAddress: { type: String },
-    phone: { type: String },
+    phoneForBranch: { type: String },
     startTime: { type: Date },
     endTime: { type: Date },
-    status: { type: Number, default: 0 } /* 0 - Active ,  1 - Deleted , 2 - Disabled */
+    status: { type: Number, default: 0 } /* 0 - Assigned ,  1 - Completed , 2 - Rescheduled , 3 - Not Available */
 }, {
     collection: 'assignServiceForBranch',
     versionKey: false,
