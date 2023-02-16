@@ -45,6 +45,13 @@ router.get('/allAssignedServices', async (req, res, next) => {
     else return res.status(200).json({ status: true, data: assignServiceData });
 })
 
+/* Get All Assigned Services */
+router.get('/:id', async (req, res, next) => {
+    let [err, assignServiceData] = await handle(AssignServiceAPI.getAssignedServicesById(req.params.id));
+    if (err) return next(err);
+    else return res.status(200).json({ status: true, data: assignServiceData });
+})
+
 /* Get All Assigned Services ( Client & Branch ) - Single Staff Id */
 router.get('/allAssignedServicesforStaff', async (req, res, next) => {
     if (lodash.isEmpty(req.body)) return next(ERR.MANDATORY_FIELD_MISSING);
@@ -70,7 +77,7 @@ router.get('/allAssignedServices/byClient', async (req, res, next) => {
 })
 
 /* Get All Assigned Services by Single Service Id */
-router.get('/allAssignedServices/byService', async (req, res, next) => {
+router.post('/allAssignedServices/byService', async (req, res, next) => {
     if (lodash.isEmpty(req.body)) return next(ERR.MANDATORY_FIELD_MISSING);
     let [err, assignServiceData] = await handle(AssignServiceAPI.getAllAssignedServicesbyServiceId(req.body));
     if (err) return next(err);

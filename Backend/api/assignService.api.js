@@ -873,6 +873,55 @@ const serviceOnEnd = async (inputData) => {
     });
 }
 
+const getAssignedServicesById = async (serviceClientId) => {
+    var query = [
+        { $match: { '_id': mongoose.Types.ObjectId(serviceClientId) } },
+        {
+            '$addFields': {
+                'user_id': { $toObjectId: "$staffId" },
+                'serviceId': { $toObjectId: "$service" },
+                'clientObjId': { $toObjectId: "$clientId" },
+            }
+        },
+        {
+            '$lookup': {
+                'from': 'staff',
+                'localField': 'user_id',
+                'foreignField': '_id',
+                'as': 'staffData'
+            }
+        },
+        {
+            "$unwind": "$staffData"
+        },
+        {
+            '$lookup': {
+                'from': 'services',
+                'localField': 'serviceId',
+                'foreignField': '_id',
+                'as': 'servicesData'
+            }
+        },
+        {
+            "$unwind": "$servicesData"
+        },
+        {
+            '$lookup': {
+                'from': 'client',
+                'localField': 'clientObjId',
+                'foreignField': '_id',
+                'as': 'clientData'
+            }
+        },
+        {
+            "$unwind": "$clientData"
+        }
+    ];
+    var [clientServicesAllDataErr, clientServicesDatabyId] = await handle(AssignServiceForClient.aggregate(query));
+    if (clientServicesAllDataErr) return Promise.reject(clientServicesAllDataErr);
+    else return Promise.resolve(clientServicesDatabyId[0])
+}
+
 module.exports = {
     assignServiceClient: assignServiceClient,
     assignServiceBranch: assignServiceBranch,
@@ -888,5 +937,6 @@ module.exports = {
     getAssignedServicesofStaffbyIdinAllServices: getAssignedServicesofStaffbyIdinAllServices,
     onBranchStartToClientPlace: onBranchStartToClientPlace,
     serviceOnStart: serviceOnStart,
-    serviceOnEnd: serviceOnEnd
+    serviceOnEnd: serviceOnEnd,
+    getAssignedServicesById: getAssignedServicesById
 }
