@@ -922,6 +922,43 @@ const getAssignedServicesById = async (serviceClientId) => {
     else return Promise.resolve(clientServicesDatabyId[0])
 }
 
+const getAssignedServicesofBranchById = async (serviceBranchId) => {
+    var query = [
+        { $match: { '_id': mongoose.Types.ObjectId(serviceBranchId) } },
+        {
+            '$addFields': {
+                'user_id': { $toObjectId: "$staffId" },
+                'branch_id': { $toObjectId: "$branchId" }
+            }
+        },
+        {
+            '$lookup': {
+                'from': 'staff',
+                'localField': 'user_id',
+                'foreignField': '_id',
+                'as': 'staffData'
+            }
+        },
+        {
+            "$unwind": "$staffData"
+        },
+        {
+            '$lookup': {
+                'from': 'branch',
+                'localField': 'branch_id',
+                'foreignField': '_id',
+                'as': 'branchData'
+            }
+        },
+        {
+            "$unwind": "$branchData"
+        }
+    ];
+    var [clientServicesAllDataErr, clientServicesDatabyId] = await handle(AssignServiceForBranch.aggregate(query));
+    if (clientServicesAllDataErr) return Promise.reject(clientServicesAllDataErr);
+    else return Promise.resolve(clientServicesDatabyId[0])
+}
+
 module.exports = {
     assignServiceClient: assignServiceClient,
     assignServiceBranch: assignServiceBranch,
@@ -938,5 +975,6 @@ module.exports = {
     onBranchStartToClientPlace: onBranchStartToClientPlace,
     serviceOnStart: serviceOnStart,
     serviceOnEnd: serviceOnEnd,
-    getAssignedServicesById: getAssignedServicesById
+    getAssignedServicesById: getAssignedServicesById,
+    getAssignedServicesofBranchById: getAssignedServicesofBranchById
 }

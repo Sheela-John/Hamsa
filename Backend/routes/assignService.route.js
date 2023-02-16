@@ -45,9 +45,16 @@ router.get('/allAssignedServices', async (req, res, next) => {
     else return res.status(200).json({ status: true, data: assignServiceData });
 })
 
-/* Get All Assigned Services */
+/* Get All Assigned Services - Of Client */
 router.get('/:id', async (req, res, next) => {
     let [err, assignServiceData] = await handle(AssignServiceAPI.getAssignedServicesById(req.params.id));
+    if (err) return next(err);
+    else return res.status(200).json({ status: true, data: assignServiceData });
+})
+
+/* Get All Assigned Services - Of Branch */
+router.get('/ofBranch/:id', async (req, res, next) => {
+    let [err, assignServiceData] = await handle(AssignServiceAPI.getAssignedServicesofBranchById(req.params.id));
     if (err) return next(err);
     else return res.status(200).json({ status: true, data: assignServiceData });
 })
