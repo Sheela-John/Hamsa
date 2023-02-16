@@ -140,4 +140,20 @@ router.post('/serviceOnEnd/client', async (req, res, next) => {
     else return res.status(200).json({ status: true, data: endData });
 })
 
+/* Update Client Service */
+router.put('/updateClient/:id', async (req, res, next) => {
+    req.body.clientServiceId = req.params.id;
+    let [err, updateData] = await handle(AssignServiceAPI.updateClient(req.body));
+    if (err) return next(err);
+    else return res.status(200).json({ status: true, data: updateData });
+})
+
+/* Update Branch Service */
+router.put('/updateBranch/:id', async (req, res, next) => {
+    req.body.clientBranchId = req.params.id;
+    let [err, updateData] = await handle(AssignServiceAPI.updateBranch(req.body));
+    if (err) return next(err);
+    else return res.status(200).json({ status: true, data: updateData });
+})
+
 module.exports = router;

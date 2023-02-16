@@ -111,10 +111,10 @@ const therapistReport = async (data) => {
             return objectsByKeyValue;
         }, {});
 
-    const groupByBrandAndYear = groupBy(["staffId", "status"]);
+    const groupByStaffIdAndStatus = groupBy(["staffId", "status"]);
 
     const brandYearCount = Object
-        .entries(groupByBrandAndYear(therapistReportData1))
+        .entries(groupByStaffIdAndStatus(therapistReportData1))
         .map(([, value]) =>
         ({
             staffId: value[0].staffId,
@@ -146,7 +146,32 @@ const therapistReport = async (data) => {
     return Promise.resolve(result);
 }
 
+const attendenceReport = async (data) => {
+    var query = [
+        {
+            '$match': {
+                'date': { '$gte': new Date(data.startDate), '$lte': new Date(data.endDate) },
+                'staffId': data.staffId
+            }
+        },
+    ]
+    let [clientErr, clientData] = await handle(AssignServiceForClient.aggregate(query));
+    if (clientErr) return Promise.reject(clientErr);
+    var query = [
+        {
+            '$match': {
+                'date': { '$gte': new Date(data.startDate), '$lte': new Date(data.endDate) },
+                'staffId': data.staffId
+            }
+        },
+    ]
+    let [branchErr, branchData] = await handle(AssignServiceForBranch.aggregate(query));
+    if (branchErr) return Promise.reject(branchErr);
+    else return Promise.resolve(branchData);
+}
+
 module.exports = {
     activityReport: activityReport,
-    therapistReport: therapistReport
+    therapistReport: therapistReport,
+    attendenceReport: attendenceReport
 }

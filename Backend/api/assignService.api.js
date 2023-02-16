@@ -168,7 +168,8 @@ const getAssignedServicesbyStaff = async (data) => {
             {
                 '$addFields': {
                     'user_id': { $toObjectId: "$staffId" },
-                    'serviceId': { $toObjectId: "$service" }
+                    'serviceId': { $toObjectId: "$service" },
+                    'clientObjId': { $toObjectId: "$clientId" }
                 }
             },
             {
@@ -192,6 +193,17 @@ const getAssignedServicesbyStaff = async (data) => {
             },
             {
                 "$unwind": "$servicesData"
+            },
+            {
+                '$lookup': {
+                    'from': 'client',
+                    'localField': 'clientObjId',
+                    'foreignField': '_id',
+                    'as': 'clientData'
+                }
+            },
+            {
+                "$unwind": "$clientData"
             }
         ];
     let [clientServiceErr, clientServiceData] = await handle(AssignServiceForClient.aggregate(query1));
@@ -959,6 +971,15 @@ const getAssignedServicesofBranchById = async (serviceBranchId) => {
     else return Promise.resolve(clientServicesDatabyId[0])
 }
 
+const updateClient = async (data) => {
+    let [staffErr, staffData] = await handle(Staff.findOne({ '_id': assignServiceData.staffId }).lean());
+    if (staffErr) return Promise.reject(staffErr);
+    if (lodash.isEmpty(staffData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+}
+
+const updateBranch = async (data) => {
+}
+
 module.exports = {
     assignServiceClient: assignServiceClient,
     assignServiceBranch: assignServiceBranch,
@@ -976,5 +997,7 @@ module.exports = {
     serviceOnStart: serviceOnStart,
     serviceOnEnd: serviceOnEnd,
     getAssignedServicesById: getAssignedServicesById,
-    getAssignedServicesofBranchById: getAssignedServicesofBranchById
+    getAssignedServicesofBranchById: getAssignedServicesofBranchById,
+    updateClient: updateClient,
+    updateBranch: updateBranch
 }
