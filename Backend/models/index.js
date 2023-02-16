@@ -13,5 +13,6 @@ db.Client = require('./client');
 db.Services = require('./services');
 db.clientDistance = require('./clientDistance');
 db.TravelAllowance = require('./travelAllowance');
+db.Attendence = require('./attendence');
 
 module.exports = db;

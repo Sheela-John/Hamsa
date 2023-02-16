@@ -44,6 +44,7 @@ app.use('/settings', require('./routes/settings.route'));
 app.use('/assignService', require('./routes/assignService.route'));
 app.use('/services', require('./routes/services.route'));
 app.use('/report', require('./routes/report.route'));
+app.use('/attendence', require('./routes/attendence.route'));
 app.use(errorHandler);
 
 
