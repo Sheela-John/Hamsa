@@ -207,7 +207,9 @@ const getAssignedServicesbyStaff = async (data) => {
             }
         ];
     let [clientServiceErr, clientServiceData] = await handle(AssignServiceForClient.aggregate(query1));
-    array.push(clientServiceData[0]);
+    if (clientServiceData.length !=  0) {
+        array.push(clientServiceData[0]);
+    }
     if (clientServiceErr) return Promise.reject(clientServiceErr);
     let query2 =
         [
@@ -247,7 +249,9 @@ const getAssignedServicesbyStaff = async (data) => {
             }
         ];
     let [branchServiceErr, branchServiceData] = await handle(AssignServiceForBranch.aggregate(query2));
-    array.push(branchServiceData[0]);
+    if (branchServiceData.length != 0) {
+        array.push(branchServiceData[0]);
+    }
     if (branchServiceErr) return Promise.reject(branchServiceErr);
     else return Promise.resolve(array);
 }
