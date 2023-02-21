@@ -59,6 +59,7 @@ const activityReport = async (data) => {
                 'staffObjId': { $toObjectId: "$staffId" },
                 'assignedServiceObjId': { $toString: "$_id" },
                 'serviceObjId': { $toObjectId: "$service" },
+                'clientObjId': { $toObjectId: "$clientId" }
             }
         },
         {
@@ -71,6 +72,17 @@ const activityReport = async (data) => {
         },
         {
             $unwind: '$staffDetails'
+        },
+        {
+            $lookup: {
+                from: 'client',
+                localField: 'clientObjId',
+                foreignField: '_id',
+                as: 'clientDetails'
+            }
+        },
+        {
+            $unwind: '$clientDetails'
         },
         {
             $lookup: {
@@ -146,32 +158,21 @@ const therapistReport = async (data) => {
     return Promise.resolve(result);
 }
 
-const attendenceReport = async (data) => {
+const travelExpenseReport = async (data) => {
     var query = [
         {
             '$match': {
-                'date': { '$gte': new Date(data.startDate), '$lte': new Date(data.endDate) },
-                'staffId': data.staffId
+                'date': { '$gte': new Date(data.startDate), '$lte': new Date(data.endDate) }
             }
         },
     ]
-    let [clientErr, clientData] = await handle(AssignServiceForClient.aggregate(query));
-    if (clientErr) return Promise.reject(clientErr);
-    var query = [
-        {
-            '$match': {
-                'date': { '$gte': new Date(data.startDate), '$lte': new Date(data.endDate) },
-                'staffId': data.staffId
-            }
-        },
-    ]
-    let [branchErr, branchData] = await handle(AssignServiceForBranch.aggregate(query));
-    if (branchErr) return Promise.reject(branchErr);
-    else return Promise.resolve(branchData);
+    let [reportErr, reportData] = await handle(ClientDistance.aggregate(query));
+    if (reportErr) return Promise.reject(reportErr);
+    else return Promise.resolve(reportData);
 }
 
 module.exports = {
     activityReport: activityReport,
     therapistReport: therapistReport,
-    attendenceReport: attendenceReport
+    travelExpenseReport: travelExpenseReport
 }

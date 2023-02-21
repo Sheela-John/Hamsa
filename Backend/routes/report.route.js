@@ -28,9 +28,9 @@ router.post('/therapistReport', async (req, res, next) => {
     else return res.status(200).json({ status: true, data: reportData });
 })
 
-/* Attendence Report */
-router.post('/attendenceReport', async (req, res, next) => {
-    let [err, reportData] = await handle(ReportAPI.attendenceReport(req.body));
+/* Travel Expense Report */
+router.post('/travelExpenseReport', async (req, res, next) => {
+    let [err, reportData] = await handle(ReportAPI.travelExpenseReport(req.body));
     if (err) return next(err);
     else return res.status(200).json({ status: true, data: reportData });
 })

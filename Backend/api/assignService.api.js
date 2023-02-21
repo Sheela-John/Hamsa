@@ -794,8 +794,8 @@ const serviceOnStart = async (inputData) => {
             log.debug('Start Service response', { attach: response.body }); log.close();
             (async () => {
                 let [settingsErr, settingsDataFind] = await handle(Settings.find({}).lean());
-                if (settingsErr) return Promise.reject(settingsErr);
-                if (lodash.isEmpty(settingsDataFind)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+                if (settingsErr) return reject(settingsErr);
+                if (lodash.isEmpty(settingsDataFind)) return reject(ERR.NO_RECORDS_FOUND);
                 var settingsData = settingsDataFind[settingsDataFind.length - 1]
                 var status;
                 if (settingsData.averageDistance > response.body.rows[0].elements[0].distance.value) {
@@ -805,7 +805,7 @@ const serviceOnStart = async (inputData) => {
                     status = false;
                 }
                 let [serviceErr, serviceData] = await handle(AssignServiceForClient.findOne({ '_id': inputData.assignedServiceId }));
-                if (serviceErr) return Promise.reject(serviceErr);
+                if (serviceErr) return reject(serviceErr);
                 let clientDistanceData = {
                     clientId: inputData.clientId,
                     staffId: serviceData.staffId,
@@ -817,7 +817,7 @@ const serviceOnStart = async (inputData) => {
                 }
                 var saveModel = new ClientDistance(clientDistanceData);
                 let [err, clientDataSaved] = await handle(saveModel.save())
-                if (err) return Promise.reject(err);
+                if (err) return reject(err);
             })();
             return resolve(response.body);
         });
