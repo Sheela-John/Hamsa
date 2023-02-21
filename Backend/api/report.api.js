@@ -159,12 +159,93 @@ const therapistReport = async (data) => {
 }
 
 const travelExpenseReport = async (data) => {
+
+    const today = new Date(data.endDate)
+    // to return the date number(1-31) for the specified date
+    let tomorrow = new Date()
+    tomorrow.setDate(today.getDate() + 1)
+    //returns the tomorrow date
+    let nextDate = new Date(tomorrow.setUTCHours(0, 0, 0, 0))
+
     var query = [
         {
             '$match': {
                 'date': { '$gte': new Date(data.startDate), '$lte': new Date(data.endDate) }
             }
         },
+        {
+            $addFields: {
+                'to': nextDate,
+                'from': new Date(data.startDate)
+            }
+        },
+        {
+            $addFields: {
+                'staffId': "$staffId",
+                'staffObjId': { $toObjectId: "$staffId" },
+                'settingsObjId': { $toObjectId: "$settingsId" },
+                'startDistanceValue': "$startDistanceValue",
+                'startDistanceValue': "$endDistanceValue",
+                daysCount: {
+                    $round: { $divide: [{ $subtract: ["$to", "$from"] }, 86400000] }
+                }
+            }
+        },
+        {
+            $lookup: {
+                from: 'staff',
+                localField: 'staffObjId',
+                foreignField: '_id',
+                as: 'staffDetails'
+            }
+        },
+        {
+            $unwind: '$staffDetails'
+        },
+        {
+            $lookup: {
+                from: 'settings',
+                localField: 'settingsObjId',
+                foreignField: '_id',
+                as: 'settingsDetails'
+            }
+        },
+        {
+            $unwind: '$settingsDetails'
+        },
+        {
+            $group:
+            {
+                _id: {
+                    staffId: "$staffId"
+                },
+                startDistanceValue: { $sum: "$startDistanceValue" },
+                endDistanceValue: { $sum: "$startDistanceValue" },
+                travelDistanceinMetre: { $sum: { $add: ['$startDistanceValue', '$endDistanceValue'] } },
+                daysCount: { $first: "$daysCount" },
+                staffName: { $first: "$staffDetails.staffName" },
+                travelExpenseCost: { $first: "$settingsDetails.travelExpenseCost" },
+                averageDistance: { $first: "$settingsDetails.averageDistance" }
+            },
+        },
+        {
+            $sort:
+                { "_id": 1 }
+        },
+        {
+            $project: {
+                '_id': "$_id.staffId",
+                'startDistanceValue': 1,
+                'endDistanceValue': 1,
+                'travelDistanceinMetre': 1,
+                'travelDistanceinKm': { $divide: ["$travelDistanceinMetre", 1000] },
+                'daysCount': 1,
+                'staffName': 1,
+                'averageDistanceinMetre': { $divide: ["$travelDistanceinMetre", "$daysCount"] },
+                'averageDistanceinKm': { $divide: [{ $divide: ["$travelDistanceinMetre", 1000] }, "$daysCount"] },
+                'amount': { "$multiply": [{ $divide: ["$travelExpenseCost", "$averageDistance"] }, "$travelDistanceinMetre"] }
+            }
+        }
     ]
     let [reportErr, reportData] = await handle(ClientDistance.aggregate(query));
     if (reportErr) return Promise.reject(reportErr);

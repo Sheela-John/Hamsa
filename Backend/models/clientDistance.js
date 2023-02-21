@@ -11,6 +11,7 @@ const clientDistanceSchema = new mongoose.Schema({
     startDistanceValue: { type: Number },
     endDistance: { type: String },
     endDistanceValue: { type: Number },
+    settingsId: { type: String },
     status: { type: Number } /* 0 - Completed ,  1 - Start Distance MisMatch , 2 - End Distance MsiMatch */
 }, {
     collection: 'clientDistance',

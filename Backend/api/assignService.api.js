@@ -70,6 +70,11 @@ const assignServiceClient = async (assignServiceData) => {
         (async () => {
             let [findStaffErr, staffNameData] = await handle(Staff.findOne({ '_id': mongoose.Types.ObjectId(assignServiceData.staffId) }));
             if (findStaffErr) return Promise.reject(findStaffErr);
+            let [settingsErr, settingsDataFind] = await handle(Settings.find({}).lean());
+            if (settingsErr) return Promise.reject(settingsErr);
+            if (lodash.isEmpty(settingsDataFind)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+            var settingsData = settingsDataFind[settingsDataFind.length - 1]
+            assignServiceData['settingsId'] = settingsData._id;
             assignServiceData['staffName'] = staffNameData.staffName;
             let [findClientErr, findClientData] = await handle(Client.findOne({ 'clientName': assignServiceData.clientName, 'phone': assignServiceData.phone }));
             if (findClientErr) return Promise.reject(findClientErr);
@@ -813,7 +818,8 @@ const serviceOnStart = async (inputData) => {
                     assignedServiceId: inputData.assignedServiceId,
                     startStatus: status,
                     startDistance: response.body.rows[0].elements[0].distance.text,
-                    startDistanceValue: response.body.rows[0].elements[0].distance.value
+                    startDistanceValue: response.body.rows[0].elements[0].distance.value,
+                    settingsId: serviceData.settingsId
                 }
                 var saveModel = new ClientDistance(clientDistanceData);
                 let [err, clientDataSaved] = await handle(saveModel.save())
