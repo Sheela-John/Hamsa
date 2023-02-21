@@ -11,6 +11,7 @@ const assignServiceForClientSchema = new mongoose.Schema({
     service: { type: String },
     time: { type: Date },
     serviceEndTime: { type: Date }, // Service End Time is from Staff Ending the Service in Client Place
+    paymentReferenceId: { type: String, default: '' },
     status: { type: Number, default: 0 } /* 0 - Assigned ,  1 - Completed , 2 - Rescheduled , 3 - Not Available , 4 - Distance MisMatch */
 }, {
     collection: 'assignServiceForClient',

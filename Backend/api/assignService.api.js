@@ -207,7 +207,7 @@ const getAssignedServicesbyStaff = async (data) => {
             }
         ];
     let [clientServiceErr, clientServiceData] = await handle(AssignServiceForClient.aggregate(query1));
-    if (clientServiceData.length !=  0) {
+    if (clientServiceData.length != 0) {
         array.push(clientServiceData[0]);
     }
     if (clientServiceErr) return Promise.reject(clientServiceErr);
@@ -975,13 +975,14 @@ const getAssignedServicesofBranchById = async (serviceBranchId) => {
     else return Promise.resolve(clientServicesDatabyId[0])
 }
 
-const updateClient = async (data) => {
-    let [staffErr, staffData] = await handle(Staff.findOne({ '_id': assignServiceData.staffId }).lean());
-    if (staffErr) return Promise.reject(staffErr);
-    if (lodash.isEmpty(staffData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
-}
-
-const updateBranch = async (data) => {
+/* To Update Assinged Service fot Client - API */
+const updateClient = async function (datatoupdate) {
+    log.debug(component, 'Update Assinged Service fot Client', { 'attach': datatoupdate }); log.close();
+    let clientId = datatoupdate.clientServiceId;
+    delete datatoupdate.clientServiceId
+    let [clientErr, clientData] = await handle(AssignServiceForClient.findOneAndUpdate({ "_id": clientId }, datatoupdate, { new: true, useFindAndModify: false }))
+    if (clientErr) return Promise.reject(clientErr);
+    else return Promise.resolve(clientData);
 }
 
 module.exports = {
@@ -1002,6 +1003,5 @@ module.exports = {
     serviceOnEnd: serviceOnEnd,
     getAssignedServicesById: getAssignedServicesById,
     getAssignedServicesofBranchById: getAssignedServicesofBranchById,
-    updateClient: updateClient,
-    updateBranch: updateBranch
+    updateClient: updateClient
 }
