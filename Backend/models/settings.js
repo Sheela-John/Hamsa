@@ -1,8 +1,10 @@
 const mongoose = require('mongoose');
 
 const settingsSchema = new mongoose.Schema({
-    averageDistance: { type: Number },
-    travelExpenseCost: { type: Number },
+    twoWheelerAverageDistance: { type: Number },
+    twoWheelerTravelExpenseCost: { type: Number },
+    fourWheelerAverageDistance: { type: Number },
+    fourWheelerTravelExpenseCost: { type: Number },
     startDate: { type: Date },
     endDate: { type: Date },
     status: { type: Number, default: 0 } /* 0 - Active ,  1 - Deleted , 2 - Disabled */
