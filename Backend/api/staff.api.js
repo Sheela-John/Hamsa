@@ -4,6 +4,7 @@ const models = require('../models');
 const Security = require("../util/security");
 const Staff = models.Staff;
 const Login = models.Login;
+const LeaveRequest = models.LeaveRequest;
 const lodash = require('lodash');
 const ERR = require('../errors.json');
 const uuid = require('../util/misc');
@@ -456,6 +457,90 @@ const find = {
     }
 }
 
+const leaveRequest = async function (data) {
+    log.debug(component, 'Creating Leave Request From Staff', data);
+    log.close();
+
+    let [findStaffErr, staffNameData] = await handle(Staff.findOne({ '_id': mongoose.Types.ObjectId(data.staffId) }));
+    if (findStaffErr) return Promise.reject(findStaffErr);
+
+    data.startDate = new Date(data.startDate);
+    let someDate = data.startDate
+    let copiedAppointmentDate = new Date(someDate.getTime());
+    data['startDate'] = copiedAppointmentDate;
+
+    data.endDate = new Date(data.endDate);
+    let someDate1 = data.endDate
+    let copiedAppointmentDate1 = new Date(someDate1.getTime());
+    data['endDate'] = copiedAppointmentDate1;
+
+    data['staffName'] = staffNameData.staffName;
+    var saveModel = new LeaveRequest(data);
+    let [err, leaveRequestData] = await handle(saveModel.save())
+    if (err) return Promise.reject(err);
+    else return Promise.resolve(leaveRequestData)
+}
+
+const getAllLeaveRequest = async function () {
+    log.debug(component, 'Get All Staff Leave Requests'); log.close();
+    let [err, leaveData] = await handle(LeaveRequest.find({}).lean());
+    if (err) return Promise.reject(err);
+    if (lodash.isEmpty(leaveData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+    return Promise.resolve(leaveData);
+}
+
+const getLeaveRequestById = async function (leaveId) {
+    log.debug(component, 'Get Staff Leave Requests By Id'); log.close();
+    let [err, leaveData] = await handle(LeaveRequest.findOne({ '_id': leaveId }).lean());
+    if (err) return Promise.reject(err);
+    if (lodash.isEmpty(leaveData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+    return Promise.resolve(leaveData);
+}
+
+const getLeaveRequestByStatus = async function (data) {
+    log.debug(component, 'Get Staff Leave Requests By Status'); log.close();
+    let [err, leaveData] = await handle(LeaveRequest.find({ 'leaveStatus': data.leaveStatus }).lean());
+    if (err) return Promise.reject(err);
+    if (lodash.isEmpty(leaveData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+    return Promise.resolve(leaveData);
+}
+
+const searchLeaveRequestByStaff = (data) => {
+    log.debug(component, 'Search Leave Requests in dropdown/typeahead');
+    log.close();
+    var query = [
+        {
+            $match: {
+                $or: [
+                    { "staffName": new RegExp(data.searchString.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"), 'gi') },
+                    { "staffName": new RegExp(data.searchString.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"), 'gi') }
+                ]
+            }
+        }
+    ];
+    return new Promise((resolve, reject) => {
+        LeaveRequest.aggregate(query)
+            .then(fetchedDocuments => {
+                log.debug(component, 'Search Leave Requests data');
+                log.close();
+                return resolve(fetchedDocuments);
+            }).catch(err => {
+                log.error(component, 'error Search the Leave Requests data');
+                log.close();
+                return reject(err);
+            })
+    })
+}
+
+const getLeaveRequestByStaffId = async function (staffId) {
+    log.debug(component, 'Get Leave Requests by Staff Id');
+    log.close();
+    let [err, leaveData] = await handle(LeaveRequest.find({ 'staffId': staffId }).lean());
+    if (err) return Promise.reject(err);
+    if (lodash.isEmpty(leaveData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+    return Promise.resolve(leaveData);
+}
+
 module.exports = {
     create: create,
     UpdateStaff: UpdateStaff,
@@ -468,5 +553,11 @@ module.exports = {
     createAdmin: createAdmin,
     findAllAdmin: findAllAdmin,
     findAdminById: findAdminById,
-    find: find
+    find: find,
+    leaveRequest: leaveRequest,
+    getAllLeaveRequest: getAllLeaveRequest,
+    getLeaveRequestById: getLeaveRequestById,
+    getLeaveRequestByStatus: getLeaveRequestByStatus,
+    searchLeaveRequestByStaff: searchLeaveRequestByStaff,
+    getLeaveRequestByStaffId: getLeaveRequestByStaffId
 }

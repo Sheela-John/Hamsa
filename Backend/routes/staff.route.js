@@ -103,4 +103,46 @@ router.post('/', async (req, res, next) => {
         else return res.status(200).json({ status: true, data: userdata });
     })
 
+    // Apply for Leave by Staff
+    .post('/leaveRequest', authenticate(), async (req, res, next) => {
+        req.body.staffId = req.user.user;
+        let [err, leaveData] = await handle(StaffAPI.leaveRequest(req.body));
+        if (err) return next(err);
+        else return res.status(200).json({ status: true, data: leaveData });
+    })
+
+    // Get All Leave Requests
+    .get('/all/leaveRequest', async (req, res, next) => {
+        let [err, leaveData] = await handle(StaffAPI.getAllLeaveRequest());
+        if (err) return next(err);
+        else return res.status(200).json({ status: true, data: leaveData });
+    })
+
+    // Get Leave Requests By Id
+    .get('/leaveRequest/:id', async (req, res, next) => {
+        let [err, leaveData] = await handle(StaffAPI.getLeaveRequestById(req.params.id));
+        if (err) return next(err);
+        else return res.status(200).json({ status: true, data: leaveData });
+    })
+
+    // Get Leave Requests By Status
+    .get('/leaveRequest', async (req, res, next) => {
+        let [err, leaveData] = await handle(StaffAPI.getLeaveRequestByStatus(req.body));
+        if (err) return next(err);
+        else return res.status(200).json({ status: true, data: leaveData });
+    })
+
+    .post('/search/leaveRequest', async (req, res, next) => {
+        let [err, leaveData] = await handle(StaffAPI.searchLeaveRequestByStaff(req.body));
+        if (err) return next(err);
+        else res.json({ status: true, "data": leaveData });
+    })
+
+    // Get Leave Requests By Status
+    .get('/leaveRequest/byStaffId/:id', async (req, res, next) => {
+        let [err, leaveData] = await handle(StaffAPI.getLeaveRequestByStaffId(req.params.id));
+        if (err) return next(err);
+        else return res.status(200).json({ status: true, data: leaveData });
+    })
+
 module.exports = router;
