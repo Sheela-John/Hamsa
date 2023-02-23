@@ -4,7 +4,8 @@ const mongoose = require('mongoose');
 const loginSchema = new mongoose.Schema({
     email: { type: String },
     phone: { type: String },
-    empId: { type: String },
+    empId: { type: String }, // For Staff
+    ipNumber: { type: String }, // For Client
     password: { type: String, default: '' },
     role: { type: String, required: true },
     staffRole: { type: String },
