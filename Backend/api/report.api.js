@@ -243,7 +243,8 @@ const travelExpenseReport = async (data) => {
                 'staffName': 1,
                 'averageDistanceinMetre': { $divide: ["$travelDistanceinMetre", "$daysCount"] },
                 'averageDistanceinKm': { $divide: [{ $divide: ["$travelDistanceinMetre", 1000] }, "$daysCount"] },
-                'amount': { "$multiply": [{ $divide: ["$travelExpenseCost", "$averageDistance"] }, "$travelDistanceinMetre"] }
+                'amount': { "$multiply": [{ $divide: ["$travelExpenseCost", "$averageDistance"] }, "$travelDistanceinMetre"] },
+                'travelExpenseCost': 1
             }
         }
     ]
