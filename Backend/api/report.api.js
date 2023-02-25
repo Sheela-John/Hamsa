@@ -224,8 +224,8 @@ const travelExpenseReport = async (data) => {
                 travelDistanceinMetre: { $sum: { $add: ['$startDistanceValue', '$endDistanceValue'] } },
                 daysCount: { $first: "$daysCount" },
                 staffName: { $first: "$staffDetails.staffName" },
-                travelExpenseCost: { $first: "$settingsDetails.travelExpenseCost" },
-                averageDistance: { $first: "$settingsDetails.averageDistance" }
+                travelExpenseCost: { $first: "$settingsDetails.twoWheelerTravelExpenseCost" },
+                averageDistance: { $first: "$settingsDetails.twoWheelerAverageDistance" }
             },
         },
         {
