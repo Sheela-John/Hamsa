@@ -31,6 +31,9 @@ const momentTz = require('moment-timezone');
 const request = require('request');
 const NodeGeocoder = require('node-geocoder');
 const genrateDefaultImage = require('../util/generateCode').genrateDefaultImage;
+const otpGenerator = require('otp-generator')
+const bcrypt = require('bcrypt');
+const fast2sms = require('fast-two-sms');
 
 const s3 = new AWS.S3({
     accessKeyId: config.AWSCredentails.AWS_ACCESS_KEY,
@@ -214,9 +217,89 @@ const UpdateClient = async function (datatoupdate) {
     else return Promise.resolve(clientData);
 }
 
+const sendOTP = async function (data) {
+    return new Promise((resolve, reject) => {
+        async.waterfall([
+            function verifyPhoneNumber(cb) {
+                (async () => {
+                    let [mobileErr, mobileData] = await handle(checkMobileAvailability(data));
+                    if (mobileErr) cb(mobileErr);
+                    else if (lodash.isEmpty(mobileData)) {
+                        return cb(ERR.MOBILE_NUMBER_NOT_REGISTERED);
+                    }
+                    else {
+                        cb(null, mobileData)
+                    };
+                })();
+            },
+            function sendSMS(resutlData, cb) {
+                (async () => {
+                    const OTP = otpGenerator.generate(6, {
+                        digits: true, lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false
+                    });
+                    const number = data.phone;
+
+                    const salt = await bcrypt.genSalt(10);
+                    const hashedOTP = await bcrypt.hash(OTP, salt)
+                    let datatoupdate = {
+                        'otp': hashedOTP
+                    }
+                    let [err, loginData] = await handle(Login.findOneAndUpdate({ "phone": number }, datatoupdate, { new: true, useFindAndModify: false }))
+                    if (err) cb(err);
+                    else {
+                        cb(null, loginData);
+                        // let [sendSmsErr, smsData] = await handle(fast2sms.sendMessage({ authorization: "3xFtQ8aNIclXJq6CnzsoDjgWAu1HiVe47GTLkpYRbBwmMyKvrd7mJied0uv6wW5bytko8RAMqPrFlxCS", message: OTP, numbers: [number] }));
+                        // if (sendSmsErr) cb(sendSmsErr);
+                        // else cb(null, smsData);
+                    };
+                })();
+            }
+        ], (err, result) => {
+            if (err) {
+                log.error(component, 'Error send OTP mobile number', { attach: err });
+                log.close();
+                return reject(err);
+            }
+            else {
+                log.debug(component, 'OTP send successfull');
+                log.close();
+                return resolve(result);
+            }
+        })
+    })
+}
+
+// check phone number availabilty
+function checkMobileAvailability(data) {
+    return new Promise((resolve, reject) => {
+        Login.findOne({ 'phone': data.phone, 'role': 'PORTAL_CLIENT' }).then(login => {
+            if (!lodash.isEmpty(login)) {
+                log.debug(component, 'Found the user data for mobile number');
+                log.close();
+                return resolve(login);
+            }
+            else {
+                log.debug(component, 'Mobile Number is not registered with us');
+                log.close();
+                return resolve(null);
+            }
+        }).catch(err => {
+            log.error(component, 'Error retrieving the user data'); log.close();
+            return reject(err);
+        })
+    })
+}
+
+const requestAdditionalService = async function (data) {
+    log.debug(component, 'Requesting Additional Service for Staff by Client', { 'attach': data });
+    log.close();
+}
+
 module.exports = {
     create: create,
     getClientDatabyId: getClientDatabyId,
     getAllClientDetails: getAllClientDetails,
-    UpdateClient: UpdateClient
+    UpdateClient: UpdateClient,
+    sendOTP: sendOTP,
+    requestAdditionalService: requestAdditionalService
 }

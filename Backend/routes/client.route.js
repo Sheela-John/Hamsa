@@ -6,6 +6,7 @@ const ERR = require('../errors.json');
 const config = require('config');
 const authenticate = require('../middleware/OAuth-Authentication');
 const log = require('../util/logger').log(COMPONENT, ___filename);
+const fast2sms = require('fast-two-sms');
 
 /* For error handling in async await function */
 const handle = (promise) => {
@@ -61,6 +62,24 @@ router.post('/', async (req, res, next) => {
         let [err, clientData] = await handle(ClientAPI.UpdateClient(req.body));
         if (err) return next(err);
         else return res.status(200).json({ status: true, data: clientData, message: "Client Updated Successfully!" });
+    })
+
+    /* Send OTP to Mobile */
+    .post('/generateOTP', async (req, res, next) => {
+        if (lodash.isEmpty(req.body)) return next(ERR.MANDATORY_FIELD_MISSING)
+        let [err, clientData] = await handle(ClientAPI.sendOTP(req.body));
+        // const response = await fast2sms.sendMessage({ authorization: "3xFtQ8aNIclXJq6CnzsoDjgWAu1HiVe47GTLkpYRbBwmMyKvrd7mJied0uv6wW5bytko8RAMqPrFlxCS", message: "Hello", numbers: [req.body.phone] });
+        if (err) return next(err);
+        // res.send(response);
+        else return res.status(200).json({ status: true, data: clientData, message: "OTP Send to Client Successfully!" });
+    })
+
+    /* Additional Service Request */
+    .post('/additionalServiceRequest', async (req, res, next) => {
+        if (lodash.isEmpty(req.body)) return next(ERR.MANDATORY_FIELD_MISSING);
+        let [err, requestData] = await handle(ClientAPI.requestAdditionalService(req.body));
+        if (err) return next(err);
+        else return res.status(200).json({ status: true, data: requestData, message: "Additional Service Request Send Successfully" })
     })
 
 module.exports = router;

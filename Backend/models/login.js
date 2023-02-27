@@ -6,6 +6,7 @@ const loginSchema = new mongoose.Schema({
     phone: { type: String },
     empId: { type: String }, // For Staff
     ipNumber: { type: String }, // For Client
+    otp: { type: String, default: '' }, // For Client
     password: { type: String, default: '' },
     role: { type: String, required: true },
     staffRole: { type: String },

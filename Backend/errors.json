@@ -249,5 +249,9 @@
     "TIME_DIFFERENCE": {
         "code": 159,
         "message": "The Appointment can be cancelled only after Certain Hours"
+    },
+    "MOBILE_NUMBER_NOT_REGISTERED": {
+        "code": 160,
+        "message": "Mobile Number Not Registered with Us"
     }
 }
