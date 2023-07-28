@@ -46,6 +46,7 @@ app.use('/services', require('./routes/services.route'));
 app.use('/serviceRequest', require('./routes/serviceRequest.route'));
 app.use('/report', require('./routes/report.route'));
 app.use('/leaveRequest', require('./routes/leaveRequest.route'));
+app.use('/travelAllowance', require('./routes/travelAllowance.route'));
 app.use('/attendence', require('./routes/attendence.route'));
 app.use('/client', require('./routes/client.route'));
 app.use('/branchTransfer', require('./routes/branchTransfer.route'));
