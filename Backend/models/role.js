@@ -1,17 +1,18 @@
 const mongoose = require('mongoose');
 
-const slotSchema = new mongoose.Schema({
-    slotName: { type: String },
-    startTime: { type: String },
-    endTime: { type: String },
-}, { _id: false })
+// const slotSchema = new mongoose.Schema({
+//     slotName: { type: String },
+//     startTime: { type: String },
+//     endTime: { type: String },
+// }, { _id: false })
 
 const roleSchema = new mongoose.Schema({
-    role: { type: String },
-    startTime: { type: Date },
-    endTime: { type: Date },
-    slots: { type: [slotSchema] },
-    status: { type: Number, default: 0 } /* 0 - Active ,  1 - Deleted , 2 - Disabled */
+   name:{type:String},
+    roles: { type: String }
+    // startTime: { type: Date },
+    // endTime: { type: Date },
+    // slots: { type: [slotSchema] },
+    // status: { type: Number, default: 0 } /* 0 - Active ,  1 - Deleted , 2 - Disabled */
 }, {
     collection: 'role',
     versionKey: false,

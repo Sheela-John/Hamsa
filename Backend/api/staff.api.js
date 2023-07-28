@@ -3,6 +3,8 @@ const component = "Staff API";
 const models = require('../models');
 const Security = require("../util/security");
 const Staff = models.Staff;
+const Branch=models.Branch;
+const Role=models.Role;
 const Login = models.Login;
 const LeaveRequest = models.LeaveRequest;
 const lodash = require('lodash');
@@ -203,9 +205,9 @@ async function checkLoginAvailablity(loginCred) {
         query =
             [
                 {
-                    $match: {
-                        $and: [{ 'empId': loginCred.empId },
-                        { 'role': loginCred.role }]
+                    $match: {'empId': loginCred.empId
+                       // $and: [{ 'empId': loginCred.empId },
+                        //{ 'role': loginCred.role }]
 
                     }
                 }
@@ -215,9 +217,9 @@ async function checkLoginAvailablity(loginCred) {
         query =
             [
                 {
-                    $match: {
-                        $and: [{ 'empId': loginCred.empId },
-                        { 'role': loginCred.role }]
+                    $match: {'empId': loginCred.empId
+                        // $and: [{ 'empId': loginCred.empId },
+                        // { 'role': loginCred.role }]
 
                     }
                 }
@@ -281,7 +283,15 @@ async function getStaffDataById(staffId) {
 /* Get All Staff Detail */
 async function getAllStaffDetails() {
     log.debug(component, 'Get All Staff Detail'); log.close();
-    let [err, staffData] = await handle(Staff.find({ "role": "PORTAL_STAFF" }).lean());
+    let [err, staffData] = await handle(Staff.find().lean());
+    console.log(staffData)
+    for(var i=0;i<staffData.length;i++)
+    {
+        let [err, branchData] = await handle(Branch.findOne({_id:staffData[i].branchId}).lean());
+        let [err1, roleData] = await handle(Role.findOne({_id:staffData[i].staffRole}).lean());
+        staffData[i].branchId=branchData.branchName;
+        staffData[i].staffRole=roleData.name;
+    }
     if (err) return Promise.reject(err);
     if (lodash.isEmpty(staffData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(staffData);

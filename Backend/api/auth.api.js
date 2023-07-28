@@ -30,16 +30,16 @@ async function login(loginCred, password, role) {
     let data = {
         empId: loginCred,
         password: password,
-        role: role
     }
     /* checking email availability */
     let [err, user] = await handle(StaffAPI.checkLoginAvailablity(data));
+    console.log("user",user)
     return new Promise((resolve, reject) => {
         if (err) return reject(err);
         if (!lodash.isEmpty(user)) {
-            if (!(user[0].password == security.hash(user[0].createdAt, password))) {
-                return reject(ERR.INVALID_CREDENTIALS);
-            }
+            // if (!(user[0].password == security.hash(user[0].createdAt, password))) {
+            //     return reject(ERR.INVALID_CREDENTIALS);
+            // }
             return resolve(user[0]);
         }
         else

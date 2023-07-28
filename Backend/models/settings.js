@@ -7,7 +7,12 @@ const settingsSchema = new mongoose.Schema({
     fourWheelerTravelExpenseCost: { type: Number },
     startDate: { type: Date },
     endDate: { type: Date },
-    status: { type: Number, default: 0 } /* 0 - Active ,  1 - Deleted , 2 - Disabled */
+    status: { type: Number, default: 0 }, /* 0 - Active ,  1 - Deleted , 2 - Disabled */
+    averageDistance:{
+        type:String
+    },
+    
+
 }, {
     collection: 'settings',
     versionKey: false,

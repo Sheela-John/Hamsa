@@ -1,15 +1,89 @@
 const mongoose = require('mongoose');
 
 const clientSchema = new mongoose.Schema({
-    clientName: { type: String },
-    clientAddress: { type: String },
-    latitude: { type: Number },
-    longitude: { type: Number },
-    phone: { type: String },
-    homeBranch: { type: String },
-    email: { type: String },
-    ipNumber: { type: String },
-    status: { type: Number, default: 0 } /* 0 - Active ,  1 - Deleted , 2 - Disabled */
+   
+   clientName:{
+    type:String
+   },
+   phoneNumber:{
+    type:String
+   },
+   amount:{
+    type:String
+   },
+    staffId:{
+    type:String
+   },
+   homeBranchId:{
+    type:String
+   },
+   packageId:{
+    type:String
+   },
+   clientHomeBranchLogitude:{
+    type:String
+   },
+   clientHomeBranchLattitude:{
+    type:String
+   },
+   clientAddressLogitude:{
+    type:String
+   },
+   clientAddressLatitude:{
+    type:String
+   },
+   serviceId:{
+    type:String
+   },
+   typeOfTreatment:{
+    type:Number
+   },
+   startTime:{
+    type:String
+   },
+   endTime:{
+    type:String
+   },
+   onWeekDay:{
+    type:Array
+   },
+   startDate:{
+    type:String
+   },
+   endDate:{
+    type:String
+   },
+   uhid:{
+    type:String
+   },
+   homeBranchAddress:{
+    type:String
+   },
+   duration:{
+    type:String
+   },
+   address:{
+    type:String
+   },
+   addSession:{
+    type:Array
+   },
+   emergencyNumber:{
+    type:String
+   },
+   email:{
+    type:String
+   },
+   slot:{
+    type:String
+   },
+   clientStatus:{
+    type:Number
+   },
+   noOfSession:{
+    type:String
+   }
+
 }, {
     collection: 'client',
     versionKey: false,
