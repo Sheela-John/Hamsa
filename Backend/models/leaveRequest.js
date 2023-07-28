@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 
 const leaveRequestSchema = new mongoose.Schema({
     staffId: { type: String },
-    staffName: { type: String },
-    startDate: { type: Date },
-    endDate: { type: Date },
+    Date: { type: String },
+    startDate: { type: String },
+    endDate: { type: String },
     reason: { type: String },
     leaveStatus: { type: Number, default: 0 } // 0 - Applied , 1 - Accepted , 2 - Denied
 }, {
