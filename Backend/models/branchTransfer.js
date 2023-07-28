@@ -18,9 +18,9 @@ const branchTransferSchema = new mongoose.Schema({
     staffId:{
         type:String
     },
-    latitude: { type: Number },
-    longitude: { type: Number },
-    status: { type: Number, default: 0 } /* 0 - Active ,  1 - Deleted , 2 - Disabled */
+    branchAddress: { type: String},
+    status: { type: Number, default: 0 },
+    isDeleted:{type : Number, default: 0} /* 0 - Active ,  1 - Deleted , 2 - Disabled */
 }, {
     collection: 'branchTransfer',
     versionKey: false,

@@ -20,4 +20,6 @@ db.AssignService= require('./assignService');
 db.BranchTransfer = require('./branchTransfer');
 db.ServiceRequest=require('./serviceRequest');
 db.RolePosition = require('./rolePosition');
+db.BranchTransfer = require('./branchTransfer');
+
 module.exports = db;
