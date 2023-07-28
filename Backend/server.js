@@ -43,6 +43,7 @@ app.use('/branch', require('./routes/branch.route'));
 app.use('/settings', require('./routes/settings.route'));
 app.use('/assignService', require('./routes/assignService.route'));
 app.use('/services', require('./routes/services.route'));
+app.use('/serviceRequest', require('./routes/serviceRequest.route'));
 app.use('/report', require('./routes/report.route'));
 app.use('/attendence', require('./routes/attendence.route'));
 app.use('/client', require('./routes/client.route'));
