@@ -1,0 +1,113 @@
+<div class="main bg-white p-6 rounded-lg shadow-lg">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-header heading text-2xl font-bold">Role</h2>
+            <button class="card-header btn float-right" (click)="addeditForm()"><i
+                    class="fa fa-reply"></i>&nbsp;Back</button>
+        </div>
+    </div>
+    <section class="flex items-center justify-center">
+        <div class="container mt-4">
+            <form class="form" novalidate="" [formGroup]="roleForm">
+                <div class="grid sm:grid-cols-1 md:grid-cols-1 md:gap-3 ">
+                    <div>
+                        <label for="name" class="block mb-2 font-bold text-gray-600 ">Role Name</label>
+                        <input type="text" id="name" name="name" placeholder="Enter Role Name"
+                            class="border border-gray-300 shadow p-2 w-full rounded " formControlName="role">
+                        <div class="error-msg-area">
+                            <div *ngIf="roleForm.controls['role'].errors && (!roleForm.controls['role'].pristine|| isroleFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!roleForm.controls['role'].errors.required">Please Enter Role Name
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="font-bold text-teal-400 mb-2" style="font-size: x-large;">Add Slot</h1>
+                   
+                </div>
+              <ng-container formArrayName="addSlot"
+              *ngFor="let room of roleForm.get('addSlot')['controls']; let i = index;">
+                <ng-container [formGroupName]=i  >
+                    <div class="grid sm:grid-cols-1 md:grid-cols-4 md:gap-3 ">
+                   
+                        <div>
+                            <label for="name" class="block mb-2 font-bold text-gray-600 ">Slot Name</label>
+                            <input type="text" id="name" name="name" placeholder="Enter  Slot Name"
+                                class="border border-gray-300 shadow p-2 w-full rounded " formControlName="slotName">
+                            <!-- <div class="error-msg-area">
+                                <div *ngIf="roleForm.controls['slotName'].addSlot?.errors && (!roleForm.controls['slotName'].addSlot?.pristine|| isroleFormSubmitted)"
+                                    class="error-msg">
+                                    <div [hidden]="!roleForm.controls['slotName'].addSlot?.errors.required">Please Enter Role Name
+                                    </div>
+                                </div>
+                            </div> -->
+                          
+                          
+                        </div>
+                        <div>
+                            <!-- <label for="twitter" class="block mb-2 font-bold text-gray-600">Start Time</label>
+                            <input class="border border-gray-300 shadow p-2 w-full rounded " type="text"
+                                placeholder="Select Start Time" formControlName="startTime" name="startTime"
+                                [ngxTimepicker]="startrange"  [format]="24">
+                            <ngx-material-timepicker #startrange (opened)="startpickerOpened = true;"
+                                [defaultTime]="'06:00 am'" [minutesGap]="5" (timeChanged)="startTimeonChangeHour($event)"></ngx-material-timepicker> -->
+                                <label for="twitter" class="block mb-2 font-bold text-gray-600">Start Time</label>
+                        <input class="border border-gray-300 shadow p-2 w-full rounded " type="text"
+                            placeholder="Select Start Time" formControlName="startTime" name="startTime"
+                            [ngxTimepicker]="startrange"  [format]="24">
+                        <ngx-material-timepicker #startrange (opened)="startpickerOpened = true;"
+                            [defaultTime]="'06:00 am'" [minutesGap]="5"
+                            (timeSet)="enableEndTIme($event)" ></ngx-material-timepicker>
+                            <!-- <div class="error-msg-area">
+                                <div *ngIf="roleForm.controls['startTime'].errors && (!roleForm.controls['startTime'].pristine|| isroleFormSubmitted)"
+                                    class="error-msg">
+                                    <div [hidden]="!roleForm.controls['startTime'].errors.required">Please Enter Start Time
+                                    </div>
+                                </div>
+                            </div> -->
+                        </div>
+                        <div>
+                            <label for="name" class="block mb-2 font-bold text-gray-600">End Time</label>
+                            <input class="border border-gray-300 shadow p-2 w-full rounded " type="text"
+                                placeholder="Select End Time" formControlName="endTime" name="endTime"
+                                [ngxTimepicker]="Endrange"  [format]="24"  [min]="endMinTime">
+                            <ngx-material-timepicker  #Endrange (opened)="endpickerOpened = true;" [defaultTime]="'18:00 pm'"
+                                [minutesGap]="5" >
+                            </ngx-material-timepicker>
+                            <!-- <div class="error-msg-area">
+                                <div *ngIf="roleForm.controls['endTime'].errors && (!roleForm.controls['endTime'].pristine|| isroleFormSubmitted)"
+                                    class="error-msg">
+                                    <div [hidden]="!roleForm.controls['endTime'].errors.required">Please Enter End Time
+                                    </div>
+                                </div>
+                            </div> -->
+                        </div>
+                        <div>
+                           
+                                <button class="card-header btn ml-4  mt-4"style="background-color:red;" (click)="RemoveSlot(i)"><i
+                                    class="fa fa-trash"></i></button>
+                        </div>
+                       
+                    </div>
+                </ng-container>
+              </ng-container>
+               
+                
+                <div >
+                    
+                </div>
+          
+               
+                <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg mt-5" *ngIf="!showAddEdit"
+                    (click)=" saveRoleBase4App()">Submit</button>
+                <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg mt-5" *ngIf="showAddEdit"
+                    (click)="updateServiceInBase4App()">Update</button>
+                    <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg " 
+                    (click)=" saveSlotBack4App()">Add Slot</button>
+            </form>
+        </div>
+    </section>
+</div>
+<app-flash-message></app-flash-message>

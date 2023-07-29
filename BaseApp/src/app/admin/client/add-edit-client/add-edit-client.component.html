@@ -1,0 +1,418 @@
+<div class="main bg-white p-6 rounded-lg shadow-lg">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-header heading text-2xl font-bold">Client</h2>
+            <button class="card-header btn float-right" (click)="addeditClientForm()"><i
+                    class="fa fa-reply"></i>&nbsp;Back</button>
+        </div>
+    </div>
+    <section class="flex items-center justify-center">
+        <div class="container mt-4">
+            <form novalidate="" [formGroup]="clientForm">
+                <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
+                    <div>
+                        <label for="clientName" class="block mb-2 font-bold text-gray-600 ">UH ID</label>
+                        <input type="text" id="name" name="clientName" placeholder="Enter UH ID"
+                            class="border border-gray-300 shadow p-2 w-full rounded" formControlName="uhid">
+                    </div>
+                    <div>
+                        <label for="clientName" class="block mb-2 font-bold text-gray-600 ">Client Name</label>
+                        <input type="text" id="name" name="clientName" placeholder="Enter Client Name"
+                            class="border border-gray-300 shadow p-2 w-full rounded" formControlName="clientName">
+                        <div class="error-msg-area">
+                            <div *ngIf="clientForm.controls['clientName'].errors && (!clientForm.controls['clientName'].pristine|| isclientFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!clientForm.controls['clientName'].errors.required">Please Enter Client
+                                    Name
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
+                    <div>
+                        <label for="PhoneNumber" class="block mb-2 font-bold text-gray-600 ">Phone Number</label>
+                        <input type="text" id="name" name="PhoneNumber" placeholder="Enter Phone Number"
+                            class="border border-gray-300 shadow p-2 w-full rounded" formControlName="PhoneNumber">
+                        <div class="error-msg-area">
+                            <div *ngIf="clientForm.controls['PhoneNumber'].errors && (!clientForm.controls['PhoneNumber'].pristine|| isclientFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!clientForm.controls['PhoneNumber'].errors.required">Please Enter valid
+                                    Phone Number
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="name" class="block mb-2 font-bold text-gray-600 ">Email</label>
+                        <input type="text" id="name" name="name" placeholder="Enter Email"
+                            class="border border-gray-300 shadow p-2 w-full rounded" formControlName="email">
+                        <div class="error-msg-area">
+                            <div *ngIf="clientForm.controls['email'].errors && (!clientForm.controls['email'].pristine|| isclientFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!clientForm.controls['email'].errors.required">Please Enter Valid Email
+                                    Id
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
+                    <div>
+                        <label for="name" class="block mb-2 font-bold text-gray-600 ">Address</label>
+                        <input class="border border-gray-300 shadow p-2 w-full rounded" id="inputPhysicalStreet"
+                            rows="3" ngx-google-places-autocomplete [options]='options' formControlName="address"
+                            name="address" #placesRef="ngx-places" (onAddressChange)="handleAddressChange($event)"
+                            autocomplete="false" />
+                        <div class="error-msg-area">
+                            <div *ngIf="clientForm.controls['address'].errors && (!clientForm.controls['address'].pristine|| isclientFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!clientForm.controls['address'].errors.required">Please Enter
+                                    Address
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="Emergency Number" class="block mb-2 font-bold text-gray-600 ">Emergency
+                            Number</label>
+                        <input type="text" id="name" name="PhoneNumber" placeholder="Enter Phone Number"
+                            class="border border-gray-300 shadow p-2 w-full rounded" formControlName="emergencyNumber">
+                        <div class="error-msg-area">
+                            <div *ngIf="clientForm.controls['emergencyNumber'].errors && (!clientForm.controls['PhoneNumber'].pristine|| isclientFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!clientForm.controls['emergencyNumber'].errors.required">Please Enter
+                                    valid
+                                    Phone Number
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
+                    <div>
+                        <label for="homeBranch" class="block mb-2 font-bold text-gray-600 ">Home Branch</label>
+                        <select class="border border-gray-300 shadow p-2 w-full rounded" formControlName="homeBranch"
+                            (change)="getBranchbyId()">
+                            <option value="" disabled>--select--</option>+
+                            <option value="{{branchList.BranchId}}" *ngFor="let branchList of BranchNameArr">
+                                {{branchList.BranchName}}
+                            </option>
+                        </select>
+                        <div class="error-msg-area">
+                            <div *ngIf="clientForm.controls['homeBranch'].errors && (!clientForm.controls['homeBranch'].pristine|| isclientFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!clientForm.controls['homeBranch'].errors.required">Please Enter Home
+                                    Branch
+                                    Name
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="name" class="block mb-2 font-bold text-gray-600 ">Home Branch Address</label>
+                        <input class="border border-gray-300 shadow p-2 w-full rounded" id="inputPhysicalStreet"
+                            rows="3" ngx-google-places-autocomplete [options]='options'
+                            formControlName="homeBranchaddress" name="homeBranchaddress" #placesRef="ngx-places"
+                            (onAddressChange)="handleAddressChange1($event)" autocomplete="false" />
+                        <div class="error-msg-area">
+                            <div *ngIf="clientForm.controls['homeBranchaddress'].errors && (!clientForm.controls['homeBranchaddress'].pristine|| isclientFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!clientForm.controls['homeBranchaddress'].errors.required">Please Enter
+                                    Address
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="font-bold text-teal-400 mb-2" style="font-size: x-large;">Package</h1>
+                </div>
+                <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
+                    <div>
+                        <label for="name" class="block mb-2 font-bold text-gray-600 ">No.of Session</label>
+                        <input type="text" id="name" name="name" placeholder="Enter No.of Session"
+                            class="border border-gray-300 shadow p-2 w-full rounded" formControlName="noOfSession"
+                            (change)="addSessionBasedOnSessionCount($event)">
+                        <div class="error-msg-area">
+                            <div *ngIf="clientForm.controls['noOfSession'].errors && (!clientForm.controls['noOfSession'].pristine|| isclientFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!clientForm.controls['noOfSession'].errors.required">Please Enter No.of
+                                    Session
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="days" class="block mb-2 font-bold text-gray-600">Select Days</label>
+                        <ng-multiselect-dropdown class="w-full shadow mt-3" formControlName="onWeekDay"
+                            [placeholder]="'Please Select Days'" [settings]="weekArr" [data]="Data"
+                            (ngModelChange)="weekly($event)">
+                        </ng-multiselect-dropdown>
+                    </div>
+                </div>
+                <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
+                    <div>
+                        <label for="name" class="block mb-2 font-bold text-gray-600">Amount</label>
+                        <input type="text" id="name" name="name" placeholder="Enter Amount"
+                            class="border border-gray-300 shadow p-2 w-full rounded" formControlName="amount">
+                        <div class="error-msg-area">
+                            <div *ngIf="clientForm.controls['amount'].errors && (!clientForm.controls['amount'].pristine|| isclientFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!clientForm.controls['amount'].errors.required">Please Enter Amount
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="Branch" class="block mb-2 font-bold text-gray-600">Staff</label>
+                        <select class="border border-gray-300 shadow p-2 w-full rounded" formControlName="staff"
+                            (change)="dividBySlotTime($event)">
+                            <option value="" disabled>--select--</option>
+                            <option value="{{staff.staffid}}" *ngFor="let staff of staffNameArr">
+                                {{staff.staffName}}
+                            </option>
+                        </select>
+                        <!-- <div class="error-msg-area">
+                            <div *ngIf="clientForm.controls['Branch'].errors && (!clientForm.controls['Branch'].pristine )"
+                                class="error-msg">
+                                <div [hidden]="!clientForm.controls['Branch'].errors.required">Please Enter Branch Name
+                                </div>
+                            </div>
+                        </div> -->
+                    </div>
+                </div>
+                <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
+                    <div>
+                        <label class="block mb-2 font-bold text-gray-600"> Start Date <span
+                                class="required">*</span></label>
+                        <div class="input-group">
+                            <!-- <div class="input-group-prepend">
+                            </div> -->
+                            <input type="text" class="form-control data-picker-color user-font"
+                                formControlName="startDate" bsDatepicker
+                                [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
+                                (bsValueChange)="onDateChangeStart($event)" (input)="inputdobValidator($event)"
+                                placeholder="DD-MM-YYYY">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block mb-2 font-bold text-gray-600">End Date <span
+                                class="required">*</span></label>
+                        <div class="input-group">
+                            <!-- <div class="input-group-prepend">
+                            </div> -->
+                            <input type="text" class="form-control data-picker-color user-font"
+                                formControlName="endDate" bsDatepicker
+                                [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
+                                (bsValueChange)="onDateChangeEnd($event)" (input)="inputdobValidator($event)"
+                                maxlength="10" placeholder="DD-MM-YYYY">
+                        </div>
+                    </div>
+                </div>
+                <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
+                    <div>
+                        <label for="Branch" class="block mb-2 mt-3 font-bold text-gray-600">Service</label>
+                        <select class="border border-gray-300 shadow p-2 w-full rounded" formControlName="service">
+                            <option value="" disabled>--select--</option>+
+                            <option value="{{service.serviceName}}" *ngFor="let service of seviceArr">
+                                {{service.serviceName}}
+                            </option>
+                        </select>
+                        <!-- <div class="error-msg-area">
+                            <div *ngIf="clientForm.controls['Branch'].errors && (!clientForm.controls['Branch'].pristine )"
+                                class="error-msg">
+                                <div [hidden]="!clientForm.controls['Branch'].errors.required">Please Enter Branch Name
+                                </div>
+                            </div>
+                        </div> -->
+                    </div>
+                    <div>
+                        <label for="type" class="block mb-1 mt-3 font-bold text-gray-600">Type</label>
+                        <div class="btn-group btn-group-toggle p-3 pl-2">
+                            <label class="btn-primary ml-2 ">
+                                <input class="form-check-input" type="radio" name="exampleRadios"
+                                    formControlName="typeofTreatment" id="exampleRadios1" value="1"> OP
+                            </label>
+                            <label class="btn-primary ml-5">
+                                <input class="form-check-input" type="radio" name="exampleRadios"
+                                    formControlName="typeofTreatment" id="exampleRadios1" value="3"> IP
+                            </label>
+                            <label class="btn-primary ml-5">
+                                <input class="form-check-input" type="radio" name="exampleRadios"
+                                    formControlName="typeofTreatment" id="exampleRadios1" value="2">Teletherapy
+                            </label>
+                            <label class="btn-primary ml-5">
+                                <input class="form-check-input" type="radio" name="exampleRadios"
+                                    formControlName="typeofTreatment" id="exampleRadios1" value="0">
+                                Home
+                            </label>
+                            <label class="btn-primary ml-5">
+                                <input class="form-check-input" type="radio" name="exampleRadios"
+                                    formControlName="typeofTreatment" id="exampleRadios1" value="4">
+                                Assessment
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3 ">
+                    <div>
+                        <label for="Branch" class="block mb-2 font-bold text-gray-600">Slots</label>
+                        <select class="border border-gray-300 shadow p-2 w-full rounded" formControlName="slot"
+                            (change)="Slot($event)">
+                            <option value="" disabled>--select--</option>
+                            <option value="{{service.slotName}}" *ngFor="let service of addRole">
+                                {{service.slotName}}
+                            </option>
+                        </select>
+                        <!-- <div class="error-msg-area">
+                        <div *ngIf="clientForm.controls['Branch'].errors && (!clientForm.controls['Branch'].pristine )"
+                            class="error-msg">
+                            <div [hidden]="!clientForm.controls['Branch'].errors.required">Please Enter Branch Name
+                            </div>
+                        </div>
+                    </div> -->
+                    </div>
+                    <div>
+                        <label for="Branch" class="block mb-2 font-bold text-gray-600">Duration</label>
+                        <select class="border border-gray-300 shadow p-2 w-full rounded" formControlName="duration"
+                            (change)="dividingSlot($event)">
+                            <option value="" disabled>--select--</option>+
+                            <option value="{{Duration.id}}" *ngFor="let Duration of sessionDuration">
+                                {{Duration.time}}
+                            </option>
+                        </select>
+                        <!-- <div class="error-msg-area">
+                        <div *ngIf="clientForm.controls['Branch'].errors && (!clientForm.controls['Branch'].pristine )"
+                            class="error-msg">
+                            <div [hidden]="!clientForm.controls['Branch'].errors.required">Please Enter Branch Name
+                            </div>
+                        </div>
+                    </div> -->
+                    </div>
+                </div>
+                <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
+                    <div>
+                        <label for="twitter" class="block mb-2 mt-3 font-bold text-gray-600">Start Time</label>
+                        <input class="border border-gray-300 shadow p-2 w-full rounded " type="text"
+                            placeholder="Select Start Time" formControlName="startTime" name="startTime"
+                            [ngxTimepicker]="startrange" [min]=startTimeData1 [max]=endTimeData1 [format]="24">
+                        <ngx-material-timepicker #startrange (opened)="startpickerOpened = true;"
+                            [defaultTime]="'06:00 am'" [minutesGap]="5"
+                            (timeChanged)="startTimeonChangeHour($event)"></ngx-material-timepicker>
+                        <!-- <div class="error-msg-area">
+                            <div *ngIf="roleForm.controls['startTime'].errors && (!roleForm.controls['startTime'].pristine|| isroleFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!roleForm.controls['startTime'].errors.required">Please Enter Start Time
+                                </div>
+                            </div>
+                        </div> -->
+                    </div>
+                    <div>
+                        <label for="name" class="block mb-2 mt-3 font-bold text-gray-600">End Time</label>
+                        <input class="border border-gray-300 shadow p-2 w-full rounded " type="text"
+                            placeholder="Select End Time" formControlName="endTime" name="endTime"
+                            [ngxTimepicker]="Endrange" [format]="24" [disabled]="true">
+                        <ngx-material-timepicker #Endrange (opened)="endpickerOpened = true;" [defaultTime]="'18:00 pm'"
+                            [minutesGap]="5" (timeChanged)="endTimeonChangeHour($event)">
+                        </ngx-material-timepicker>
+                        <!-- <div class="error-msg-area">
+                            <div *ngIf="roleForm.controls['endTime'].errors && (!roleForm.controls['endTime'].pristine|| isroleFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!roleForm.controls['endTime'].errors.required">Please Enter End Time
+                                </div>
+                            </div>
+                        </div> -->
+                    </div>
+                </div>
+                <div>
+                    <button class="block float-right bg-teal-400 text-white font-bold p-2 mt-4 rounded-lg"
+                        (click)="addClient()">Add Session</button>
+                </div>
+                <div class="col-12 mt-5" *ngIf="showAddSession">
+                    <h1 class="font-bold text-teal-400 mb-2 mt-4" style="font-size: x-large;">Add Session</h1>
+                    <ng-container formArrayName="addSession"
+                        *ngFor="let room of clientForm.get('addSession')['controls']; let i= index;">
+                        <ng-container [formGroupName]="i">
+                            <div class="row">
+                                <div class="col-7">
+                                    <div class="card mb-4">
+                                        <ng-container>
+                                            <div class="card py-0">
+                                                <div class="card-header">
+                                                    <div class="text-center">{{dateForSlot[i]}}</div>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <ng-container *ngFor="let slot of timeInterval; let j = index">
+                                                            <div class="col-md-4 sessionSlots card"
+                                                                [ngClass]="(i == i && j == newDuplicateIndex[i][j]) ? 'bg-gray-300' : 'pointer'"
+                                                                (click)="(i == i && j == newDuplicateIndex[i][j]) ? '' : slotSelection(slot, i, j)">
+                                                                {{slot}}
+                                                                <div class="badge_position">
+                                                                    <span class="badge bg-teal-400"
+                                                                        *ngIf="(i == slotIndexForI) && (j == slotIndexForJ)">Booked</span>
+                                                                </div>
+                                                            </div>
+                                                        </ng-container>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                                <div class="col-5">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div>
+                                                <label for="twitter" class="block mb-2 font-bold text-gray-600">Slot Start
+                                                    Time</label>
+                                                <input class="border border-gray-300 shadow p-2 w-full rounded " type="text"
+                                                    placeholder="Select Start Time" formControlName="slotStartTime"
+                                                    name="startTime" [ngxTimepicker]="startrange" [format]="24"
+                                                    [disabled]="true">
+                                                <ngx-material-timepicker #startrange (opened)="startpickerOpened = true;"
+                                                    [defaultTime]="'06:00 am'" [minutesGap]="5"
+                                                    (timeChanged)="startTimeonChangeHour($event)"></ngx-material-timepicker>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div>
+                                                <label for="name" class="block mb-2 font-bold text-gray-600">Slot End
+                                                    Time</label>
+                                                <input class="border border-gray-300 shadow p-2 w-full rounded " type="text"
+                                                    placeholder="Select End Time" formControlName="slotEndTime" name="endTime"
+                                                    [ngxTimepicker]="Endrange" [format]="24" [disabled]="true">
+                                                <ngx-material-timepicker #Endrange (opened)="endpickerOpened = true;"
+                                                    [defaultTime]="'18:00 pm'" [minutesGap]="5"
+                                                    (timeChanged)="endTimeonChangeHour($event)">
+                                                </ngx-material-timepicker>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div>
+                                            <label for="Branch" class="block mb-2 font-bold text-gray-600 ">Slots</label>
+                                            <select class="border border-gray-300 shadow p-2 w-full rounded"
+                                                formControlName="slot" (change)=" sessionSlot($event,i)">
+                                                <option value="" disabled>--select--</option>+
+                                                <option value="{{service.slotName}}" *ngFor="let service of addRole">
+                                                    {{service.slotName}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </ng-container>
+                </div>
+                <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg"
+                    *ngIf="!showAddEdit && showAddSession" (click)="saveClient()">Submit</button>
+                <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg"
+                    *ngIf="showAddEdit && showAddSession" (click)="updateClientInBase4App()">Update</button>
+            </form>
+        </div>
+    </section>
+</div>
+<app-flash-message></app-flash-message>

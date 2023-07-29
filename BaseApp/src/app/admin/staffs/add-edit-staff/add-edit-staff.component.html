@@ -1,0 +1,126 @@
+<div class="bg-white p-6 rounded-lg shadow-lg">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-header heading text-2xl font-bold">Staff</h2>
+            <button class="card-header btn float-right" (click)="back()"><i class="fa fa-reply"></i>&nbsp;Back</button>
+        </div>
+    </div>
+    <section class="flex items-center justify-center">
+        <div class="container mt-4">
+            <form class="form" novalidate="" [formGroup]="staffForm">
+                <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
+                    <div>
+                        <label for="empId" class="block mb-2 font-bold text-gray-600">Employee ID</label>
+                        <input class="border border-gray-300 shadow p-2 w-full rounded" type="text"
+                            placeholder="Enter Employee Id" formControlName="empId" name="empId">
+                        <div class="error-msg-area">
+                            <div *ngIf="staffForm.controls['empId'].errors && (!staffForm.controls['empId'].pristine|| isStaffFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!staffForm.controls['empId'].errors.required">Please Enter Start Time
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="staffName" class="block mb-2 font-bold text-gray-600 ">Staff Name</label>
+                        <input type="text" id="staffName" name="staffName" placeholder="Enter Staff Name"
+                            class="border border-gray-300 shadow p-2 w-full rounded" formControlName="staffName">
+                        <div class="error-msg-area">
+                            <div *ngIf="staffForm.controls['staffName'].errors && (!staffForm.controls['staffName'].pristine || isStaffFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!staffForm.controls['staffName'].errors.required">Please Enter Staff Name
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
+                    <div>
+                        <label for="Branch" class="block mb-2 font-bold text-gray-600">Branch</label>
+                        <select class="border border-gray-300 shadow p-2 w-full rounded" formControlName="branchId" >
+                            <option value="">--select--</option>+
+                            <option value="{{branch._id}}" *ngFor="let branch of branchDataList" >
+                                {{branch.branchName}}
+                            </option>
+                        </select>
+                        <div class="error-msg-area">
+                            <div *ngIf="staffForm.controls['branchId'].errors && (!staffForm.controls['branchId'].pristine|| isStaffFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!staffForm.controls['branchId'].errors.required">Please Enter Branch Name
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="email" class="block mb-2 font-bold text-gray-600">Email</label>
+                        <input class="border border-gray-300 shadow p-2 w-full rounded" type="text"
+                            placeholder="Enter Email" formControlName="email" name="email">
+                        <div class="error-msg-area">
+                            <div *ngIf="staffForm.controls['email'].errors && (!staffForm.controls['email'].pristine|| isStaffFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!staffForm.controls['email'].errors.required">Please Enter Email
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
+                    <div class="grid sm:grid-cols-1 md:grid-cols-1 ">
+                        <label for="name" class="block mb-2 font-bold text-gray-600 ">Address</label>
+                        <input class="border border-gray-300 shadow p-2 w-full rounded" id="inputPhysicalStreet"
+                            rows="3" ngx-google-places-autocomplete [options]='options' formControlName="address"
+                            name="address" #placesRef="ngx-places" (onAddressChange)="handleAddressChange($event)"
+                            autocomplete="false" />
+                        <div class="error-msg-area">
+                            <div *ngIf="staffForm.controls['address'].errors && (!staffForm.controls['address'].pristine|| isStaffFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!staffForm.controls['address'].errors.required">Please Enter Address
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="phone" class="block mb-2 font-bold text-gray-600">Phone</label>
+                        <input class="border border-gray-300 shadow p-2 w-full rounded" type="text"
+                            placeholder="Enter Phone Number" formControlName="phone" name="phone">
+                        <div class="error-msg-area">
+                            <div *ngIf="staffForm.controls['phone'].errors && (!staffForm.controls['phone'].pristine|| isStaffFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!staffForm.controls['phone'].errors.required">Please Enter Phone Number
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
+                    <div>
+                        <label for="staffRole" class="block mb-2 font-bold text-gray-600">Role</label>
+                        <select class="border border-gray-300 shadow p-2 w-full rounded" formControlName="staffRole" (change)="getRolebyIdBack4App($event)">
+                            <option value="">--select--</option>+
+                            <option value="{{role._id}}" *ngFor="let role of roleDataList">
+                                {{role.name}}
+                            </option>
+                        </select>
+                        <div class="error-msg-area">
+                            <div *ngIf="staffForm.controls['staffRole'].errors && (!staffForm.controls['staffRole'].pristine|| isStaffFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!staffForm.controls['staffRole'].errors.required">Please Enter Role
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+
+                </div>
+
+                <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg" (click)="addStaff()"
+                    *ngIf="!showAddEdit">Add Staff</button>
+                <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg"
+                    (click)="updateStaffByID()" *ngIf="showAddEdit">Update Staff</button>
+            </form>
+        </div>
+    </section>
+</div>
+<app-flash-message></app-flash-message>

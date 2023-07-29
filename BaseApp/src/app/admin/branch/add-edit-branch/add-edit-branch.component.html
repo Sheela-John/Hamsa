@@ -1,0 +1,46 @@
+<div class="main bg-white p-6 rounded-lg shadow-lg">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-header heading text-2xl font-bold">Branch</h2>
+            <button class="card-header btn float-right" (click)="addeditForm()"><i
+                    class="fa fa-reply"></i>&nbsp;Back</button>
+        </div>
+    </div>
+    <section class="flex items-center justify-center">
+        <div class="container mt-4">
+            <form novalidate="" [formGroup]="branchForm">
+                <div class="grid sm:grid-cols-1 md:grid-cols-1 ">
+                    <label for="name" class="block mb-2 font-bold text-gray-600 ">Branch Name</label>
+                    <input type="text" id="name" name="name" placeholder="Enter Branch Name"
+                        class="border border-gray-300 shadow p-2 w-full rounded" formControlName="branchName">
+                    <div class="error-msg-area">
+                        <div *ngIf="branchForm.controls['branchName'].errors && (!branchForm.controls['branchName'].pristine|| isbranchFormSubmitted)"
+                            class="error-msg">
+                            <div [hidden]="!branchForm.controls['branchName'].errors.required">Please Enter Branch Name
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid sm:grid-cols-1 md:grid-cols-1 ">
+                    <label for="name" class="block mb-2 font-bold text-gray-600 ">Address</label>
+                    <input class="border border-gray-300 shadow p-2 w-full rounded" id="inputPhysicalStreet" rows="3"
+                        ngx-google-places-autocomplete [options]='options' formControlName="branchAddress"
+                        name="branchAddress" #placesRef="ngx-places" (onAddressChange)="handleAddressChange($event)"
+                        autocomplete="false" />
+                    <div class="error-msg-area">
+                        <div *ngIf="branchForm.controls['branchAddress'].errors && (!branchForm.controls['branchAddress'].pristine|| isbranchFormSubmitted)"
+                            class="error-msg">
+                            <div [hidden]="!branchForm.controls['branchAddress'].errors.required">Please Enter Address
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg" *ngIf="!showAddEdit"
+                    (click)="saveBranchBase4App()">Submit</button>
+                <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg" *ngIf="showAddEdit"
+                    (click)="updateBranchInBase4App()">Update</button>
+            </form>
+        </div>
+    </section>
+</div>
+<app-flash-message></app-flash-message>

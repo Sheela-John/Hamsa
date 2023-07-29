@@ -1,0 +1,68 @@
+<div class="main bg-white p-6 rounded-lg shadow-lg">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-header heading text-2xl font-bold">Staff List</h2>
+            <button class="card-header btn float-right" (click)="addStaffs()"><i
+                    class="fa fa-plus"></i>&nbsp;&nbsp;Add</button>
+        </div>
+    </div>
+    <section class="flex items-center justify-center">
+        <div class="container">
+            <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger"
+                class="w-full flex flex-row flex-no-wrap sm:bg-white rounded-lg overflow-hidden sm:shadow-lg my-5">
+                <thead class="text-white">
+                    <tr
+                        class="bg-teal-400 flex flex-col flex-no wrap sm:table-row rounded-l-lg sm:rounded-none mb-2 sm:mb-0">
+                        <th class="p-3 text-left">Employee ID</th>
+                        <th class="p-3 text-left">Staff Name</th>
+                        <th class="p-3 text-left">Phone Number</th>
+                        <th class="p-3 text-left">Email ID</th>
+                        <!-- <th class="p-3 text-left">Address</th> -->
+                        <th class="p-3 text-left">Branch</th>
+                        <th class="p-3 text-left">Role</th>
+                        <th class="p-3 text-left" width="110px">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="flex-1 sm:flex-none">
+                    <tr class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0"
+                        *ngFor="let staffList of this.staffList">
+                        <td class="border-grey-light border hover:bg-gray-100 ">{{staffList.empId}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 ">{{staffList.staffName}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 ">{{staffList.phone}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 ">{{staffList.email}}</td>
+                        <!-- <td class="border-grey-light border hover:bg-gray-100 p-3">{{staffList.Address}}</td> -->
+                        <td class="border-grey-light border hover:bg-gray-100 ">{{staffList.branchName}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 ">{{staffList.staffRoleName}}</td>
+                        <td
+                            class="border-grey-light border hover:bg-gray-100 text-center text-red-400 hover:text-red-600 hover:font-medium cursor-pointer">
+                            <div class="grid sm:grid-cols-1 md:grid-cols-4 md:gap-1 mt-4">
+                                <div>
+                                    <button title="Edit" class="btn" (click)="editStaff(staffList._id)" style="padding: 0px 5px;"><i
+                                            class='fa fa-edit fa-xs'></i></button>
+                                </div>
+                                <div><button class="btn" title="Branch Transfer" (click)="branchTransfer(staffList.staffId)" style="background-color: rgb(22 51 57);;padding: 0px 5px;"><i
+                                            class="fa-solid fa-upload fa-xs"></i></button></div>
+                                <div>
+                                    <button class="btn" title="Enable" style="background-color:green;padding: 0px 5px;"
+                                        (click)="enableDisableStaffInBase4App(staffList.staffId)" *ngIf=" staffList.Status== 0"><i
+                                            class="fa fa-unlock fa-xs" aria-hidden="true"></i></button>
+                                    <button class="btn"  title="Disable" style="background-color:red;padding: 0px 5px;"
+                                        (click)="enableDisableStaffInBase4App(staffList.staffId)" *ngIf="staffList.Status == 2"><i
+                                            class="fa fa-lock fa-xs" aria-hidden="true"></i></button>
+                                </div>
+                                <div>
+                                    <button class="btn"  title="View" style="background-color: rgb(253 179 18);padding: 0px 5px;"
+                                        (click)="viewStaff(staffList.staffId)"><i
+                                            class='fa fa-eye fa-xs'></i></button>&nbsp;&nbsp;
+                                </div>
+
+                            </div>
+
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+<app-flash-message></app-flash-message>

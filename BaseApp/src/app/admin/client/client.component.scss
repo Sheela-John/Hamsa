@@ -1,0 +1,33 @@
+@media (min-width: 640px){
+.sm\:-translate-y-24 {
+    --tw-translate-y: -2rem;  
+}
+}
+.py-10 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+.px-8 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+.pb-4 {
+    padding-bottom: 0.5rem!important;
+}
+.pt-3 {
+    padding-top: 0.5rem!important;
+}
+.max-w-sm {
+    max-width: 32rem;
+}
+.from-blue-400 {
+    --tw-gradient-from:#017981 ;
+    --tw-gradient-to: rgb(96 165 250 / 0);
+    --tw-gradient-stops: var(--tw-gradient-from), #163339;
+}
+.p-8 {
+    padding: 1rem;
+}
+.h-72 {
+    height: 20rem;
+}

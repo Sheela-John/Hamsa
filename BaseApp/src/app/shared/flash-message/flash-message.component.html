@@ -1,0 +1,12 @@
+<div *ngIf="type==2" class="toastMessage" [ngClass]="{'show': displayMessage,'errorMessage':isError}">
+    <span *ngIf="displayMessage">{{message}}</span>
+</div>
+<div *ngIf="type==1" class="flashMessage animateCss"
+    [ngClass]="{'showFlashmessage': displayMessage,'errorMessage':isError}">
+    <span *ngIf="displayMessage">{{message}}</span>
+</div>
+<!-- Error Message which has to be shown till last -->
+<div *ngIf="type==3" class="flashMessage animateCss"
+    [ngClass]="{'showFlashmessageLong': displayMessage,'errorMessage':isError}">
+    <span *ngIf="displayMessage">{{message}}</span>
+</div>

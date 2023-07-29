@@ -1,0 +1,34 @@
+.hover\:border-pink-600:hover {
+    --border-opacity: 1;
+    border-color: #f3dd15 !important;
+    border-color: rgba(213,63,140,var(--border-opacity));
+}
+.box{
+    background-color: #dbd7c4;
+}
+.subbox{
+    background-color: #163339;
+}
+.fa-id-badge:before {
+    content: "\f2c1";
+    color: #294545;;
+}
+.to-purple-600 {
+    --tw-gradient-to: #e0ea33;
+}
+
+.via-blue-500 {
+    --tw-gradient-to: rgb(59 130 246 / 0);
+    --tw-gradient-stops: #e6b91d, #163339, #e6b91d,#163339;
+}
+.headbox{
+    background-color: white;
+}
+img {
+    
+    margin: 0px 132px;
+    border-radius: 50%;
+}
+article{
+    width: 1050px;
+}

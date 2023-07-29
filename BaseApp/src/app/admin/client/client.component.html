@@ -1,0 +1,46 @@
+<div class="main bg-white p-6 rounded-lg shadow-lg">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-header heading text-2xl font-bold">Client</h2>
+            <button class="card-header btn float-right" (click)="addClient()"><i
+                    class="fa fa-plus"></i>&nbsp;&nbsp;Add</button>
+        </div>
+    </div>
+    <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="w-full flex flex-row flex-no-wrap sm:bg-white rounded-lg overflow-hidden sm:shadow-lg my-5">
+        <thead class="text-white">
+            <tr
+                class="bg-teal-400 flex flex-col flex-no wrap sm:table-row rounded-l-lg sm:rounded-none mb-2 sm:mb-0">
+                <th class="p-3 text-left">UHID</th>
+                <th class="p-3 text-left">Client Name</th>
+                <th class="p-3 text-left">phone</th>
+                <th class="p-3 text-left">Email</th>
+                <th class="p-3 text-left">Address</th>
+                <th class="p-3 text-left">NoOfSession</th>
+                <!-- <th class="p-3 text-left">WeeklySession</th> -->
+                <th class="p-3 text-left">Amount</th>
+                <th class="p-3 text-left" width="110px">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="flex-1 sm:flex-none">
+            <tr class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0"*ngFor="let client of ClientDataArr"  >
+                <td class="border-grey-light border hover:bg-gray-100 p-3">{{client.UHID }}</td>
+                <td class="border-grey-light border hover:bg-gray-100 p-3">{{client.ClientName}}</td>
+                <td class="border-grey-light border hover:bg-gray-100 p-3">{{client.Phone}}</td>
+                <td class="border-grey-light border hover:bg-gray-100 p-3">{{client.Email}}</td>
+                <td class="border-grey-light border hover:bg-gray-100 p-3">{{client.ClientAddress}}</td>
+                <td class="border-grey-light border hover:bg-gray-100 p-3">{{client.NoOfSession}}</td>
+                <!-- <td class="border-grey-light border hover:bg-gray-100 p-3">{{client.WeeklySession}}</td> -->
+                <td class="border-grey-light border hover:bg-gray-100 p-3">{{client.Amount}}</td>
+                <td
+                class="border-grey-light border hover:bg-gray-100 p-3 text-red-400 hover:text-red-600 hover:font-medium cursor-pointer">
+                <button class="btn" (click)="editClient(client.ClientId,client.PackageId)"><i class='fa fa-edit'></i></button>&nbsp;&nbsp;
+                <button class="btn" style="background-color: green;" (click)="enableDisableClientInBase4App(client.ClientId)"
+                *ngIf="client.status == 0"><i class="fa fa-unlock" aria-hidden="true"></i></button>
+                <button class="btn" style="background-color: red;" (click)="enableDisableClientInBase4App(client.ClientId)"
+                *ngIf="client.status == 2"><i class="fa fa-lock" aria-hidden="true"></i></button>
+            </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<app-flash-message></app-flash-message>

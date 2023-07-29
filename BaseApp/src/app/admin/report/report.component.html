@@ -1,0 +1,306 @@
+<div class="main bg-white p-6 rounded-lg shadow-lg">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-header heading text-2xl font-bold">Reports</h2>
+            <!-- <button class="card-header btn float-right" (click)="addService()"><i
+                class="fa fa-plus"></i>&nbsp;&nbsp;Add</button> -->
+        </div>
+    </div>
+
+    <div class="warpper mt-3">
+        <input class="radio" id="one" name="group" type="radio" checked>
+        <input class="radio" id="two" name="group" type="radio">
+        <input class="radio" id="three" name="group" type="radio">
+        <input class="radio" id="four" name="group" type="radio">
+
+        <div class="tabs">
+            <label class="tab" id="one-tab" for="one">Activity Report</label>
+            <label class="tab" id="two-tab" for="two">Therapist Report</label>
+            <label class="tab" id="three-tab" for="three">Travel Expense Report</label>
+            <label class="tab" id="four-tab" for="four">Working Hours Report</label>
+        </div>
+
+        <div class="panels">
+            <div class="panel" id="one-panel">
+                <!-- <div class="panel-title">Activity Report</div> -->
+                <form class="form" novalidate="" [formGroup]="activityReportForm">
+                    <div class="grid sm:grid-cols-1 md:grid-cols-3 md:gap-3">
+                        <!-- <div>
+                            <label for="staffId" class="block mb-2 font-bold text-gray-600">Staff Name</label>
+                        <select class="border border-gray-300 shadow p-2 w-full rounded" 
+                            formControlName="staffId">
+                            <option value="">--select--</option>
+                            <option value="{{staff._id}}" *ngFor="let staff of staffList">{{staff.staffName}}</option>
+                        </select>
+                            <div class="error-msg-area">
+                                <div *ngIf="activityReportForm.controls['staffId'].errors && (!activityReportForm.controls['staffId'].pristine|| isActivityReportSubmitted)"
+                                    class="error-msg">
+                                    <div [hidden]="!activityReportForm.controls['staffId'].errors.required">Please Select Staff Name
+                                    </div>
+                                </div>
+                            </div>
+                        </div> -->
+                        <div>
+                            <label for="startDate" class="block mb-2 font-bold text-gray-600">Start Date</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                </div>
+                                <input type="text" class="form-control data-picker-color user-font"
+                                    formControlName="startDate" bsDatepicker
+                                    [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
+                                    (bsValueChange)="onDateChangeStart($event)"  (input)="inputdobValidator($event)"
+                                     placeholder="DD-MM-YYYY">
+                            </div>
+                            <div class="error-msg-area">
+                                <div *ngIf="activityReportForm.controls['startDate'].errors && (!activityReportForm.controls['startDate'].pristine|| isActivityReportSubmitted)"
+                                    class="error-msg">
+                                    <div [hidden]="!activityReportForm.controls['startDate'].errors.required">Please Enter Start Date
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="endDate" class="block mb-2 font-bold text-gray-600">End Date</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                </div>
+                                <input type="text" class="form-control data-picker-color user-font"
+                                    formControlName="endDate" bsDatepicker
+                                    [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
+                                    (bsValueChange)="onDateChangeEnd($event)" (input)="inputdobValidator($event)"
+                                    maxlength="10" placeholder="DD-MM-YYYY">
+                            </div>
+                            <div class="error-msg-area">
+                                <div *ngIf="activityReportForm.controls['endDate'].errors && (!activityReportForm.controls['endDate'].pristine|| isActivityReportSubmitted)"
+                                    class="error-msg">
+                                    <div [hidden]="!activityReportForm.controls['endDate'].errors.required">Please Enter End Date
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg"
+                        (click)="submitActivityReport()">Submit</button>
+                        </div>
+                    </div>
+                </form>
+                <section class="flex items-center justify-center">
+                    <div class="container">
+                        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" *ngIf="isActivityReportSubmitted"
+                            class="flex sm:bg-white rounded-lg overflow-hidden sm:shadow-lg my-5">
+                            <thead class="text-white">
+                                <tr
+                                    class="bg-teal-400 flex flex-col flex-no wrap sm:table-row rounded-l-lg sm:rounded-none mb-2 sm:mb-0">
+                                    <th class="p-3 text-left">Date</th>
+                                    <th class="p-3 text-left">Emp ID</th>
+                                    <th class="p-3 text-left">Client Name</th>
+                                    <th class="p-3 text-left">Phone Number</th>
+                                    <th class="p-3 text-left">Address</th>
+                                    <th class="p-3 text-left">Start Distance</th>
+                                    <th class="p-3 text-left">End Distance</th>
+                                    <th class="p-3 text-left">Staff Name</th>
+                                    <th class="p-3 text-left">Service</th>
+                                    <th class="p-3 text-left">Start Time</th>
+                                    <!-- <th class="p-3 text-left">End Time</th> -->
+                                    <th class="p-3 text-left">Trans Ref</th>
+                                </tr>
+                            </thead>
+                            <tbody class="flex-1 sm:flex-none">
+                                <tr class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0" *ngFor="let data of activityReportData">
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.date}}</td>
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.empId}}</td>
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.clientName}}</td>
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.phone}}</td>
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.address}}</td>
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.startDistance}}</td>
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.endDistance}}</td>
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.staffName}}</td>
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.serviceName}}</td>
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.time}}</td>
+                                    <!-- <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.staffRole}}</td> -->
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.paymentReferenceId}}</td>
+                                </tr>
+                            </tbody>
+                            <h4 class="text-center" *ngIf="activityReportData.length == 0">No Data Available</h4>
+                        </table>
+                    </div>
+                </section>
+            </div>
+            <div class="panel" id="two-panel">
+                <!-- <div class="panel-title"></div> -->
+                <form class="form" novalidate="" [formGroup]="therapistReportForm">
+                    <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
+                        <div>
+                            <label for="startDate" class="block mb-2 font-bold text-gray-600">Start Date</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                </div>
+                                <input type="text" class="form-control data-picker-color user-font"
+                                    formControlName="startDate" bsDatepicker
+                                    [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
+                                    (bsValueChange)="onDateChangeStart($event)"  (input)="inputdobValidator($event)"
+                                     placeholder="DD-MM-YYYY">
+                            </div>
+                            <div class="error-msg-area">
+                                <div *ngIf="therapistReportForm.controls['startDate'].errors && (!therapistReportForm.controls['startDate'].pristine|| isTherapistReportSubmitted)"
+                                    class="error-msg">
+                                    <div [hidden]="!therapistReportForm.controls['startDate'].errors.required">Please Enter Start Date
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="endDate" class="block mb-2 font-bold text-gray-600">End Date</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                </div>
+                                <input type="text" class="form-control data-picker-color user-font"
+                                    formControlName="endDate" bsDatepicker
+                                    [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
+                                    (bsValueChange)="onDateChangeEnd($event)" (input)="inputdobValidator($event)"
+                                    maxlength="10" placeholder="DD-MM-YYYY">
+                            </div>
+                            <div class="error-msg-area">
+                                <div *ngIf="therapistReportForm.controls['endDate'].errors && (!therapistReportForm.controls['endDate'].pristine|| isTherapistReportSubmitted)"
+                                    class="error-msg">
+                                    <div [hidden]="!therapistReportForm.controls['endDate'].errors.required">Please Enter End Date
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg"
+                        (click)="submitTherapistReport()">Submit</button>
+                        </div>
+                    </div>
+                </form>
+                <section class="flex items-center justify-center">
+                    <div class="container">
+                        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" *ngIf="isTherapistReportSubmitted"
+                            class="w-full flex flex-row flex-no-wrap sm:bg-white rounded-lg overflow-hidden sm:shadow-lg my-5">
+                            <thead class="text-white">
+                                <tr
+                                    class="bg-teal-400 flex flex-col flex-no wrap sm:table-row rounded-l-lg sm:rounded-none mb-2 sm:mb-0">
+                                    <th class="p-3 text-left">Staff Name</th>
+                                    <th class="p-3 text-left">Assigned</th>
+                                    <th class="p-3 text-left">Completed</th>
+                                </tr>
+                            </thead>
+                            <tbody class="flex-1 sm:flex-none">
+                                <tr class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0" *ngFor="let data of therapistReportData">
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.staffName}}</td>
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.assigned}}</td>
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.completed}}</td>
+                                </tr>
+                            </tbody>
+                        <h4 class="text-center" *ngIf="therapistReportData.length == 0">No Data Available</h4>
+                        </table>
+                    </div>
+                </section>
+            </div>
+            <div class="panel" id="three-panel">
+                <!-- <div class="panel-title">3</div> -->
+                <form class="form" novalidate="" [formGroup]="travelExpenseReportForm">
+                    <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
+                        <div>
+                            <label for="startDate" class="block mb-2 font-bold text-gray-600">Start Date</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                </div>
+                                <input type="text" class="form-control data-picker-color user-font"
+                                    formControlName="startDate" bsDatepicker
+                                    [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
+                                    (bsValueChange)="onDateChangeStart($event)"  (input)="inputdobValidator($event)"
+                                     placeholder="DD-MM-YYYY">
+                            </div>
+                            <div class="error-msg-area">
+                                <div *ngIf="travelExpenseReportForm.controls['startDate'].errors && (!travelExpenseReportForm.controls['startDate'].pristine|| isTravelExpenseReportSubmitted)"
+                                    class="error-msg">
+                                    <div [hidden]="!travelExpenseReportForm.controls['startDate'].errors.required">Please Enter Start Date
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="endDate" class="block mb-2 font-bold text-gray-600">End Date</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                </div>
+                                <input type="text" class="form-control data-picker-color user-font"
+                                    formControlName="endDate" bsDatepicker
+                                    [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
+                                    (bsValueChange)="onDateChangeEnd($event)" (input)="inputdobValidator($event)"
+                                    maxlength="10" placeholder="DD-MM-YYYY">
+                            </div>
+                            <div class="error-msg-area">
+                                <div *ngIf="travelExpenseReportForm.controls['endDate'].errors && (!travelExpenseReportForm.controls['endDate'].pristine|| isTravelExpenseReportSubmitted)"
+                                    class="error-msg">
+                                    <div [hidden]="!travelExpenseReportForm.controls['endDate'].errors.required">Please Enter End Date
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg"
+                        (click)="submitTravelExpenseReport()">Submit</button>
+                        </div>
+                    </div>
+                </form>
+                <section class="flex items-center justify-center">
+                    <div class="container">
+                        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger"
+                            class="w-full flex flex-row flex-no-wrap sm:bg-white rounded-lg overflow-hidden sm:shadow-lg my-5">
+                            <thead class="text-white">
+                                <tr
+                                    class="bg-teal-400 flex flex-col flex-no wrap sm:table-row rounded-l-lg sm:rounded-none mb-2 sm:mb-0">
+                                    <th class="p-3 text-left">Staff Name</th>
+                                    <th class="p-3 text-left">Travel Distance</th>
+                                    <th class="p-3 text-left">Amount per KM</th>
+                                    <th class="p-3 text-left">Total Amount</th>
+                                  
+                                </tr>
+                            </thead>
+                            <tbody class="flex-1 sm:flex-none" *ngFor="let travelExpense of TravelExpenseData">
+                                <tr class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0">
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{travelExpense.staffName}}</td>
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{travelExpense.travelDistanceinKm}}</td>
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{travelExpense.travelExpenseCost}}</td>
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{travelExpense.amount}}
+                                    </td>
+                                   
+                                    <!-- <td
+                                        class="border-grey-light border hover:bg-gray-100 p-3 text-red-400 hover:text-red-600 hover:font-medium cursor-pointer">
+                                        <button class="btn" (click)="editStaff()"><i class='fa fa-edit'></i></button>
+                                    </td> -->
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+            <div class="panel" id="four-panel">
+                <!-- <div class="panel-title">4</div> -->
+                <form class="form" novalidate="" [formGroup]="activityReportForm">
+                    <div class="grid sm:grid-cols-1 md:grid-cols-3 md:gap-3">
+                               
+                        <div>
+                            <label for="endDate" class="block mb-2 font-bold text-gray-600">End Date</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                </div>
+                                <input type="text" class="form-control data-picker-color user-font"
+                                    formControlName="endDate" bsDatepicker
+                                    [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
+                                    (bsValueChange)="onDateChangeEnd($event)" (input)="inputdobValidator($event)"
+                                    maxlength="10" placeholder="DD-MM-YYYY">
+                            </div>
+                            <div class="error-msg-area">
+                                <div *ngIf="activityReportForm.controls['endDate'].errors && (!activityReportForm.controls['endDate'].pristine|| isActivityReportSubmitted)"
+                                    class="error-msg">
+                                    <div [hidden]="!activityReportForm.controls['endDate'].errors.required">Please Enter End Date
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg"
+                        (click)="submitActivityReport()">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

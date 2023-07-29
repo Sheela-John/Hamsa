@@ -1,0 +1,79 @@
+/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.main {
+    height: 660px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.error-msg{
+	font-size: 12px;
+	color: red;
+	font-style: italic;
+	min-height: 12px;
+}
+.error-msg-area, .required {
+	height: 20px;
+	color: red;
+	font-style: italic;
+	text-transform: capitalize;
+}
+.card {
+    position: relative;
+}
+
+.card-header {
+    background-color: #163339;
+    color: white;
+    display: inline;
+}
+
+.heading {
+    padding-bottom: 0px !important;
+}
+
+.btn {
+    background-color:rgb(45 212 191 / var(--tw-bg-opacity));
+    color: white;
+}
+
+@media (min-width: 640px) {
+    table {
+        display: inline-table !important;
+    }
+
+    thead tr:not(:first-child) {
+        display: none;
+    }
+}
+
+td:not(:last-child) {
+    border-bottom: 0;
+}
+
+th:not(:last-child) {
+    border-bottom: 2px solid rgba(0, 0, 0, .1);
+}
+
+.dataTables_wrapper .dataTables_length select {
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    background-color: transparent;
+    padding: 4px;
+    margin-top: 20px;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    padding: 5px;
+    background-color: transparent;
+    margin-left: 3px;
+    margin-top: 20px;
+}
+table.dataTable tbody th, table.dataTable tbody td {
+    padding: 0px 9px !important;
+}

@@ -1028,6 +1028,34 @@ const updateClient = async function (datatoupdate) {
     else return Promise.resolve(clientData);
 }
 
+
+async function getAssignServiceDataByStaffIdAndDate(data)
+{
+    
+    log.debug(component, 'Getting AssignService Data by StaffId And Date');
+    log.close();
+    console.log("data",data)
+    let someDate = new Date(data.date);
+    console.log("someDate",new Date(someDate.getTime()))
+    let copiedAppointmentDate = new Date(someDate.getTime());
+    console.log("copiedAppointmentDate",copiedAppointmentDate)
+    let [Err, assignServiceData] = await handle(AssignService.find({ 'staffId': data.staffId,date:copiedAppointmentDate }).lean());
+    console.log("assign",assignServiceData)
+    for(var i=0;i<assignServiceData.length;i++)
+    {
+        let [err, clientData] = await handle(Client.findOne({_id:assignServiceData[i].clientId}).lean());
+        let [err1, staffData] = await handle(Staff.findOne({_id:assignServiceData[i].staffId}).lean());
+        let [err2,serviceData]= await handle(Service.findOne({_id:assignServiceData[i].serviceId}).lean());
+        console.log(err2,"serviceData",serviceData)
+        assignServiceData[i].clientName=clientData.clientName;
+        assignServiceData[i].staffName=staffData.staffName;
+        assignServiceData[i].serviceName=serviceData.serviceName;
+    }
+    if (Err) return Promise.reject(Err);
+    if (lodash.isEmpty(assignServiceData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+    return Promise.resolve(assignServiceData);
+}
+
 module.exports = {
     assignServiceClient: assignServiceClient,
     assignServiceBranch: assignServiceBranch,
@@ -1046,5 +1074,6 @@ module.exports = {
     serviceOnEnd: serviceOnEnd,
     getAssignedServicesById: getAssignedServicesById,
     getAssignedServicesofBranchById: getAssignedServicesofBranchById,
-    updateClient: updateClient
+    updateClient: updateClient,
+    getAssignServiceDataByStaffIdAndDate:getAssignServiceDataByStaffIdAndDate
 }

@@ -1,0 +1,61 @@
+<div class="main bg-white p-6 rounded-lg shadow-lg">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-header heading text-2xl font-bold">Assign Service</h2>
+            <button class="card-header btn float-right" (click)="addAssignService()"><i
+                    class="fa fa-plus"></i>&nbsp;&nbsp;Assign</button>
+        </div>
+    </div>
+    <section class="flex items-center justify-center">
+        <div class="container">
+            <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="w-full flex flex-row flex-no-wrap sm:bg-white rounded-lg overflow-hidden sm:shadow-lg my-5">
+                <thead class="text-white">
+                    <tr
+                        class="bg-teal-400 flex flex-col flex-no wrap sm:table-row rounded-l-lg sm:rounded-none mb-2 sm:mb-0">
+                        <th class="p-3 text-left">Client Name</th>
+                        <th class="p-3 text-left">Phone Number</th>
+                        <th class="p-3 text-left">Address</th>
+                        <th class="p-3 text-left">Service</th>
+                        <th class="p-3 text-left">Staff Name</th>
+                        <th class="p-3 text-left">Date</th>
+                        <th class="p-3 text-left">Start Time</th>
+                        <th class="p-3 text-left">End Time</th>
+                        <th class="p-3 text-left">Status</th>
+                        <th class="p-3 text-left">Action</th>
+                        <!-- <th class="p-3 text-left" width="110px">Actions</th> -->
+                    </tr>
+                </thead>
+                <tbody class="flex-1 sm:flex-none">
+                    <tr class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0"  *ngFor="let assignService of assignServiceList">
+                        <td class="border-grey-light border hover:bg-gray-100 p-3">{{assignService.ClientName}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 p-3">{{assignService.Phone}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 p-3">{{assignService.Address}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 p-3">{{assignService.Service}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 p-3">{{assignService.staffName}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 p-3">{{assignService.Date}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 p-3">{{assignService.startTime}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 p-3">{{assignService.endTime}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 p-3">
+                            <button class="btn" style="background-color: rgb(177, 9, 87);"
+                                *ngIf="assignService.Status == 0">Assigned</button>
+                            <button class="btn" style="background-color: green;"
+                                *ngIf="assignService.Status == 1">Completed</button>
+                            <button class="btn" style="background-color: rgb(255, 204, 0);"
+                                *ngIf="assignService.Status == 2">Reshedule</button>
+                            <button class="btn" style="background-color: rgb(233, 19, 4);"
+                                *ngIf="assignService.Status == 3">Not Available</button>
+                            <button class="btn" style="background-color: rgb(18, 69, 134);"
+                                *ngIf="assignService.Status == 4">Distance Mismatch</button>
+                        </td>
+                        <td class="border-grey-light border hover:bg-gray-100 p-3">
+                        <button class="btn" (click)="edit(assignService._id)"><i class='fa fa-edit'></i></button>
+                        </td>
+                        <!-- <td
+                            class="border-grey-light border hover:bg-gray-100 p-3 text-red-400 hover:text-red-600 hover:font-medium cursor-pointer">
+                            <button class="btn" (click)="editrole(roleList._id)"><i class='fa fa-edit'></i></button></td> -->
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

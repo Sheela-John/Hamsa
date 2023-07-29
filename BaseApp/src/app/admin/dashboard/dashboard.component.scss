@@ -1,0 +1,85 @@
+.progressBar {
+    display: flex;
+    flex-direction: row;
+    margin: 15px;
+    column-gap: 170px;
+}
+
+.progressBar-heading {
+    font-size: 18px;
+    font-weight: 750;
+}
+
+.progressBar-name {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: 750;
+}
+
+.warpper {
+    display: flex;
+    flex-direction: column;
+}
+
+.tab {
+    cursor: pointer;
+    padding: 10px 20px;
+    margin: 0px 2px;
+    background: rgb(45 212 191);
+    display: inline-block;
+    color: #fff;
+    border-radius: 3px 3px 0px 0px;
+    box-shadow: 0 0.5rem 0.4rem #00000080;
+}
+
+.panels {
+    background: #fff;
+    width: 100%;;
+    text-align: left;
+}
+
+.panel {
+    display: none;
+    border-radius: 5px;
+    animation: fadein 0.8s;
+    padding: 15px;
+    box-shadow: 0 1rem 1rem #00000080;
+}
+
+@keyframes fadein {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.panel-title {
+    font-size: 1.5em;
+    font-weight: normal;
+}
+
+.radio {
+    display: none;
+}
+
+#one:checked~.panels #one-panel,
+#two:checked~.panels #two-panel,
+#three:checked~.panels #three-panel,
+#four:checked~.panels #four-panel,
+#five:checked~.panels #five-panel {
+    display: block;
+}
+
+#one:checked~.tabs #one-tab,
+#two:checked~.tabs #two-tab,
+#three:checked~.tabs #three-tab,
+#four:checked~.tabs #four-tab,
+#five:checked~.tabs #five-tab {
+    background: #fff;
+    color: #000;
+    border-top: 3px solid rgb(45 212 191);
+}

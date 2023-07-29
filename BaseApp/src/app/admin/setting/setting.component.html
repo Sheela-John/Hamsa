@@ -1,0 +1,36 @@
+<div class="main bg-white p-6 rounded-lg shadow-lg">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-header heading text-2xl font-bold">Settings</h2>
+        </div>
+    </div>
+    <section class="flex items-center justify-center">
+        <div class="container mt-4">
+            <form novalidate="" [formGroup]="settingForm">
+                <div class="grid sm:grid-cols-2 md:grid-cols-2">
+                    <div>
+                        <label for="name" class="block mb-2 font-bold text-gray-600 ">Average Distance</label>
+                        <input type="text" id="name" name="name" placeholder="Average Distance"
+                            class="border border-gray-300 shadow p-3 w-full rounded mb-"
+                            formControlName="averageDistance">
+                        <div class="error-msg-area">
+                            <div *ngIf="settingForm.controls['averageDistance'].errors && (!settingForm.controls['averageDistance'].pristine|| isSettingFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!settingForm.controls['averageDistance'].errors.required">Please Enter
+                                    Average Distance
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="saveUpdateButton float-left ml-5 bg-teal-400 text-white font-bold p-2 rounded-lg"
+                            *ngIf="!showAddEdit" (click)="SaveSettings()">Save</button>
+                        <button class="saveUpdateButton float-left ml-5 bg-teal-400 text-white font-bold p-2 rounded-lg"
+                            *ngIf="showAddEdit" (click)="updateSettings()">Update</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+</div>
+<app-flash-message></app-flash-message>

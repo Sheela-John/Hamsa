@@ -1,0 +1,91 @@
+<div class="flex flex-no-wrap">
+    <!-- Sidebar starts -->
+    <!-- Remove class [ hidden ] and replace [ sm:flex ] with [ flex ] -->
+    <div style="min-height: 716px"
+        class="side-nav w-64 absolute sm:relative shadow md:h-full flex-col justify-between hidden sm:flex">
+        <!-- Mobile View -->
+        <div class="px-8">
+            <div class="h-16 mt-4 w-full flex items-center">
+                <img src="assets/images/Logo.png" alt="#">
+            </div>
+            <ul class="sidenav-nav mt-10">
+                <li *ngFor="let data of navData"
+                    class="sidenav-nav-item flex w-full justify-between text-gray-300 hover:text-gray-500 cursor-pointer items-center mb-6">
+                    <div class="flex items-center">
+                        <a class="sidenav-nav-link" [routerLink]="[data.url]" routerLinkActive="active"
+                            [routerLinkActiveOptions]="{ exact: true }">
+                            <i class="icon" aria-hidden="true" [class]="data.icon" routerLinkActive="active"
+                                [routerLinkActiveOptions]="{exact:
+                            true}"></i>
+                            <span class="text-md ml-2">{{ data.name }}</span>
+                        </a>
+                    </div>
+                </li>
+                <li
+                    class="sidenav-nav-item flex w-full justify-between text-gray-300 hover:text-gray-500 cursor-pointer items-center mb-6">
+                    <div class="flex items-center">
+                        <a class="sidenav-nav-link" routerLink="/auth/login" routerLinkActive="active"
+                            [routerLinkActiveOptions]="{ exact: true }">
+                            <i class="fa fa-sign-out" aria-hidden="true" routerLinkActive="active"
+                                [routerLinkActiveOptions]="{exact:
+                            true}"></i>
+                            <span class="text-md ml-2">Logout</span>
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div
+        [ngClass]="'side-nav w-64 z-40 absolute shadow md:h-full flex-col justify-between sm:hidden transition duration-150 ease-in-out ' + (isMenu ? 'transform translate-x-0' : 'transform -translate-x-full')">
+        <div class="h-10 w-10 bg-gray-800 absolute right-0 mt-10 -mr-10 flex items-center shadow rounded-tr rounded-br justify-center cursor-pointer"
+            (click)="isMenuBtn()">
+            <i class="fa fa-sliders" aria-hidden="true"></i>
+        </div>
+        <div [ngClass]="(isMenu ? 'block' : 'hidden') + ' h-10 w-10 bg-gray-800 absolute right-0 mt-10 -mr-10 flex items-center shadow rounded-tr rounded-br justify-center cursor-pointer text-white'"
+            (click)="isMenuBtn()">
+            <i class="fa fa-times-circle" aria-hidden="true"></i>
+        </div>
+        <!-- Full View -->
+        <div class="px-8">
+            <div class="h-16 mt-4 w-full flex items-center">
+                <img src="assets/images/Logo.png" alt="#">
+            </div>
+            <ul class="mt-12">
+                <li *ngFor="let data of navData"
+                    class="sidenav-nav-item flex w-full justify-between text-gray-300 active:bg-white active:text-black cursor-pointer items-center mb-6">
+                    <div class="flex items-center">
+                        <a class="sidenav-nav-link" [routerLink]="[data.url]" routerLinkActive="active"
+                            [routerLinkActiveOptions]="{ exact: true }">
+                            <i class="icon" aria-hidden="true" [class]="data.icon" routerLinkActive="active"
+                                [routerLinkActiveOptions]="{exact:
+                            true}"></i>
+                            <span class="text-md ml-2">{{ data.name }}</span>
+                        </a>
+                    </div>
+                </li>
+                <li
+                    class="sidenav-nav-item flex w-full justify-between text-gray-300 hover:text-gray-500 cursor-pointer items-center mb-6">
+                    <div class="flex items-center">
+                        <a class="sidenav-nav-link" routerLink="/auth/login" routerLinkActive="active"
+                            [routerLinkActiveOptions]="{ exact: true }">
+                            <i class="fa fa-sign-out" aria-hidden="true" routerLinkActive="active"
+                                [routerLinkActiveOptions]="{exact:
+                            true}"></i>
+                            <span class="text-md ml-2">Logout</span>
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!-- Sidebar ends -->
+    <!-- Remove class [ h-64 ] when adding a card block -->
+    <div class="container mx-auto py-8 h-64 md:w-4/5 w-11/12 px-4">
+        <!-- Remove class [ border-dashed border-2 border-gray-300 ] to remove dotted border -->
+        <div class="w-full h-full rounded">
+            <app-common-layout></app-common-layout>
+            <!-- Place your content here -->
+        </div>
+    </div>
+</div>

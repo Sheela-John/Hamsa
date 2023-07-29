@@ -1,0 +1,230 @@
+.flashMessage {
+    width: 100%;
+    background: #058405;
+    text-align: center;
+    padding: 5px 5px;
+    color: #fff;
+    font-size: 14px;
+    visibility: hidden;
+    text-transform: capitalize;
+}
+
+.errorMessage {
+    background: #f53c3c !important; 
+}
+
+/* Show the snackbar when clicking on a button (class added with JavaScript) */
+.flashMessage.showFlashmessage {
+    text-transform: capitalize;
+    visibility: visible;
+    -webkit-animation: enter 0.5s, exit 0.5s 2.5s;
+    animation: enter 0.5s, exit 0.5s 2.5s;
+}
+
+/* Animations to fade the snackbar in and out */
+@-webkit-keyframes enter {
+    from {
+        opacity: 0;
+        height: 0;
+    }
+    to {
+        opacity: 1;
+        height: 32px;
+    }
+}
+
+@keyframes enter {
+    from {
+        opacity: 0;
+        height: 0;
+    }
+    to {
+        opacity: 1;
+        height: 32px;
+    }
+}
+
+@-webkit-keyframes exit {
+    from {
+        opacity: 1;
+        height: 32px;
+    }
+    to {
+        opacity: 0;
+        height: 0px;
+    }
+}
+
+@keyframes exit {
+    from {
+        opacity: 1;
+        height: 32px;
+    }
+    to {
+        opacity: 0;
+        height: 0px;
+    }
+}
+
+.flashMessage.showFlashmessageLong {
+    visibility: visible;
+    -webkit-animation: enter 0.5s;
+    animation: enter 0.5s;
+}
+
+/* Animations to fade the snackbar in and out */
+@-webkit-keyframes enter {
+    from {
+        opacity: 0;
+        height: 0;
+    }
+    to {
+        opacity: 1;
+        height: 32px;
+    }
+}
+
+@keyframes enter {
+    from {
+        opacity: 0;
+        height: 0;
+    }
+    to {
+        opacity: 1;
+        height: 32px;
+    }
+}
+
+/* The snackbar - position it at the bottom and in the middle of the screen */
+.toastMessage {
+    visibility: hidden;
+    /* Hidden by default. Visible on click */
+    min-width: 250px;
+    /* Set a default minimum width */
+    margin-left: -125px;
+    /* Divide value of min-width by 2 */
+    background-color: #058405;
+    /* Black background color */
+    color: #fff;
+    /* White text color */
+    text-align: center;
+    /* Centered text */
+    border-radius: 2px;
+    /* Rounded borders */
+    padding: 10px;
+    /* Padding */
+    position: fixed;
+    /* Sit on top of the screen */
+    z-index: 10000;
+    /* Add a z-index if needed */
+    left: 50%;
+    /* Center the snackbar */
+    bottom: 40px;
+    /* 30px from the bottom */
+    /* text-transform: capitalize; */
+}
+
+/* Show the snackbar when clicking on a button (class added with JavaScript) */
+.toastMessage.show {
+    visibility: visible;
+    /* Show the snackbar */
+    /* Add animation: Take 0.5 seconds to fade in and out the snackbar. 
+   However, delay the fade out process for 2.5 seconds */
+    -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+/* Animations to fade the snackbar in and out */
+@-webkit-keyframes fadein {
+    from {
+        bottom: 0;
+        opacity: 0;
+    }
+    to {
+        bottom: 40px;
+        opacity: 1;
+    }
+}
+
+@keyframes fadein {
+    from {
+        bottom: 0;
+        opacity: 0;
+    }
+    to {
+        bottom: 40px;
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes fadeout {
+    from {
+        bottom: 40px;
+        opacity: 1;
+    }
+    to {
+        bottom: 0;
+        opacity: 0;
+    }
+}
+
+@keyframes fadeout {
+    from {
+        bottom: 40px;
+        opacity: 1;
+    }
+    to {
+        bottom: 0;
+        opacity: 0;
+    }
+}
+
+@media (max-width:800px) {
+    .toastMessage {
+        bottom: 60px;
+    }
+
+    @-webkit-keyframes fadein {
+        from {
+            bottom: 0;
+            opacity: 0;
+        }
+        to {
+            bottom: 60px;
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadein {
+        from {
+            bottom: 0;
+            opacity: 0;
+        }
+        to {
+            bottom: 60px;
+            opacity: 1;
+        }
+    }
+
+    @-webkit-keyframes fadeout {
+        from {
+            bottom: 60px;
+            opacity: 1;
+        }
+        to {
+            bottom: 0;
+            opacity: 0;
+        }
+    }
+
+    @keyframes fadeout {
+        from {
+            bottom: 60px;
+            opacity: 1;
+        }
+        to {
+            bottom: 0;
+            opacity: 0;
+        }
+    }
+}

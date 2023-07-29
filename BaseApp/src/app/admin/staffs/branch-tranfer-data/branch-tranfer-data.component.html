@@ -1,0 +1,57 @@
+<div class="main bg-white p-6 rounded-lg shadow-lg">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-header heading text-2xl font-bold">Branch Transfer</h2>
+            <button class="card-header btn float-right" (click)="addBranchTransfer()"><i
+                    class="fa fa-plus"></i>&nbsp;&nbsp;Add</button>
+        </div>
+    </div>
+    <section class="flex items-center justify-center">
+        <div class="container">
+            <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger"
+                class="w-full flex flex-row flex-no-wrap sm:bg-white rounded-lg overflow-hidden sm:shadow-lg my-5">
+                <thead class="text-white">
+                    <tr
+                        class="bg-teal-400 flex flex-col flex-no wrap sm:table-row rounded-l-lg sm:rounded-none mb-2 sm:mb-0">
+                        <th class="p-3 text-left"> BranchTransfer Type</th>
+                        <th class="p-3 text-left">Start Date</th>
+                        <th class="p-3 text-left">End Date</th>
+                        <th class="p-3 text-left">Branch</th>
+                        <th class="p-3 text-left"> Branch Address</th>
+                        <th class="p-3 text-left">Start Time</th>
+                        <th class="p-3 text-left">End Time</th>
+                        
+                        <th class="p-3 text-left" width="110px">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="flex-1 sm:flex-none">
+                    <tr class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0"
+                        *ngFor="let staffList of this.branchTransferArr">
+                        <td class="border-grey-light border hover:bg-gray-100 ">{{staffList.BranchTranfer}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 ">{{staffList.startDate}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 ">{{staffList.endDate}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 ">{{staffList.Branch}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 p-3">{{staffList.Address}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 ">{{staffList.startTime}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 ">{{staffList.endTime}}</td>
+                        <td
+                            class="border-grey-light border hover:bg-gray-100 text-center text-red-400 hover:text-red-600 hover:font-medium cursor-pointer">
+                            <div class="grid sm:grid-cols-1 md:grid-cols-4 md:gap-1 mt-4">
+                                <div>
+                                    <button title="Edit" class="btn text-center" (click)="editBranchTransfer(staffList.BranchTranferId)"><i
+                                            class='fa fa-edit fa-xs'></i></button>
+                                
+                                  
+                                </div>
+                            
+
+                            </div>
+
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+<app-flash-message></app-flash-message>

@@ -1,0 +1,46 @@
+<div class="main bg-white p-6 rounded-lg shadow-lg">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-header heading text-2xl font-bold">Service</h2>
+            <button class="card-header btn float-right" (click)="back()"><i
+                        class="fa fa-reply"></i>&nbsp;Back</button>
+        </div>
+    </div>
+    <section class="flex items-center justify-center">
+        <div class="container mt-4">
+            <form class="form" novalidate="" [formGroup]="serviceForm">
+                <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
+                    <div>
+                        <label for="serviceName" class="block mb-2 font-bold text-gray-600">Service Name</label>
+                        <input class="border border-gray-300 shadow p-2 w-full rounded" type="text"
+                            placeholder="Enter Service Name" formControlName="serviceName" name="serviceName">
+                        <div class="error-msg-area">
+                            <div *ngIf="serviceForm.controls['serviceName'].errors && (!serviceForm.controls['serviceName'].pristine|| isServiceFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!serviceForm.controls['serviceName'].errors.required">Please Enter Service Name
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="duration" class="block mb-2 font-bold text-gray-600 ">Duration</label>
+                        <input type="number" id="duration" name="duration" placeholder="Enter Duration"
+                            class="border border-gray-300 shadow p-2 w-full rounded" formControlName="duration">
+                        <div class="error-msg-area">
+                            <div *ngIf="serviceForm.controls['duration'].errors && (!serviceForm.controls['duration'].pristine || isServiceFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!serviceForm.controls['duration'].errors.required">Please Enter Duration
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg"
+                    (click)="addService()" *ngIf="!showAddEdit">Add Service</button>
+                <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg"
+                    (click)="updateService()" *ngIf="showAddEdit">Update Service</button>
+            </form>
+        </div>
+    </section>
+</div>
+<app-flash-message></app-flash-message>

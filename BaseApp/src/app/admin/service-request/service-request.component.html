@@ -1,0 +1,45 @@
+<div class="main bg-white p-6 rounded-lg shadow-lg">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-header heading text-2xl font-bold">Service Request</h2>
+        </div>
+    </div>
+    <section class="flex items-center justify-center">
+        <div class="container">
+            <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="w-full flex flex-row flex-no-wrap sm:bg-white rounded-lg overflow-hidden sm:shadow-lg my-5">
+                <thead class="text-white">
+                    <tr
+                        class="bg-teal-400 flex flex-col flex-no wrap sm:table-row rounded-l-lg sm:rounded-none mb-2 sm:mb-0">
+                        <th class="p-3 text-left">Patient Name</th>
+                        <th class="p-3 text-left">Date</th>
+                        <th class="p-3 text-left">Service</th>
+                        <th class="p-3 text-left">Reference By</th>
+                        <th class="p-3 text-left">Type Of Request</th>
+                        <th class="p-3 text-left" width="110px">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="flex-1 sm:flex-none" >
+                    <tr class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0" *ngFor="let service of serviceData">
+                        <td class="border-grey-light border hover:bg-gray-100 p-3">{{service.patientName}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 p-3">{{service.date}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 p-3">{{service.service}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 p-3">{{service.referenceBy}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 p-3" >
+                            <span *ngIf="service.status==0">Additional Request</span>
+                            <span *ngIf="service.status==1">Reschedule</span>
+                        </td>
+                       
+                        <td
+                            class="border-grey-light border hover:bg-gray-100 p-3 text-red-400 hover:text-red-600 hover:font-medium cursor-pointer">
+                            <button class="btn" *ngIf="!service.isAssigned && service.status==0"(click)="assignServiceRequest(service.id)">Assign</button>&nbsp;&nbsp;
+                            <button class="btn" *ngIf="!service.isAssigned && service.status==1"(click)="assignServiceRequest(service.id)">Reschedule</button>&nbsp;&nbsp;
+                            <button class="btn" *ngIf="service.isAssigned && service.status==0"(click)="assignServiceRequest(service.id)" disabled>Assigned</button>&nbsp;&nbsp;
+                            <button class="btn" *ngIf="service.isAssigned && service.status==1"(click)="assignServiceRequest(service.id)" disabled>Rescheduled</button>&nbsp;&nbsp;
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+<app-flash-message></app-flash-message>

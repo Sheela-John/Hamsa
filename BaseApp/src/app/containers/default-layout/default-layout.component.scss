@@ -1,0 +1,22 @@
+.logo {
+    max-width: 30%;
+    height: auto;
+}
+
+.sidenav-nav-link {
+    display: flex;
+    align-items: center;
+    height: 2rem;
+    text-decoration: none;
+    border-radius: 0.625rem;
+    transition: all .3s ease;
+}
+
+.sidenav-nav-link:active {
+    background-color: #f3f3f3;
+    color: #163339;
+}
+
+.side-nav {
+    background-color: #163339;
+}

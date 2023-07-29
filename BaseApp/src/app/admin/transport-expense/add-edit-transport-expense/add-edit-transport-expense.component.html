@@ -1,0 +1,49 @@
+<div class="main bg-white p-6 rounded-lg shadow-lg">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-header heading text-2xl font-bold">Transport Expense</h2>
+            <button class="card-header btn float-right" (click)="back()"><i class="fa fa-reply"></i>&nbsp;Back</button>
+        </div>
+    </div>
+    <section class="flex items-center justify-center">
+        <div class="container mt-4">
+            <form novalidate="" [formGroup]="travelExpenseForm">
+                <div class="grid sm:grid-cols-1 md:grid-cols-1 ">
+                    <label for="name" class="block mb-2 font-bold text-gray-600 ">Travel Expense Mode</label>
+                    <input type="text" id="name" name="name" placeholder="Travel Expense Mode"
+                        class="border border-gray-300 shadow p-3 w-full rounded mb-"
+                        formControlName="travelExpenseMode">
+                    <div class="error-msg-area">
+                        <div *ngIf="travelExpenseForm.controls['travelExpenseMode'].errors && 
+                            (!travelExpenseForm.controls['travelExpenseMode'].pristine || 
+                            isTravelExpenseFormSubmitted)" class="error-msg">
+                            <div [hidden]="!travelExpenseForm.controls['travelExpenseMode'].errors.required">
+                                Please Enter Travel Expense Mode
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid sm:grid-cols-1 md:grid-cols-1 ">
+                    <label for="name" class="block mb-2 font-bold text-gray-600 ">Travel Expense Cost</label>
+                    <input type="text" id="name" name="name" placeholder="Travel Expense Cost"
+                        class="border border-gray-300 shadow p-3 w-full rounded mb-"
+                        formControlName="travelExpenseCost">
+                    <div class="error-msg-area">
+                        <div *ngIf="travelExpenseForm.controls['travelExpenseCost'].errors && 
+                            (!travelExpenseForm.controls['travelExpenseCost'].pristine || 
+                            isTravelExpenseFormSubmitted)" class="error-msg">
+                            <div [hidden]="!travelExpenseForm.controls['travelExpenseCost'].errors.required">
+                                Please Enter Travel Expense Cost
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg" *ngIf="!showAddEdit"
+                    (click)="saveTravelExpense()">Save</button>
+                <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg" *ngIf="showAddEdit"
+                    (click)="updateTravelExpense()">Update</button>
+            </form>
+        </div>
+    </section>
+</div>
+<app-flash-message></app-flash-message>

@@ -155,5 +155,9 @@ router.put('/updateBranch/:id', async (req, res, next) => {
     if (err) return next(err);
     else return res.status(200).json({ status: true, data: updateData });
 })
-
+router.post('/getAssignServiceDataByStaffIdAndDate', async (req, res, next) => {
+    let [err, assignServiceDataData] = await handle(AssignServiceAPI.getAssignServiceDataByStaffIdAndDate(req.body));
+    if (err) return next(err);
+    else return res.status(200).json({ status: true, data: assignServiceDataData });
+})
 module.exports = router;

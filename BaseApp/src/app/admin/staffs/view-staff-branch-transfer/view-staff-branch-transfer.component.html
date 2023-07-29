@@ -1,0 +1,56 @@
+<div class="bg-white p-6 rounded-lg shadow-lg">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-header heading text-2xl font-bold">Staff</h2>
+            <button class="card-header btn float-right" (click)="back()"><i class="fa fa-reply"></i>&nbsp;Back</button>
+        </div>
+    </div>
+    <section class="flex items-center justify-center">
+
+
+        <article class="rounded-xl border border-gray-700 box p-4 mt-5 ">
+            <div class="relative block overflow-hidden rounded-lg border headbox border-gray-100  mb-4 sm:p-6 lg:p-4">
+                <span
+                    class="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"></span>
+                <div class="grid sm:grid-cols-1 md:grid-cols-1 md:gap-3 ml-4 ">
+                    <div class="font-bold italic text-xl text-center">{{staffName}} - &nbsp;<i class="fa fa-id-badge"
+                            aria-hidden="true"></i>&nbsp;{{empid}}</div>
+                </div>
+            </div>
+            <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3 ml-4">
+                <div class="md:grid-cols-1">
+                    <div class="font-semibold italic text-xl"><i class="fa fa-envelope"
+                            aria-hidden="true"></i>&nbsp;&nbsp;{{Email}}</div>
+                    <div class="font-semibold italic text-xl"><i class="fa fa-phone"
+                            aria-hidden="true"></i>&nbsp;&nbsp;{{phone}}</div>
+                    <div class="font-semibold italic text-xl "><i class="fa fa-map-marker"
+                            aria-hidden="true"></i>&nbsp;&nbsp;{{address}}</div>
+                    <div class="font-semibold italic text-xl "><i class="fa fa-user-circle"
+                            aria-hidden="true"></i>&nbsp;&nbsp;{{RoleArr}} </div>
+                    <div class="font-semibold italic text-xl"><i class="fa fa-home"
+                            aria-hidden="true"></i>&nbsp;&nbsp;{{Branch}}</div>
+                </div>
+                <!-- <div>
+                    <img src="assets/images/user.jpg" width="143px" height="50px" />
+                </div> -->
+            </div>
+
+            <ul class="mt-4 space-y-2" *ngFor="let branch of this.branchTransferArr">
+                <li>
+                    <div class="block h-full rounded-lg border border-gray-700 subbox p-4 hover:border-pink-600">
+                        <div class="grid sm:grid-cols-1 md:grid-cols-6 md:gap-3 ml-4 " style="color:white">
+                            <div>{{branch.BranchTranfer}}</div>
+                            <div>{{branch.BranchName}}</div>
+                            <div>{{branch.startDate}} {{branch.startTime}}</div>
+                            <div>{{branch.endDate}}  {{branch.endTime}} </div>
+                            <div> <button  class="btn" (click)="editBranchTransfer(branch.BranchTranferId)" style="background-color: rgb(253 179 18)"><i
+                                class='fa fa-edit fa-xs'></i></button></div>
+                                <div> <button  class="btn" (click)="deleteBranchTransfer(branch,branch.BranchTranferId)" style="background-color: rgb(253, 45, 18)"><i
+                                    class='fa fa-trash fa-xs'></i></button></div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </article>
+    </section>
+    <app-flash-message></app-flash-message>

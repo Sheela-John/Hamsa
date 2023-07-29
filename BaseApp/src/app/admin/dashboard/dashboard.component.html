@@ -1,0 +1,451 @@
+<div class="main bg-white p-6 rounded-lg shadow-lg">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-header heading text-2xl font-bold">Dashboard</h2>
+        </div>
+    </div>
+    <section class="flex items-center justify-center">
+        <div class="container">
+            <div class="col-12 col-md-6 display-block float-right mt-3">
+                <div class="input-group-lg">
+                <select class="form-select" aria-label="Default select example">
+                    <option selected>Select Staff</option>
+                    <option value="1">Grace</option>
+                    <option value="2">Gabrielle</option>
+                    <option value="3">Molly</option>
+                </select>
+            </div>
+            </div>
+            <h4 class="progressBar-heading mt-7">Assigned Service Status</h4>
+            <div class="progressBar mt-5">
+                <div>
+                    <round-progress [current]="assignedLength" [max]="100" [color]="'rgb(177, 9, 87)'"
+                        [background]="'#eaeaea'" [radius]="65" [stroke]="25" [semicircle]="false" [rounded]="true"
+                        [clockwise]="true" [responsive]="false" [duration]="800" [animation]="'easeInOutQuart'"
+                        [animationDelay]="800">
+                    </round-progress>
+                    <h4 class="progressBar-name" style="color:rgb(177, 9, 87)">Assigned</h4>
+                </div>
+                <div>
+                    <round-progress [current]="completedLength" [max]="100" [color]="'green'"
+                        [background]="'#eaeaea'" [radius]="65" [stroke]="25" [semicircle]="false" [rounded]="true"
+                        [clockwise]="true" [responsive]="false" [duration]="800" [animation]="'easeInOutQuart'"
+                        [animationDelay]="800">
+                    </round-progress>
+                    <h4 class="progressBar-name" style="color:green">Completed</h4>
+                </div>
+                <div>
+                    <round-progress [current]="rescheduleLength" [max]="100"
+                        [color]="'rgb(255, 204, 0)'" [background]="'#eaeaea'" [radius]="65" [stroke]="25"
+                        [semicircle]="false" [rounded]="true" [clockwise]="true" [responsive]="false" [duration]="800"
+                        [animation]="'easeInOutQuart'" [animationDelay]="800">
+                    </round-progress>
+                    <h4 class="progressBar-name" style="color:rgb(255, 204, 0)">Rescheduled</h4>
+                </div>
+                <div>
+                    <round-progress [current]="notAvailableLength" [max]="100"
+                        [color]="'rgb(233, 19, 4)'" [background]="'#eaeaea'" [radius]="65" [stroke]="25"
+                        [semicircle]="false" [rounded]="true" [clockwise]="true" [responsive]="false" [duration]="800"
+                        [animation]="'easeInOutQuart'" [animationDelay]="800">
+                    </round-progress>
+                    <h4 class="progressBar-name" style="color:rgb(233, 19, 4)">Not Available</h4>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="warpper mt-3">
+        <input class="radio" id="one" name="group" type="radio" checked>
+        <input class="radio" id="two" name="group" type="radio">
+        <input class="radio" id="three" name="group" type="radio">
+        <input class="radio" id="four" name="group" type="radio">
+        <input class="radio" id="five" name="group" type="radio">
+
+        <div class="tabs">
+            <label class="tab" id="one-tab" for="one">TODAY</label>
+            <label class="tab" id="two-tab" for="two">YESTERDAY</label>
+            <label class="tab" id="three-tab" for="three">PAST 7 DAYS</label>
+            <label class="tab" id="four-tab" for="four">PAST 30 DAYS</label>
+            <label class="tab" id="five-tab" for="five">CUSTOM</label>
+        </div>
+
+        <div class="panels">
+            <div class="panel" id="one-panel">
+                <div class="row g-3 mb-3 row-deck">
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">Total time tracked</span>
+                                <div><span class="fs-6 fw-bold me-2">-</span></div>
+                                <small class="text-muted d-block">This week: -</small>
+                                <small class="text-muted d-block">This month: -</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">Productive time</span>
+                                <div><span class="fs-6 fw-bold me-2">-</span></div>
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 30%" aria-valuenow="30"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">Distance Mismatch</span>
+                                <div><span class="fs-6 fw-bold me-2">-</span></div>
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped bg-info" role="progressbar" style="width: 30%" aria-valuenow="35"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-title">Average Visiting Count</div>
+                <div class="row g-3 mb-3 row-deck">
+                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">OP</span>
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped" role="progressbar" style="width: 30%" aria-valuenow="30"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">IP</span>
+                                <!-- <div><span class="fs-6 fw-bold me-2">7H</span></div> -->
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped bg-danger" role="progressbar" style="width: 40%" aria-valuenow="40"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">Teletherapy</span>
+                                <!-- <div><span class="fs-6 fw-bold me-2">7H</span></div> -->
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped bg-warning" role="progressbar" style="width: 40%" aria-valuenow="40"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">Home</span>
+                                <!-- <div><span class="fs-6 fw-bold me-2">5 Count</span></div> -->
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 30%" aria-valuenow="30"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panels">
+            <div class="panel" id="two-panel">
+                <div class="row g-3 mb-3 row-deck">
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">Total time tracked</span>
+                                <div><span class="fs-6 fw-bold me-2">-</span></div>
+                                <small class="text-muted d-block">This week: -</small>
+                                <small class="text-muted d-block">This month: -</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">Productive time</span>
+                                <div><span class="fs-6 fw-bold me-2">-</span></div>
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 30%" aria-valuenow="30"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">Distance Mismatch</span>
+                                <div><span class="fs-6 fw-bold me-2">-</span></div>
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped bg-info" role="progressbar" style="width: 30%" aria-valuenow="35"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-title">Average Visiting Count</div>
+                <div class="row g-3 mb-3 row-deck">
+                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">OP</span>
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped" role="progressbar" style="width: 30%" aria-valuenow="30"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">IP</span>
+                                <!-- <div><span class="fs-6 fw-bold me-2">7H</span></div> -->
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped bg-danger" role="progressbar" style="width: 40%" aria-valuenow="40"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">Teletherapy</span>
+                                <!-- <div><span class="fs-6 fw-bold me-2">7H</span></div> -->
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped bg-warning" role="progressbar" style="width: 40%" aria-valuenow="40"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">Home</span>
+                                <!-- <div><span class="fs-6 fw-bold me-2">5 Count</span></div> -->
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 30%" aria-valuenow="30"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panels">
+            <div class="panel" id="three-panel">
+                <div class="row g-3 mb-3 row-deck">
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">Total time tracked</span>
+                                <div><span class="fs-6 fw-bold me-2">-</span></div>
+                                <small class="text-muted d-block">This week: -</small>
+                                <small class="text-muted d-block">This month: -</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">Productive time</span>
+                                <div><span class="fs-6 fw-bold me-2">-</span></div>
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 30%" aria-valuenow="30"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">Distance Mismatch</span>
+                                <div><span class="fs-6 fw-bold me-2">-</span></div>
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped bg-info" role="progressbar" style="width: 30%" aria-valuenow="35"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-title">Average Visiting Count</div>
+                <div class="row g-3 mb-3 row-deck">
+                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">OP</span>
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped" role="progressbar" style="width: 30%" aria-valuenow="30"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">IP</span>
+                                <!-- <div><span class="fs-6 fw-bold me-2">7H</span></div> -->
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped bg-danger" role="progressbar" style="width: 40%" aria-valuenow="40"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">Teletherapy</span>
+                                <!-- <div><span class="fs-6 fw-bold me-2">7H</span></div> -->
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped bg-warning" role="progressbar" style="width: 40%" aria-valuenow="40"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">Home</span>
+                                <!-- <div><span class="fs-6 fw-bold me-2">5 Count</span></div> -->
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 30%" aria-valuenow="30"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panels">
+            <div class="panel" id="four-panel">
+                <div class="row g-3 mb-3 row-deck">
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">Total time tracked</span>
+                                <div><span class="fs-6 fw-bold me-2">-</span></div>
+                                <small class="text-muted d-block">This week: -</small>
+                                <small class="text-muted d-block">This month: -</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">Productive time</span>
+                                <div><span class="fs-6 fw-bold me-2">-</span></div>
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 30%" aria-valuenow="30"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">Distance Mismatch</span>
+                                <div><span class="fs-6 fw-bold me-2">-</span></div>
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped bg-info" role="progressbar" style="width: 30%" aria-valuenow="35"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-title">Average Visiting Count</div>
+                <div class="row g-3 mb-3 row-deck">
+                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">OP</span>
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped" role="progressbar" style="width: 30%" aria-valuenow="30"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">IP</span>
+                                <!-- <div><span class="fs-6 fw-bold me-2">7H</span></div> -->
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped bg-danger" role="progressbar" style="width: 40%" aria-valuenow="40"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">Teletherapy</span>
+                                <!-- <div><span class="fs-6 fw-bold me-2">7H</span></div> -->
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped bg-warning" role="progressbar" style="width: 40%" aria-valuenow="40"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6">
+                        <div class="card">
+                            <div class="card-body py-xl-4 py-3">
+                                <span class="text-muted">Home</span>
+                                <!-- <div><span class="fs-6 fw-bold me-2">5 Count</span></div> -->
+                                <div class="progress mt-4" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 30%" aria-valuenow="30"
+                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panels">
+            <div class="panel" id="five-panel">
+                <div class="panel-title"></div>
+                <div class="col-xl-5 col-lg-12 col-md-12">
+                    <div class="row g-2">
+                        <div class="col-12 col-md-6">
+                            <div class="input-group-lg">
+                                <input type="date" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

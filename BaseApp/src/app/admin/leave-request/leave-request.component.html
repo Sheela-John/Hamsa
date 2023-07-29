@@ -1,0 +1,39 @@
+<div class="main bg-white p-6 rounded-lg shadow-lg">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-header heading text-2xl font-bold">Leave Request</h2>
+            <!-- <button class="card-header btn float-right" (click)="addClient()"><i
+                    class="fa fa-plus"></i>&nbsp;&nbsp;Add</button> -->
+        </div>
+    </div>
+    <section class="flex items-center justify-center">
+        <div class="grid sm:grid-cols-1 lg:grid-cols-3 md:grid-cols-1 md:gap-2 ml-2">
+            <div class="container1" *ngFor="let leave of leaveDataArr">
+                <h3 style=" font-size: 20px;"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;&nbsp;{{leave.staffName}}</h3>
+                <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-6 mt-4">
+                    <div class="sm:inline-flex sm:shrink-0 sm:items-center border-t border-b border-r border-l p-1 border-slate-500 sm:gap-2">
+                        <div class="mt-1.5 sm:mt-0" style="font-size: medium;color: white;">
+                            <p class=" font-bold mb-1"><i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;&nbsp;Start
+                                Date</p>
+                            <p class="font-medium">{{leave.startDate}}</p>
+                        </div>
+                    </div>                    
+                    <div
+                        class="sm:inline-flex sm:shrink-0  border-t border-b border-r border-l p-1 border-slate-500 sm:items-center sm:gap-2">
+                        <div class="mt-1.5 sm:mt-0" style="font-size: medium;color: white;">
+                            <p class=" font-bold mb-1"><i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;&nbsp;End
+                                Date</p>
+                            <p class="font-medium">{{leave.endDate}}</p>
+                        </div>
+                    </div>
+                </div>
+                <p class="second mt-4" >
+                   Reason : {{leave.reason}}
+                </p>
+            </div>
+          
+        </div>
+        
+    </section>
+</div>
+<app-flash-message></app-flash-message>
