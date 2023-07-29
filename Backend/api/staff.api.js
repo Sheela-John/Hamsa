@@ -270,6 +270,39 @@ const UpdateStaff = async function (datatoupdate) {
     else return Promise.resolve(staffData);
 }
 
+/* Get Staff Role by  Id */
+async function getStaffroleById(staffId) {
+    log.debug(component, 'Getting Staff Data by Id');
+    log.close();
+    let [staffErr, staffData] = await handle(Staff.findOne({ '_id': staffId }).lean());
+    console.log("staffData",staffData)
+    if (staffErr) return Promise.reject(staffErr);
+    else{
+        let [err, slotData] = await handle(Role.findOne({_id:staffData.staffRole}).lean());
+        console.log("slotData",slotData)
+        staffData.slots=slotData.slots;
+        console.log("staffData.slots",staffData.slots)
+        if (err) return Promise.reject(err);
+        else{
+            var output=[];
+            for(var i=0;i<staffData.slots.length;i++)
+            {
+                var temp={
+                    slotName :staffData.slots[i].slotName,
+                    slotId :staffData.slots[i]._id
+                }
+               
+                output.push(temp)
+                }
+            }
+    if (lodash.isEmpty(output)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+    else{
+        return Promise.resolve(output);
+    }
+    
+}
+}
+
 /* Get Staff by Id */
 async function getStaffDataById(staffId) {
     log.debug(component, 'Getting Staff Data by Id');
@@ -569,5 +602,6 @@ module.exports = {
     getLeaveRequestById: getLeaveRequestById,
     getLeaveRequestByStatus: getLeaveRequestByStatus,
     searchLeaveRequestByStaff: searchLeaveRequestByStaff,
-    getLeaveRequestByStaffId: getLeaveRequestByStaffId
+    getLeaveRequestByStaffId: getLeaveRequestByStaffId,
+    getStaffroleById: getStaffroleById
 }

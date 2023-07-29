@@ -1,7 +1,7 @@
 const COMPONENT = "STAFF ROUTER";
 const router = require('express').Router();
 const lodash = require('lodash');
-const StaffAPI = require('../api/Staff.api');
+const StaffAPI = require('../api/staff.api');
 const ERR = require('../errors.json');
 const config = require('config');
 const authenticate = require('../middleware/OAuth-Authentication');
@@ -29,6 +29,22 @@ router.post('/', async (req, res, next) => {
         let [err, staffData] = await handle(StaffAPI.UpdateStaff(req.body));
         if (err) return next(err);
         else return res.status(200).json({ status: true, data: staffData, message: "Staff Updated Successfully!" });
+    })
+
+    /* Get By Id */
+    .get('/staffrole/:id', async (req, res, next) => {
+        log.debug(COMPONENT, 'Search for Staff by ID'); log.close();
+        let [err, staffData] = await handle(StaffAPI.getStaffroleById(req.params.id));
+        if (err) {
+            log.error(COMPONENT, 'Get Staff by Id error', { attach: err });
+            log.close();
+            return res.json({ status: false, err: Object.assign(ERR.UNKNOWN, { message: err.message }) });
+        }
+        else {
+            log.debug(COMPONENT, 'Staff found');
+            log.close();
+            return res.json({ status: true, data: staffData });
+        }
     })
 
     /* Get By Id */
