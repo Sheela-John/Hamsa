@@ -43,15 +43,15 @@ const handle = (promise) => {
 /* Create Settings */
 async function create(settingsData) {
     log.debug(component, 'Creating a Settings', { 'attach': settingsData }); log.close();
-    var todayDate = new Date().toISOString().slice(0, 10);
-    settingsData.date = new Date(todayDate);
-    let someDate = settingsData.date
-    let copiedAppointmentDate = new Date(someDate.getTime());
-    settingsData['startDate'] = copiedAppointmentDate;
-    settingsData['endDate'] = copiedAppointmentDate;
+    // var todayDate = new Date().toISOString().slice(0, 10);
+    // settingsData.date = new Date(todayDate);
+ //   let someDate = settingsData.date
+  //  let copiedAppointmentDate = new Date(someDate.getTime());
+    // settingsData['startDate'] = copiedAppointmentDate;
+    // settingsData['endDate'] = copiedAppointmentDate;
     var saveModel = new Settings(settingsData);
-    saveModel.createdAt = copiedAppointmentDate;
-    saveModel.updatedAt = copiedAppointmentDate;
+    // saveModel.createdAt = copiedAppointmentDate;
+    // saveModel.updatedAt = copiedAppointmentDate;
     let [err, settingsDataSaved] = await handle(saveModel.save())
     if (err) return Promise.reject(err);
     else return Promise.resolve(settingsDataSaved)

@@ -14,7 +14,8 @@ const staffSchema = new mongoose.Schema({
     type:String
    },
    status:{
-    type:String
+    type:String,
+    default:0
    },
    address:{
     type:String

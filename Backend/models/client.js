@@ -82,6 +82,10 @@ const clientSchema = new mongoose.Schema({
    },
    noOfSession:{
     type:String
+   },
+   status:{
+    type:Number,
+    default:0
    }
 
 }, {

@@ -5,10 +5,12 @@ const Security = require("../util/security");
 const Staff = models.Staff;
 const AssignServiceForClient = models.AssignServiceForClient;
 const AssignServiceForBranch = models.AssignServiceForBranch;
+const AssignService=models.AssignService;
 const Client = models.Client;
 const ClientDistance = models.clientDistance;
 const Settings = models.Settings;
 const Branch = models.Branch;
+const Service=models.Services;
 const TravelAllowance = models.TravelAllowance;
 const lodash = require('lodash');
 const ERR = require('../errors.json');
@@ -54,6 +56,7 @@ const assignServiceClient = async (assignServiceData) => {
     log.debug(component, 'Creating New Assign Service - for Service', assignServiceData);
     log.close();
     let [staffErr, staffData] = await handle(Staff.findOne({ '_id': assignServiceData.staffId }).lean());
+    console.log("staff",staffData);
     if (staffErr) return Promise.reject(staffErr);
     if (lodash.isEmpty(staffData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
 
@@ -68,15 +71,19 @@ const assignServiceClient = async (assignServiceData) => {
     delete assignServiceData._id;
     return new Promise((resolve, reject) => {
         (async () => {
-            let [findStaffErr, staffNameData] = await handle(Staff.findOne({ '_id': mongoose.Types.ObjectId(assignServiceData.staffId) }));
+            let [findStaffErr, staffNameData] = await handle(Staff.findOne({ '_id': (assignServiceData.staffId) }));
+            console.log("staffNameData",staffNameData)
             if (findStaffErr) return Promise.reject(findStaffErr);
             let [settingsErr, settingsDataFind] = await handle(Settings.find({}).lean());
+            console.log("settingsDataFind",settingsDataFind)
             if (settingsErr) return Promise.reject(settingsErr);
             if (lodash.isEmpty(settingsDataFind)) return Promise.reject(ERR.NO_RECORDS_FOUND);
             var settingsData = settingsDataFind[settingsDataFind.length - 1]
             assignServiceData['settingsId'] = settingsData._id;
             assignServiceData['staffName'] = staffNameData.staffName;
-            let [findClientErr, findClientData] = await handle(Client.findOne({ 'clientName': assignServiceData.clientName, 'phone': assignServiceData.phone }));
+            let [findClientErr, findClientData] = await handle(Client.findOne({ 'clientName': assignServiceData.clientName }));
+            console.log("findClientData",findClientData)
+            assignServiceData['clientId']=findClientData._id;
             if (findClientErr) return Promise.reject(findClientErr);
             if (findClientData == undefined) {
                 const options = {
@@ -96,11 +103,13 @@ const assignServiceClient = async (assignServiceData) => {
                     latitude: res[0].latitude,
                     longitude: res[0].longitude
                 }
+                console.log("clientData",clientData)
                 var saveModel = new Client(clientData);
                 let [err, clientDataSaved] = await handle(saveModel.save())
+                console.log("clientDataSaved",clientDataSaved)
                 if (err) return Promise.reject(err);
                 assignServiceData['clientId'] = clientDataSaved._id;
-                var saveData = new AssignServiceForClient(assignServiceData);
+                var saveData = new AssignService(assignServiceData);
                 saveData.save().then((assignService) => {
                     log.debug(component, 'Saved Assign Service successfully');
                     log.close();
@@ -112,10 +121,11 @@ const assignServiceClient = async (assignServiceData) => {
                 })
             }
             else {
-                var saveData = new AssignServiceForClient(assignServiceData);
+                var saveData = new AssignService(assignServiceData);
                 saveData.save().then((assignService) => {
                     log.debug(component, 'Saved Assign Service successfully');
                     log.close();
+                    console.log("assignService",assignService)
                     return resolve(assignService);
                 }).catch((err) => {
                     log.error(component, 'Error while saving Assign Service data', { attach: err });
@@ -261,90 +271,108 @@ const getAssignedServicesbyStaff = async (data) => {
     else return Promise.resolve(array);
 }
 
-const getAllAssignedServices = async () => {
-    var data = [];
-    let [err, clientServicesData] = await handle(AssignServiceForClient.find({}).lean());
-    for (let i = 0; i < clientServicesData.length; i++) {
-        var query = [
-            { $match: { '_id': mongoose.Types.ObjectId(clientServicesData[i]._id) } },
-            {
-                '$addFields': {
-                    'user_id': { $toObjectId: "$staffId" },
-                    'serviceId': { $toObjectId: "$service" }
-                }
-            },
-            {
-                '$lookup': {
-                    'from': 'staff',
-                    'localField': 'user_id',
-                    'foreignField': '_id',
-                    'as': 'staffData'
-                }
-            },
-            {
-                "$unwind": "$staffData"
-            },
-            {
-                '$lookup': {
-                    'from': 'services',
-                    'localField': 'serviceId',
-                    'foreignField': '_id',
-                    'as': 'servicesData'
-                }
-            },
-            {
-                "$unwind": "$servicesData"
-            }
-        ];
-        var [clientServicesAllDataErr, clientServicesAllData] = await handle(AssignServiceForClient.aggregate(query));
-        data.push(clientServicesAllData[0]);
-        if (clientServicesAllDataErr) return Promise.reject(clientServicesAllDataErr);
+// const getAllAssignedServices = async () => {
+//     var data = [];
+//     let [err, clientServicesData] = await handle(AssignServiceForClient.find({}).lean());
+//     for (let i = 0; i < clientServicesData.length; i++) {
+//         var query = [
+//             { $match: { '_id': mongoose.Types.ObjectId(clientServicesData[i]._id) } },
+//             {
+//                 '$addFields': {
+//                     'user_id': { $toObjectId: "$staffId" },
+//                     'serviceId': { $toObjectId: "$service" }
+//                 }
+//             },
+//             {
+//                 '$lookup': {
+//                     'from': 'staff',
+//                     'localField': 'user_id',
+//                     'foreignField': '_id',
+//                     'as': 'staffData'
+//                 }
+//             },
+//             {
+//                 "$unwind": "$staffData"
+//             },
+//             {
+//                 '$lookup': {
+//                     'from': 'services',
+//                     'localField': 'serviceId',
+//                     'foreignField': '_id',
+//                     'as': 'servicesData'
+//                 }
+//             },
+//             {
+//                 "$unwind": "$servicesData"
+//             }
+//         ];
+//         var [clientServicesAllDataErr, clientServicesAllData] = await handle(AssignServiceForClient.aggregate(query));
+//         data.push(clientServicesAllData[0]);
+//         if (clientServicesAllDataErr) return Promise.reject(clientServicesAllDataErr);
+//     }
+//     if (err) return Promise.reject(err);
+//     else if (lodash.isEmpty(clientServicesData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+
+//     let [clientBranchErr, clientBranchData] = await handle(AssignServiceForBranch.find({}).lean());
+//     for (let i = 0; i < clientBranchData.length; i++) {
+//         var query = [
+//             { $match: { '_id': mongoose.Types.ObjectId(clientBranchData[i]._id) } },
+//             {
+//                 '$addFields': {
+//                     'user_id': { $toObjectId: "$staffId" },
+//                     'branch_id': { $toObjectId: "$branchId" }
+//                 }
+//             },
+//             {
+//                 '$lookup': {
+//                     'from': 'staff',
+//                     'localField': 'user_id',
+//                     'foreignField': '_id',
+//                     'as': 'staffData'
+//                 }
+//             },
+//             {
+//                 "$unwind": "$staffData"
+//             },
+//             {
+//                 '$lookup': {
+//                     'from': 'branch',
+//                     'localField': 'branch_id',
+//                     'foreignField': '_id',
+//                     'as': 'branchData'
+//                 }
+//             },
+//             {
+//                 "$unwind": "$branchData"
+//             }
+//         ];
+//         var [clientBranchAllDataErr, clientBranchAllData] = await handle(AssignServiceForBranch.aggregate(query));
+//         data.push(clientBranchAllData[0]);
+//         if (clientBranchAllDataErr) return Promise.reject(clientBranchAllDataErr);
+//     }
+//     if (clientBranchErr) return Promise.reject(clientBranchErr);
+//     else if (lodash.isEmpty(clientBranchData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+//     else return Promise.resolve(data);
+// }
+async function getAllAssignedServices()
+{
+    log.debug(component, 'Get All Assign Service Detail'); log.close();
+    let [err, assignServiceData] = await handle(AssignService.find().lean());
+    console.log(assignServiceData)
+    for(var i=0;i<assignServiceData.length;i++)
+    {
+        let [err, clientData] = await handle(Client.findOne({_id:assignServiceData[i].clientId}).lean());
+        let [err1, staffData] = await handle(Staff.findOne({_id:assignServiceData[i].staffId}).lean());
+        let [err2,serviceData]= await handle(Service.findOne({_id:assignServiceData[i].serviceId}).lean());
+        console.log(err2,"serviceData",serviceData)
+        assignServiceData[i].clientName=clientData.clientName;
+        assignServiceData[i].staffName=staffData.staffName;
+        assignServiceData[i].serviceName=serviceData.serviceName;
     }
     if (err) return Promise.reject(err);
-    else if (lodash.isEmpty(clientServicesData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
-
-    let [clientBranchErr, clientBranchData] = await handle(AssignServiceForBranch.find({}).lean());
-    for (let i = 0; i < clientBranchData.length; i++) {
-        var query = [
-            { $match: { '_id': mongoose.Types.ObjectId(clientBranchData[i]._id) } },
-            {
-                '$addFields': {
-                    'user_id': { $toObjectId: "$staffId" },
-                    'branch_id': { $toObjectId: "$branchId" }
-                }
-            },
-            {
-                '$lookup': {
-                    'from': 'staff',
-                    'localField': 'user_id',
-                    'foreignField': '_id',
-                    'as': 'staffData'
-                }
-            },
-            {
-                "$unwind": "$staffData"
-            },
-            {
-                '$lookup': {
-                    'from': 'branch',
-                    'localField': 'branch_id',
-                    'foreignField': '_id',
-                    'as': 'branchData'
-                }
-            },
-            {
-                "$unwind": "$branchData"
-            }
-        ];
-        var [clientBranchAllDataErr, clientBranchAllData] = await handle(AssignServiceForBranch.aggregate(query));
-        data.push(clientBranchAllData[0]);
-        if (clientBranchAllDataErr) return Promise.reject(clientBranchAllDataErr);
-    }
-    if (clientBranchErr) return Promise.reject(clientBranchErr);
-    else if (lodash.isEmpty(clientBranchData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
-    else return Promise.resolve(data);
+    if (lodash.isEmpty(assignServiceData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+    return Promise.resolve(assignServiceData);
 }
-
 const getAllAssignedServicesforStaff = async (inputData) => {
     var data = [];
 
@@ -895,55 +923,64 @@ const serviceOnEnd = async (inputData) => {
     });
 }
 
-const getAssignedServicesById = async (serviceClientId) => {
-    var query = [
-        { $match: { '_id': mongoose.Types.ObjectId(serviceClientId) } },
-        {
-            '$addFields': {
-                'user_id': { $toObjectId: "$staffId" },
-                'serviceId': { $toObjectId: "$service" },
-                'clientObjId': { $toObjectId: "$clientId" },
-            }
-        },
-        {
-            '$lookup': {
-                'from': 'staff',
-                'localField': 'user_id',
-                'foreignField': '_id',
-                'as': 'staffData'
-            }
-        },
-        {
-            "$unwind": "$staffData"
-        },
-        {
-            '$lookup': {
-                'from': 'services',
-                'localField': 'serviceId',
-                'foreignField': '_id',
-                'as': 'servicesData'
-            }
-        },
-        {
-            "$unwind": "$servicesData"
-        },
-        {
-            '$lookup': {
-                'from': 'client',
-                'localField': 'clientObjId',
-                'foreignField': '_id',
-                'as': 'clientData'
-            }
-        },
-        {
-            "$unwind": "$clientData"
-        }
-    ];
-    var [clientServicesAllDataErr, clientServicesDatabyId] = await handle(AssignServiceForClient.aggregate(query));
-    if (clientServicesAllDataErr) return Promise.reject(clientServicesAllDataErr);
-    else return Promise.resolve(clientServicesDatabyId[0])
-}
+// const getAssignedServicesById = async (serviceClientId) => {
+//     var query = [
+//         { $match: { '_id': mongoose.Types.ObjectId(serviceClientId) } },
+//         {
+//             '$addFields': {
+//                 'user_id': { $toObjectId: "$staffId" },
+//                 'serviceId': { $toObjectId: "$service" },
+//                 'clientObjId': { $toObjectId: "$clientId" },
+//             }
+//         },
+//         {
+//             '$lookup': {
+//                 'from': 'staff',
+//                 'localField': 'user_id',
+//                 'foreignField': '_id',
+//                 'as': 'staffData'
+//             }
+//         },
+//         {
+//             "$unwind": "$staffData"
+//         },
+//         {
+//             '$lookup': {
+//                 'from': 'services',
+//                 'localField': 'serviceId',
+//                 'foreignField': '_id',
+//                 'as': 'servicesData'
+//             }
+//         },
+//         {
+//             "$unwind": "$servicesData"
+//         },
+//         {
+//             '$lookup': {
+//                 'from': 'client',
+//                 'localField': 'clientObjId',
+//                 'foreignField': '_id',
+//                 'as': 'clientData'
+//             }
+//         },
+//         {
+//             "$unwind": "$clientData"
+//         }
+//     ];
+//     var [clientServicesAllDataErr, clientServicesDatabyId] = await handle(AssignServiceForClient.aggregate(query));
+//     if (clientServicesAllDataErr) return Promise.reject(clientServicesAllDataErr);
+//     else return Promise.resolve(clientServicesDatabyId[0])
+// }
 
+async function getAssignedServicesById(id)
+{
+    log.debug(component, 'Getting AssignService Data by Id');
+    log.close();
+    let [Err, assignServiceData] = await handle(AssignService.findOne({ '_id': id }).lean());
+    if (Err) return Promise.reject(Err);
+    if (lodash.isEmpty(assignServiceData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+    return Promise.resolve(assignServiceData);
+}
 const getAssignedServicesofBranchById = async (serviceBranchId) => {
     var query = [
         { $match: { '_id': mongoose.Types.ObjectId(serviceBranchId) } },

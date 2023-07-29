@@ -15,7 +15,7 @@ const handle = (promise) => {
 }
 
 /* Created Assign Service API */
-router.post('/client', async (req, res, next) => {
+router.post('/', async (req, res, next) => {
     if (lodash.isEmpty(req.body)) return next(ERR.MANDATORY_FIELD_MISSING);
     let [err, assignServiceData] = await handle(AssignServiceAPI.assignServiceClient(req.body));
     if (err) return next(err);

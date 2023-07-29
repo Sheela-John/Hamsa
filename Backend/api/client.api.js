@@ -65,7 +65,6 @@ async function create(clientData) {
     if (clientData.gender) {
         clientData.defaultImageUrl = genrateDefaultImage(clientData.gender);
     }
-
     if (clientData.dob) {
         clientData.dob = new Date(clientData.dob);
         let copiedDate = new Date(clientData.dob.getTime());
@@ -167,7 +166,7 @@ async function checkForExistingUser(loginCred) {
             $match: {
                 $and: [{
                     $or: [
-                        { 'ipNumber': loginCred.ipNumber }]
+                        { 'email': loginCred.email }]
                     // { 'phone': loginCred.phone }]
                 }]
             }

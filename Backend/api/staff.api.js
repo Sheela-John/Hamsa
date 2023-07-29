@@ -289,8 +289,8 @@ async function getAllStaffDetails() {
     {
         let [err, branchData] = await handle(Branch.findOne({_id:staffData[i].branchId}).lean());
         let [err1, roleData] = await handle(Role.findOne({_id:staffData[i].staffRole}).lean());
-        staffData[i].branchId=branchData.branchName;
-        staffData[i].staffRole=roleData.name;
+        staffData[i].branchName=branchData.branchName;
+        staffData[i].staffRoleName=roleData.name;
     }
     if (err) return Promise.reject(err);
     if (lodash.isEmpty(staffData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
