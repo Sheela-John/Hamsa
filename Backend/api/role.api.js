@@ -43,8 +43,10 @@ const handle = (promise) => {
 /* Create Role */
 async function create(roleData) {
     log.debug(component, 'Creating a Role', { 'attach': roleData }); log.close();
+    console.log("roleData",roleData)
     var saveModel = new Role(roleData);
     let [err, roleDataSaved] = await handle(saveModel.save())
+    console.log(err,"fsdfgdg",roleDataSaved)
     if (err) return Promise.reject(err);
     else return Promise.resolve(roleDataSaved)
 }

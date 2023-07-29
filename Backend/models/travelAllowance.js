@@ -9,7 +9,7 @@ const distanceSchema = new mongoose.Schema({
 const travelAllowanceSchema = new mongoose.Schema({
     costType:{ type:Number,default: 0 }, //0- per km, 1- by distance
     travelExpenseMode:{type:String },
-    distance:distanceSchema
+    distance:{ type: [distanceSchema] }
 }, {
     collection: 'travelAllowance',
     versionKey: false,
