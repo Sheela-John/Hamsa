@@ -2,15 +2,16 @@
 const component = "Staff API";
 const models = require('../models');
 const Security = require("../util/security");
-const Staff = models.Staff;
 const AssignServiceForClient = models.AssignServiceForClient;
 const AssignServiceForBranch = models.AssignServiceForBranch;
-const AssignService=models.AssignService;
+const AssignService = models.AssignService;
 const Client = models.Client;
+const Staff = models.Staff;
+const Role = models.Role;
 const ClientDistance = models.clientDistance;
 const Settings = models.Settings;
 const Branch = models.Branch;
-const Service=models.Services;
+const Service = models.Services;
 const TravelAllowance = models.TravelAllowance;
 const lodash = require('lodash');
 const ERR = require('../errors.json');
@@ -56,34 +57,36 @@ const assignServiceClient = async (assignServiceData) => {
     log.debug(component, 'Creating New Assign Service - for Service', assignServiceData);
     log.close();
     let [staffErr, staffData] = await handle(Staff.findOne({ '_id': assignServiceData.staffId }).lean());
-    console.log("staff",staffData);
+    console.log("staff", staffData);
     if (staffErr) return Promise.reject(staffErr);
     if (lodash.isEmpty(staffData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
-
     assignServiceData.status = 0;
+
     assignServiceData.date = new Date(assignServiceData.date);
     let someDate = assignServiceData.date
     let copiedAppointmentDate = new Date(someDate.getTime());
-    assignServiceData['date'] = copiedAppointmentDate;
-    assignServiceData.time = someDate.setUTCHours(assignServiceData.time.split(':')[0], assignServiceData.time.split(':')[1]);
-    assignServiceData['time'] = assignServiceData.time;
 
+    assignServiceData['date'] = copiedAppointmentDate;
+
+    // assignServiceData.time = someDate.setUTCHours(assignServiceData.time.split(':')[0], assignServiceData.time.split(':')[1]);
+    // assignServiceData['time'] = assignServiceData.time;
+    console.log("assignServiceData", assignServiceData)
     delete assignServiceData._id;
     return new Promise((resolve, reject) => {
         (async () => {
             let [findStaffErr, staffNameData] = await handle(Staff.findOne({ '_id': (assignServiceData.staffId) }));
-            console.log("staffNameData",staffNameData)
+            console.log("staffNameData", staffNameData)
             if (findStaffErr) return Promise.reject(findStaffErr);
             let [settingsErr, settingsDataFind] = await handle(Settings.find({}).lean());
-            console.log("settingsDataFind",settingsDataFind)
+            console.log("settingsDataFind", settingsDataFind)
             if (settingsErr) return Promise.reject(settingsErr);
             if (lodash.isEmpty(settingsDataFind)) return Promise.reject(ERR.NO_RECORDS_FOUND);
             var settingsData = settingsDataFind[settingsDataFind.length - 1]
             assignServiceData['settingsId'] = settingsData._id;
             assignServiceData['staffName'] = staffNameData.staffName;
             let [findClientErr, findClientData] = await handle(Client.findOne({ 'clientName': assignServiceData.clientName }));
-            console.log("findClientData",findClientData)
-            assignServiceData['clientId']=findClientData._id;
+            console.log("findClientData", findClientData)
+            assignServiceData['clientId'] = findClientData._id;
             if (findClientErr) return Promise.reject(findClientErr);
             if (findClientData == undefined) {
                 const options = {
@@ -103,12 +106,13 @@ const assignServiceClient = async (assignServiceData) => {
                     latitude: res[0].latitude,
                     longitude: res[0].longitude
                 }
-                console.log("clientData",clientData)
+                console.log("clientData", clientData)
                 var saveModel = new Client(clientData);
                 let [err, clientDataSaved] = await handle(saveModel.save())
-                console.log("clientDataSaved",clientDataSaved)
+                console.log("clientDataSaved", clientDataSaved)
                 if (err) return Promise.reject(err);
                 assignServiceData['clientId'] = clientDataSaved._id;
+                assignServiceData['bookedCount'] = 1;
                 var saveData = new AssignService(assignServiceData);
                 saveData.save().then((assignService) => {
                     log.debug(component, 'Saved Assign Service successfully');
@@ -125,7 +129,7 @@ const assignServiceClient = async (assignServiceData) => {
                 saveData.save().then((assignService) => {
                     log.debug(component, 'Saved Assign Service successfully');
                     log.close();
-                    console.log("assignService",assignService)
+                    console.log("assignService", assignService)
                     return resolve(assignService);
                 }).catch((err) => {
                     log.error(component, 'Error while saving Assign Service data', { attach: err });
@@ -354,20 +358,18 @@ const getAssignedServicesbyStaff = async (data) => {
 //     else if (lodash.isEmpty(clientBranchData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
 //     else return Promise.resolve(data);
 // }
-async function getAllAssignedServices()
-{
+async function getAllAssignedServices() {
     log.debug(component, 'Get All Assign Service Detail'); log.close();
     let [err, assignServiceData] = await handle(AssignService.find().lean());
     console.log(assignServiceData)
-    for(var i=0;i<assignServiceData.length;i++)
-    {
-        let [err, clientData] = await handle(Client.findOne({_id:assignServiceData[i].clientId}).lean());
-        let [err1, staffData] = await handle(Staff.findOne({_id:assignServiceData[i].staffId}).lean());
-        let [err2,serviceData]= await handle(Service.findOne({_id:assignServiceData[i].serviceId}).lean());
-        console.log(err2,"serviceData",serviceData)
-        assignServiceData[i].clientName=clientData.clientName;
-        assignServiceData[i].staffName=staffData.staffName;
-        assignServiceData[i].serviceName=serviceData.serviceName;
+    for (var i = 0; i < assignServiceData.length; i++) {
+        let [err, clientData] = await handle(Client.findOne({ _id: assignServiceData[i].clientId }).lean());
+        let [err1, staffData] = await handle(Staff.findOne({ _id: assignServiceData[i].staffId }).lean());
+        let [err2, serviceData] = await handle(Service.findOne({ _id: assignServiceData[i].serviceId }).lean());
+        console.log(err2, "serviceData", serviceData)
+        assignServiceData[i].clientName = clientData.clientName;
+        assignServiceData[i].staffName = staffData.staffName;
+        assignServiceData[i].serviceName = serviceData.serviceName;
     }
     if (err) return Promise.reject(err);
     if (lodash.isEmpty(assignServiceData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
@@ -972,8 +974,7 @@ const serviceOnEnd = async (inputData) => {
 //     else return Promise.resolve(clientServicesDatabyId[0])
 // }
 
-async function getAssignedServicesById(id)
-{
+async function getAssignedServicesById(id) {
     log.debug(component, 'Getting AssignService Data by Id');
     log.close();
     let [Err, assignServiceData] = await handle(AssignService.findOne({ '_id': id }).lean());
@@ -1029,33 +1030,199 @@ const updateClient = async function (datatoupdate) {
 }
 
 
-async function getAssignServiceDataByStaffIdAndDate(data)
-{
-    
+async function getAssignServiceDataByStaffIdAndDate(data) {
+
     log.debug(component, 'Getting AssignService Data by StaffId And Date');
     log.close();
-    console.log("data",data)
     let someDate = new Date(data.date);
-    console.log("someDate",new Date(someDate.getTime()))
     let copiedAppointmentDate = new Date(someDate.getTime());
-    console.log("copiedAppointmentDate",copiedAppointmentDate)
-    let [Err, assignServiceData] = await handle(AssignService.find({ 'staffId': data.staffId,date:copiedAppointmentDate }).lean());
-    console.log("assign",assignServiceData)
-    for(var i=0;i<assignServiceData.length;i++)
-    {
-        let [err, clientData] = await handle(Client.findOne({_id:assignServiceData[i].clientId}).lean());
-        let [err1, staffData] = await handle(Staff.findOne({_id:assignServiceData[i].staffId}).lean());
-        let [err2,serviceData]= await handle(Service.findOne({_id:assignServiceData[i].serviceId}).lean());
-        console.log(err2,"serviceData",serviceData)
-        assignServiceData[i].clientName=clientData.clientName;
-        assignServiceData[i].staffName=staffData.staffName;
-        assignServiceData[i].serviceName=serviceData.serviceName;
+    let [Err, assignServiceData] = await handle(AssignService.find({ 'staffId': data.staffId, date: copiedAppointmentDate }).lean());
+    for (var i = 0; i < assignServiceData.length; i++) {
+        let [err, clientData] = await handle(Client.findOne({ _id: assignServiceData[i].clientId }).lean());
+        let [err1, staffData] = await handle(Staff.findOne({ _id: assignServiceData[i].staffId }).lean());
+        let [err2, serviceData] = await handle(Service.findOne({ _id: assignServiceData[i].serviceId }).lean());
+        assignServiceData[i].clientName = clientData.clientName;
+        assignServiceData[i].staffName = staffData.staffName;
+        assignServiceData[i].serviceName = serviceData.serviceName;
     }
     if (Err) return Promise.reject(Err);
     if (lodash.isEmpty(assignServiceData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(assignServiceData);
 }
 
+async function getSlotsForAssignService(data) {
+    log.debug(component, 'Getting AssignService Data by StaffId And Date');
+    log.close();
+    let [err, staffData] = await handle(Staff.findOne({ _id: data.staffId }).lean());
+    let [err1, roleData] = await handle(Role.findOne({ "_id": staffData.staffRole }).lean());
+    var slotTime = [];
+    var temp;
+    let [err2, bookedSlots] = await handle(getAssignServiceDataByStaffIdAndDate(data));
+    var typeOfTreamentArray = ["1", "3", "4"];
+    for (var i = 0; i < roleData.slots.length; i++) {
+        if (roleData.slots[i]._id == data.slotId) {
+            temp = {
+                startTime: roleData.slots[i].startTime,
+                endTime: roleData.slots[i].endTime
+            }
+            slotTime.push(temp);
+        }
+    }
+    var output = makeTimeIntervals(slotTime[0].startTime, slotTime[0].endTime, data.duration)
+    var final = [];
+    for (var j = 0; j < output.length; j++) {
+        if (j != output.length - 1) {
+            var temp = {
+                "slot": (output[j] + '-' + output[j + 1]),
+                "bookedStatus": 0,
+            }
+            final.push(temp);
+        }
+    }
+    var count = 0;
+    for (var i = 0; i < bookedSlots.length; i++) {
+        if (typeOfTreamentArray.includes(bookedSlots[i].typeOfTreatment)) {
+            count = count + 1
+        }
+    }
+    for (var i = 0; i < bookedSlots.length; i++) {
+        if (bookedSlots[i].date == new Date(data.date)) {
+            if (typeOfTreamentArray.includes(data.typeOfTreatment)) {
+                for (var j = 0; j < final.length; j++) {
+                    var start = bookedSlots[i].startTime.split(' ')[0];
+                    var end = bookedSlots[i].endTime.split(' ')[0];
+                    if (final[j].slot.includes(start) || final[j].slot.includes(end)) {
+                        if (count != 0 && count <= 3) {
+                            final[j].bookedStatus = 0;
+                        }
+                        else {
+                            var temp = final[j].slot.split('-')[0]
+                            if (temp.includes(end)) {
+                                final[j].bookedStatus = 0;
+
+                            }
+                            else {
+                                final[j].bookedStatus = 1;
+                            }
+                        }
+                    }
+                    else {
+                        final[j].bookedStatus = 0;
+                    }
+                }
+
+            }
+            else {
+                for (var j = 0; j < final.length; j++) {
+                    var start = bookedSlots[i].startTime.split(' ')[0];
+                    var end = bookedSlots[i].endTime.split(' ')[0];
+                    if (final[j].slot.includes(start) || final[j].slot.includes(end)) {
+                        var temp = final[j].slot.split('-')[0]
+                        if (temp.includes(end)) {
+                            final[j].bookedStatus = 0;
+                        }
+                        else {
+                            final[j].bookedStatus = 1;
+                        }
+                    }
+                    else {
+                        final[j].bookedStatus = 0;
+                    }
+                }
+            }
+        }
+    }
+    if (err1) return Promise.reject(err1);
+    if (lodash.isEmpty(final)) return reject(ERR.NO_RECORDS_FOUND);
+    return Promise.resolve(final);
+}
+var makeTimeIntervals = function (start_Time, end_Time, increment) {
+    var startTime = start_Time.toString().split(':');
+    var endTime = end_Time.toString().split(':');
+    increment = parseInt(increment, 10);
+
+    var startHr = parseInt(startTime[0], 10);
+    var startMin = parseInt(startTime[1], 10);
+    var endHr = parseInt(endTime[0], 10);
+    var endMin = parseInt(endTime[1], 10);
+    var currentHr = startHr;
+    var currentMin = startMin;
+    var previous = pad(currentHr) + ':' + pad(currentMin);
+    var current = '';
+    var r = [];
+    r.push(start_Time)
+    do {
+        currentMin += increment;
+        if ((currentMin % 60) === 0 || currentMin > 60) {
+            currentMin = (currentMin === 60) ? 0 : currentMin - 60;
+            currentHr += 1;
+            if (currentHr == 24) currentHr = 0o0;
+        }
+        current = pad(currentHr) + ':' + pad(currentMin);
+        if (current <= endTime) {
+            r.push(current)
+            previous = current;
+        }
+    }
+    while ((currentHr != endHr));
+    r.push(end_Time)
+    return r;
+};
+const pad = function (n) { return (n < 10) ? '0' + n.toString() : n; };
+/* Find the appointments and matching slot timing to push appointment into that slot */
+/* Will check the clinician start time appointment date */
+// var matchBookedSlots = function (blockedSlots, userPerSlot, timeZone, intervals, appointmentDate, clinicanBlockedSession) {
+
+//     if (typeof appointmentDate == 'string') appointmentDate = new Date(appointmentDate);
+//     let copiedDate = new Date(appointmentDate.getTime());
+//     var slotstartTime = copiedDate.setUTCHours(intervals.startTime.split(':')[0], intervals.startTime.split(':')[1]);
+//     var date = newDate(timeZone);
+//     if (slotstartTime < date) {
+//         intervals.slotExpired = true;
+//     }
+//     blockedSlots.forEach(element => {
+//         var startTime = pad(new Date(element.clinicianStartTime).getUTCHours()) + ':' + pad(new Date(element.clinicianStartTime).getUTCMinutes())
+//         var endTime = pad(new Date(element.clinicianEndTime).getUTCHours()) + ':' + pad(new Date(element.clinicianEndTime).getUTCMinutes())
+
+
+
+//         /*Previously If statement for Duration Per Slot*/
+//         // if ((startTime == intervals['startTime']) && (endTime == intervals['endTime']) && (appointmentDate.getTime() == new Date(element.appointmentDate).getTime())) {
+//         //     if (element.appointmentStatus !== 0) intervals.occupiedSlots += 1;
+//         //     if (element.pushed == undefined) intervals['appointmentDetails'].push(element);
+//         //     element.pushed = true;
+//         //     if (intervals.occupiedSlots == userPerSlot) {
+//         //         intervals.booked = true;
+//         //     } else intervals.booked = false;
+//         // }
+
+//         /*Modified If Statement for Appointment 30,45,60 mins*/
+//         if (((intervals['startTime']) < (endTime)) && ((intervals['endTime']) > (startTime)) && (appointmentDate.getTime() == new Date(element.appointmentDate).getTime())) {
+//             if (element.appointmentStatus !== 0) intervals.occupiedSlots += 1;
+//             if (element.pushed == undefined) intervals['appointmentDetails'].push(element);
+//             element.pushed = true;
+//             if (intervals.occupiedSlots == userPerSlot) {
+//                 intervals.booked = true;
+//             } else intervals.booked = false;
+//         }
+
+
+//     });
+//     clinicanBlockedSession.forEach(blockedElements => {
+//         var clinicianBlockedStartTime = pad(new Date(blockedElements.blockEventStartTime).getUTCHours()) + ':' + pad(new Date(blockedElements.blockEventStartTime).getUTCMinutes())
+//         var clinicianBlockedEndTime = pad(new Date(blockedElements.blockEventEndTime).getUTCHours()) + ':' + pad(new Date(blockedElements.blockEventEndTime).getUTCMinutes())
+
+//         if ((appointmentDate.getTime() == new Date(blockedElements.blockEventStartDate).getTime())) {
+//             if ((blockedElements.status !== 0) && ((intervals['startTime']) < (clinicianBlockedEndTime)) && ((intervals['endTime']) > (clinicianBlockedStartTime))) {
+//                 intervals.clinicianBlocked = true;
+//             }
+//             else {
+//                 intervals.clinicianBlocked = false;
+//             }
+//         }
+//     })
+//     return intervals;
+// }
 module.exports = {
     assignServiceClient: assignServiceClient,
     assignServiceBranch: assignServiceBranch,
@@ -1075,5 +1242,6 @@ module.exports = {
     getAssignedServicesById: getAssignedServicesById,
     getAssignedServicesofBranchById: getAssignedServicesofBranchById,
     updateClient: updateClient,
-    getAssignServiceDataByStaffIdAndDate:getAssignServiceDataByStaffIdAndDate
+    getAssignServiceDataByStaffIdAndDate: getAssignServiceDataByStaffIdAndDate,
+    getSlotsForAssignService: getSlotsForAssignService
 }

@@ -63,6 +63,9 @@ const assignServiceSchema = new mongoose.Schema({
    },
    otherBranchId:{
     type:String
+   },
+   bookedCount:{
+    type:Number
    }
 }, {
     collection: 'assignService',
