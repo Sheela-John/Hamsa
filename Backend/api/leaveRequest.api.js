@@ -75,13 +75,15 @@ async function getAllleaveRequestDetails(){
     for(var i=0;i<leaveRequestData.length;i++)
     {
         let [err1, staffData] = await handle(Staff.findOne({_id:leaveRequestData[i].staffId}).lean()); 
-        console.log("leaveRequestData",leaveRequestData)
-        leaveRequestData[i].staffId=staffData.staffName;
+        console.log("leaveRequestData",staffData)
+        leaveRequestData[i].staffName=staffData.staffName;
     }
     if (err) return Promise.reject(err);
     if (lodash.isEmpty(leaveRequestData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(leaveRequestData);
 }
+
+
 module.exports = {
     create: create,
     UpdateleaveRequest: UpdateleaveRequest,
