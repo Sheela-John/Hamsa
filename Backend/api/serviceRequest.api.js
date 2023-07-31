@@ -65,6 +65,15 @@ async function getserviceRequestDataById(serviceRequestId) {
     log.close();
     let [serviceRequestErr, serviceRequestData] = await handle(serviceRequest.findOne({ '_id': serviceRequestId }).lean());
     if (serviceRequestErr) return Promise.reject(serviceRequestErr);
+    else{
+        let [err, clientData] = await handle(Client.findOne({_id:serviceRequestData.clientId}).lean());
+        let [err1, staffData] = await handle(Staff.findOne({_id:serviceRequestData.staffId}).lean());
+        let [err2,serviceData]= await handle(Service.findOne({_id:serviceRequestData.serviceId}).lean());
+        console.log(err2,"serviceData",serviceData)
+        serviceRequestData.clientName=clientData.clientName;
+        serviceRequestData.staffName=staffData.staffName;
+        serviceRequestData.serviceName=serviceData.serviceName;
+    }
     if (lodash.isEmpty(serviceRequestData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(serviceRequestData);
 }
