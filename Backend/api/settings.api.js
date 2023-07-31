@@ -58,33 +58,46 @@ async function create(settingsData) {
 }
 
 /* To Update Settings - API */
+// const UpdateSettings = async function (datatoupdate) {
+
+//     log.debug(component, 'Updating a Settings', { 'attach': datatoupdate }); log.close();
+//     let [findSettingsErr, findSettingsData] = await handle(Settings.find({}));
+//     if (findSettingsErr) return Promise.reject(findSettingsErr);
+//     var last = findSettingsData[findSettingsData.length - 1]
+//     var todayDate = new Date().toISOString().slice(0, 10);
+//     datatoupdate.date = new Date(todayDate);
+//     let someDate = datatoupdate.date
+//     let copiedAppointmentDate = new Date(someDate.getTime());
+//     if (last.endDate.getTime() == copiedAppointmentDate.getTime()) {
+//         let [err, updateSettings] = await handle(Settings.findOneAndUpdate({ "_id": last._id }, datatoupdate, { new: true, useFindAndModify: false }))
+//         if (err) return Promise.reject(err);
+//         else return Promise.resolve(updateSettings);
+//     }
+//     else {
+//         let [err, updateSettings] = await handle(Settings.findOneAndUpdate({ "_id": last._id }, { '$set': { 'endDate': copiedAppointmentDate } }, { new: true, useFindAndModify: false }))
+//         if (err) return Promise.reject(err);
+//         datatoupdate['startDate'] = copiedAppointmentDate;
+//         datatoupdate['endDate'] = copiedAppointmentDate;
+//         var saveModel = new Settings(datatoupdate);
+//         saveModel.createdAt = copiedAppointmentDate;
+//         saveModel.updatedAt = copiedAppointmentDate;
+//         let [settingsErr, settingsData] = await handle(saveModel.save())
+//         if (settingsErr) return Promise.reject(settingsErr);
+//         else return Promise.resolve(settingsData);
+//     }
+// }
+
+
+
 const UpdateSettings = async function (datatoupdate) {
-    log.debug(component, 'Updating a Settings', { 'attach': datatoupdate }); log.close();
-    let [findSettingsErr, findSettingsData] = await handle(Settings.find({}));
-    if (findSettingsErr) return Promise.reject(findSettingsErr);
-    var last = findSettingsData[findSettingsData.length - 1]
-    var todayDate = new Date().toISOString().slice(0, 10);
-    datatoupdate.date = new Date(todayDate);
-    let someDate = datatoupdate.date
-    let copiedAppointmentDate = new Date(someDate.getTime());
-    if (last.endDate.getTime() == copiedAppointmentDate.getTime()) {
-        let [err, updateSettings] = await handle(Settings.findOneAndUpdate({ "_id": last._id }, datatoupdate, { new: true, useFindAndModify: false }))
-        if (err) return Promise.reject(err);
-        else return Promise.resolve(updateSettings);
-    }
-    else {
-        let [err, updateSettings] = await handle(Settings.findOneAndUpdate({ "_id": last._id }, { '$set': { 'endDate': copiedAppointmentDate } }, { new: true, useFindAndModify: false }))
-        if (err) return Promise.reject(err);
-        datatoupdate['startDate'] = copiedAppointmentDate;
-        datatoupdate['endDate'] = copiedAppointmentDate;
-        var saveModel = new Settings(datatoupdate);
-        saveModel.createdAt = copiedAppointmentDate;
-        saveModel.updatedAt = copiedAppointmentDate;
-        let [settingsErr, settingsData] = await handle(saveModel.save())
-        if (settingsErr) return Promise.reject(settingsErr);
-        else return Promise.resolve(settingsData);
-    }
+    log.debug(component, 'Updating a SettingsData', { 'attach': datatoupdate }); log.close();
+    let settingsDataId = datatoupdate._id;
+    delete datatoupdate._id
+    let [settingsDataErr, settingsData] = await handle(Settings.findOneAndUpdate({ "_id": settingsDataId }, datatoupdate, { new: true, useFindAndModify: false }))
+    if (settingsDataErr) return Promise.reject(settingsDataErr);
+    else return settingsData.toObject(); 
 }
+
 
 /* Get Settings by Id */
 async function getSettingsDataById(settingsId) {
@@ -99,11 +112,11 @@ async function getSettingsDataById(settingsId) {
 /* Get All Settings Detail */
 async function getAllSettingsDetails() {
     log.debug(component, 'Get All Settings Detail'); log.close();
-    let [err, settingsData] = await handle(Settings.find({}).lean());
+    let [err, settingsData] = await handle(Settings.find().lean());
+    console.log("settingsData",settingsData)
     if (err) return Promise.reject(err);
     if (lodash.isEmpty(settingsData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
-    var last = settingsData[settingsData.length - 1]
-    return Promise.resolve(last);
+    return Promise.resolve(settingsData);
 }
 
 /* Enable / Disable Settings By Settings Id */

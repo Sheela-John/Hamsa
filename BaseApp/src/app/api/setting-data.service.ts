@@ -12,17 +12,43 @@ import { throwError, Observable } from 'rxjs';
 export class SettingDataService {
     constructor(private router: Router, private httpClient: HttpClient) { }
 
+    // SaveSettings(data: any) {
+    //     throw new Error('Method not implemented.');
+    // }
+  
+
     //Get All setting
-    public getAllSetting(): Observable<any> {
+    public getAllSettings(): Observable<any> {
         return this.httpClient.get('settings/get/allSettings').pipe(tap(res => {
             return res;
         }), catchError(error => throwError(error)));
     }
 
+
+
+      //Add New Staff
+      public SaveSettings(data): Observable<any> {
+        return this.httpClient.post('settings/', data).pipe(tap(res => {
+            return res;
+        }), catchError(error => throwError(error)));
+    }
+
+    
+    //Get Staff By Id
+    public getSettingsById(id): Observable<any> {
+        return this.httpClient.get('settings/'+ id).pipe(tap(res => {
+            return res;
+        }), catchError(error => throwError(error)));
+    }
+
+  
+
     //Update Setting
-    public updateSetting(data): Observable<any> {
-        return this.httpClient.put('settings/', data).pipe(tap(res => {
+    public updateSetting(id,data): Observable<any> {
+        return this.httpClient.put('settings/' +id,data).pipe(tap(res => {
           return res;
         }), catchError(error => throwError(error)));
       }
+
+
 }

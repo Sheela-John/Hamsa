@@ -17,6 +17,9 @@ export class SettingComponent implements OnInit {
   public isSettingFormSubmitted: Boolean = false;
   public destroy$ = new Subject();
   public settingsId: any;
+  public routerData: any;
+  public settingsData: any
+
   public showAddEdit: boolean = false;
 
   constructor(private fb: FormBuilder, private router: Router, public SettingService: SettingService, private flashMessageService: FlashMessageService, private route: ActivatedRoute) {
@@ -26,7 +29,18 @@ export class SettingComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeSettingsForm();
-    this.getAllSettings();
+    // this.getSettingsById(this.routerData)
+    this.getAllSettings()
+    // if (this.routerData != undefined) {
+    //   this.getSettingsById(this.routerData);
+    //   this.showAddEdit = true;
+    // } else {
+    //   this.showAddEdit = false;
+    // }
+
+    // this.getAllSettings();
+    // this.getByStaffId(this.routerData);
+
   }
 
   //initializeSettingForm
@@ -34,72 +48,126 @@ export class SettingComponent implements OnInit {
     this.settingForm = this.fb.group({
       averageDistance: ['', [Validators.required]],
     });
+    // this.getSettingsById(id);
   }
 
-  //Get all Settings
-  async getAllSettings() {
-    console.log("Inside Function");
-    const settings = Parse.Object.extend('Settings');
-    const query = new Parse.Query(settings);
-    try {
-      const settingsData = await query.find();
-      console.log("dfvfdv:", settingsData);
-      if (settingsData.length != 0) {
-        this.settingsId = settingsData[0].id;
-        this.getSettingsByIdBase4App(this.settingsId);
-      }
-    } catch (err) {
-      alert(`Failed to retrieve the object, with error code: ${err.message}`);
-    }
-  }
+  // //Get all Settings
+  // async getAllSettings() {
+  //   console.log("Inside Function");
+  //   const settings = Parse.Object.extend('Settings');
+  //   const query = new Parse.Query(settings);
+  //   try {
+  //     const settingsData = await query.find();
+  //     console.log("dfvfdv:", settingsData);
+  //     if (settingsData.length != 0) {
+  //       this.settingsId = settingsData[0].id;
+  //       this.getSettingsByIdBase4App(this.settingsId);
+  //     }
+  //   } catch (err) {
+  //     alert(`Failed to retrieve the object, with error code: ${err.message}`);
+  //   }
+  // }
 
   //Save Settings
-  async SaveSettings() {
-    this.isSettingFormSubmitted = true;
+
+  // async SaveSettingsBase4App() {
+  //   this.isSettingFormSubmitted = true;
+  //   const setting = new Parse.Object("Setting");
+  //   const user: Parse.User = new Parse.User();
+  //   setting.set("averageDistance", this.settingForm.value.averageDistance)
+  //    try {
+  //     let userResult: Parse.User = await user.signUp();
+  // if(userResult){
+  //   let result = await setting.save()
+  // }
+
+  //     this.flashMessageService.successMessage("Setting Created Successfully", 2);
+  //     this.router.navigateByUrl('admin/settings')
+  //   } catch (error) {
+  //     this.flashMessageService.errorMessage("Error while Creating Setting", 2);
+  //   }
+  // }
+
+
+  //Save Settings
+  SaveSettings() {
+    this.isSettingFormSubmitted = false;
     if (this.settingForm.valid) {
-      const Settings = new Parse.Object("Settings");
-      Settings.set("averageDistance", this.settingForm.value.averageDistance)
-      try {
-        let result = await Settings.save()
-        this.flashMessageService.successMessage("Settings Save Successfully", 2);
-        this.settingsId = result.id;
-        this.getSettingsByIdBase4App(this.settingsId);
-      }
-      catch (error) {
-        this.flashMessageService.errorMessage("Error while  Save Settings", 2);
-      }
+
+      var data = this.settingForm.value;
+      console.log("data", data)
+
+      this.SettingService.SaveSettings(data).subscribe((res) => {
+        if (res.status) {
+          this.flashMessageService.successMessage("Settings Created Successfully");
+          this.router.navigateByUrl("admin/settings");
+        }
+        else {
+          this.flashMessageService.errorMessage("Settings  Failed");
+        }
+      })
     }
   }
 
-  //Get Settings By Id
-  async getSettingsByIdBase4App(id) {
-    this.showAddEdit = true;
-    const branch = Parse.Object.extend('Settings');
-    const query = new Parse.Query(branch);
-    query.equalTo('objectId', id);
-    try {
-      const results = await query.find();
-      for (const settingValue of results) {
-        this.settingForm.get('averageDistance').patchValue(settingValue.get('averageDistance'));
+  // getAllSettings() {
+
+  //   // console.log("id",id);
+  //   this.SettingService.getAllSettings().subscribe(res => {
+  //     if (res.status) {
+  //       this.showAddEdit = true;
+  //       this.settingsData = res.data;
+        
+
+  //     }
+  //     console.log("this.staffData", this.settingsData)
+  //   })
+  // }
+
+
+  // getSettingsById(id) {
+  //   this.SettingService.getSettingsById(id).subscribe((res) => {
+  //     console.log("response:", res.data);
+  //     if (res.status) {
+  //       this.settingForm.patchValue(res.data);
+  //     }
+  //   })
+  // }
+
+
+
+  getAllSettings() {
+    this.SettingService.getAllSettings().subscribe(res => {
+      if (res.status) {
+        this.showAddEdit = true;
+        console.log(res.data)
+        this.settingsData = res.data;
+        this.settingsId = this.settingsData[0]._id;
+        this.settingForm.patchValue({
+          averageDistance: this.settingsData[0].averageDistance,
+
+        })
+        console.log("this.Settings", this.settingsData)
       }
-    } catch (error) {
-      console.error('Error while fetching ToDo', error);
+    })
+  }
+
+
+  // Update Service
+  updateSettings() {
+    this.isSettingFormSubmitted = true;
+    console.log(this.settingsId, "ddd")
+    if (this.settingForm.valid) {
+      this.SettingService.updateSetting(this.settingsId, this.settingForm.value).subscribe((res) => {
+        if (res.status) {
+          this.flashMessageService.successMessage("Service Updated Successfully", 2);
+          this.router.navigateByUrl('admin/settings')
+        }
+        else {
+          this.flashMessageService.errorMessage("Error while Updating Service", 2);
+        }
+      })
     }
   }
 
-  //Update Settings
-  async updateSettings() {
-    this.isSettingFormSubmitted = true;
-    if (this.settingForm.valid) {
-      const Settings = new Parse.Object("Settings");
-      Settings.set('objectId', this.settingsId);
-      Settings.set("averageDistance", this.settingForm.value.averageDistance)
-      try {
-        let result = await Settings.save()
-        this.flashMessageService.successMessage("Settings Update Successfully", 2);
-      } catch (error) {
-        this.flashMessageService.errorMessage("Error while Updated Settings", 2);
-      }
-    }
-  }
+
 }

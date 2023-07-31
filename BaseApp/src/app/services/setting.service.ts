@@ -6,16 +6,36 @@ import { SettingDataService } from '../api/setting-data.service';
 })
 
 export class SettingService {
+    // updateSettings(id: any, value: any) {
+    //   throw new Error('Method not implemented.');
+    // }
+    // SaveSettings(data: any) {
+    //   throw new Error('Method not implemented.');
+    // }
     constructor(private SettingDataService:SettingDataService) { }
 
     //Get All setting
-    public getAllSetting() {
-        return this.SettingDataService.getAllSetting();
+    public getAllSettings() {
+        return this.SettingDataService.getAllSettings();
+    }
+
+   
+     
+    //Add New Staff
+    public SaveSettings(data) {
+        return this.SettingDataService.SaveSettings(data);
+    }
+
+ 
+    //Get Staff By Id
+    public getSettingsById(id) {
+        return this.SettingDataService.getSettingsById(id);
     }
 
     //update Setting
-    public updateSetting(data) {
+    public updateSetting(id,data) {
         console.log(data)
-        return this.SettingDataService.updateSetting(data);
+        return this.SettingDataService.updateSetting(id,data);
       }
+
 }
