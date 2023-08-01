@@ -20,12 +20,10 @@ const handle = (promise) => {
 }
 
 router.post('/login', (req, res) => {
-    console.log("req",req)
     req.body.grant_type = 'password';
     req.body.client_id = 'my-app';
     req.body.password = req.body.password + ',' + req.body.role;
     var request = new Request(req);
-    console.log("request",request)
     var response = new Response(res);
     oauth
         .token(request, response)

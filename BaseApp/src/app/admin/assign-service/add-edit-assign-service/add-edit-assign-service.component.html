@@ -11,13 +11,19 @@
             <form novalidate="" [formGroup]="assignServiceForm">
                 <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3 ">
                     <div>
-                        <label for="clientName" class="block mb-2 font-bold text-gray-600">Staff
+                        <label for="staffName" class="block mb-2 font-bold text-gray-600">Staff
                             Name</label>
                         <select class="border border-gray-300 shadow p-2 w-full rounded"
-                            (change)="dividBySlotTime($event)" formControlName="staffId" placeholder="--select--">
+                            (change)="dividBySlotTime($event)" formControlName="staffId" placeholder="--select--" >
                             <option value="">--select--</option>
                             <option value="{{branch._id}}" *ngFor="let branch of staffList">
                                 {{branch.staffName}}
+                            </option>
+                        </select>
+                        <select class="border border-gray-300 shadow p-2 w-full rounded"   (change)="dividBySlotTime($event)" formControlName="staffId">
+                            <option value="">--select--</option>+
+                            <option value="{{role._id}}" *ngFor="let role of staffList">
+                                {{role._id}}
                             </option>
                         </select>
                     </div>

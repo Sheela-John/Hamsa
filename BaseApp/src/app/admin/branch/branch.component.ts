@@ -36,7 +36,7 @@ export class BranchComponent implements OnInit {
       retrieve: true,
       ordering: false
     }
-    this.getAllBranchInBase4App();
+    this.getAllBranch();
   }
   
 

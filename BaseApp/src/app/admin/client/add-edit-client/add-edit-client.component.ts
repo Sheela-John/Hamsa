@@ -192,7 +192,7 @@ export class AddEditClientComponent implements OnInit {
       this.showAddEdit = false;
     }
     this.initializeClientForm();
-    this.getAllBranchInBase4App()
+   this.getAllBranch();
     this.getAllServicesInBase4App()
     this.getAllStaffbase4App()
     this.RRule();
@@ -314,25 +314,16 @@ export class AddEditClientComponent implements OnInit {
   }
 
   //getBranchbyId to patch branchaddress while selecting Branch
-  async getBranchbyId() {
-    var id = this.clientForm.value.homeBranch
-    const branch = Parse.Object.extend('Branch');
-    const query = new Parse.Query(branch);
-    query.equalTo('objectId', id);
-    try {
-      const results = await query.find();
-      for (const branch of results) {
-        // Access the Parse Object attributes using the .GET method
-        const BranchName = branch.get('BranchName')
-        const BranchAddress = branch.get('BranchAddress')
-        this.homeBranchLatitude = branch.get('Latitude')
-        this.homeBranchLongitude = branch.get('Longitude')
-        this.BranchNameData = branch.get('BranchName')
-        this.clientForm.get('homeBranchaddress').patchValue(BranchAddress)
+  async getBranchbyId(event) {
+    var id=event.target.value;
+    this.BranchService.getBranchbyId(id).subscribe(res => {
+      if (res.status) {
+        console.log("res.data",res.data)
+       var brandchData=res.data;
+       console.log(brandchData)
+       this.clientForm.controls['homeBranchaddress'].setValue(brandchData.branchAddress)
       }
-    } catch (error) {
-    
-    }
+    })
   }
 
   //back -Route
@@ -1244,4 +1235,8 @@ else{
       }
     });
   }
+
+//  -------------------------------------------------------------------------------------------------------------
+
+
 }

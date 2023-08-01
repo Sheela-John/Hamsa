@@ -18,7 +18,7 @@ const serviceRequestSchema = new mongoose.Schema({
    },
    serviceId:{
     type:String
-   }
+   },
 
 }, {
     collection: 'serviceRequest',

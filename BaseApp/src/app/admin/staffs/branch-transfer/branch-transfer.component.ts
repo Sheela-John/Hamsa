@@ -68,8 +68,8 @@ export class BranchTransferComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeBranchTransferForm();
-    // this.getAllBranch();
-    this.getAllBranchInBase4App()
+     this.getAllBranch();
+   // this.getAllBranchInBase4App()
     if (this.routerData != undefined) {
       this.getBranchTranferByIdBase4App(this.routerData)
       this.showAddEdit = true;

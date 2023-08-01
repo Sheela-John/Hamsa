@@ -3,9 +3,12 @@ const component = "Client API";
 const models = require('../models');
 const Security = require("../util/security");
 const Staff = models.Staff;
-const AssignServiceForClient = models.AssignServiceForClient;
+const AssignService = models.AssignService;
 const AssignServiceForBranch = models.AssignServiceForBranch;
+const AssignServiceAPI = require('../api/assignService.api');
 const Client = models.Client;
+const Branch = models.Branch;
+const Service = models.Services;
 const ClientDistance = models.clientDistance;
 const Settings = models.Settings;
 const TravelAllowance = models.TravelAllowance;
@@ -34,6 +37,7 @@ const genrateDefaultImage = require('../util/generateCode').genrateDefaultImage;
 const otpGenerator = require('otp-generator')
 const bcrypt = require('bcrypt');
 const fast2sms = require('fast-two-sms');
+const { RRule } = require("rrule");
 
 const s3 = new AWS.S3({
     accessKeyId: config.AWSCredentails.AWS_ACCESS_KEY,
@@ -91,8 +95,30 @@ async function create(clientData) {
             function saveClient(cb) {
                 (async () => {
                     clientData.role = "PORTAL_CLIENT";
+                    clientData.packageId = Math.floor((Math.random() * 100000000000) + 1);
                     var saveModel = new Client(clientData);
                     let [err, client] = await handle(saveModel.save())
+                    for (var i = 0; i < client.addSession.length; i++) {
+                        var assignData = {
+
+                            "clientId": client._id,
+                            "clientName": client.clientName,
+                            "staffId": client.staffId,
+                            "phone": client.phoneNumber,
+                            "date": new Date(client.addSession[i].date),
+                            "status": 0,
+                            "packageId": client.packageId,
+                            "address": client.address,
+                            "serviceId": client.serviceId,
+                            "endTime": client.addSession[i].slotEndTime,
+                            "startTime": client.addSession[i].slotStartTime,
+                            "duration": client.addSession[i].duration,
+                            "slot": client.addSession[i].slot,
+                            "typeOfTreatment": client.typeOfTreatment
+                        }
+                        var saveAssignData = new AssignService(assignData);
+                        let [err1, assignServiceData] = await handle(saveAssignData.save())
+                    }
                     if (err) cb(err, null);
                     else {
                         cb(null, client);
@@ -107,7 +133,7 @@ async function create(clientData) {
                     clientDataModel['email'] = clientDatafromFunction.email;
                     clientDataModel['role'] = "PORTAL_CLIENT";
                     // clientDataModel['password'] = Security.hash(clientDatafromFunction.createdAt, clientDatafromFunction.password);
-                    clientDataModel['phone'] = clientDatafromFunction.phone;
+                    clientDataModel['phone'] = clientDatafromFunction.phoneNumber;
                     clientDataModel['user'] = clientDatafromFunction._id;
                     clientDataModel['createdAt'] = clientDatafromFunction.createdAt;
                     const loginModel = new Login(clientDataModel);
@@ -192,6 +218,17 @@ async function getClientDatabyId(clientId) {
     log.debug(component, 'Getting Client Data by Id');
     log.close();
     let [clientErr, clientData] = await handle(Client.findOne({ '_id': clientId }).lean());
+    let [Err, assignServiceData] = await handle(AssignService.find({ 'packageId': clientData.packageId }).lean());
+    var sessionArray = [];
+    for (var i = 0; i < assignServiceData.length; i++) {
+        var temp = {
+            date: assignServiceData[i].date,
+            startTime: assignServiceData[i].startTime,
+            endTime: assignServiceData[i].endTime
+        }
+        sessionArray.push(temp)
+    }
+    clientData.session = sessionArray
     if (clientErr) return Promise.reject(clientErr);
     if (lodash.isEmpty(clientData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(clientData);
@@ -201,6 +238,15 @@ async function getClientDatabyId(clientId) {
 async function getAllClientDetails() {
     log.debug(component, 'Get All Client Detail'); log.close();
     let [err, clientData] = await handle(Client.find({}).lean());
+    for (var i = 0; i < clientData.length; i++) {
+        let [err, branchData] = await handle(Branch.findOne({ _id: clientData[i].homeBranchId }).lean());
+        let [err1, staffData] = await handle(Staff.findOne({ _id: clientData[i].staffId }).lean());
+        let [err2, serviceData] = await handle(Service.findOne({ _id: clientData[i].serviceId }).lean());
+        clientData[i].homeBranchAddress = branchData.branchAddress;
+        clientData[i].staffName = staffData.staffName;
+        clientData[i].serviceName = serviceData.serviceName;
+    }
+
     if (err) return Promise.reject(err);
     if (lodash.isEmpty(clientData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(clientData);
@@ -212,6 +258,29 @@ const UpdateClient = async function (datatoupdate) {
     let clientId = datatoupdate._id;
     delete datatoupdate._id
     let [err, clientData] = await handle(Client.findOneAndUpdate({ "_id": clientId }, datatoupdate, { new: true, useFindAndModify: false }))
+    let [err1, assignData] = await handle(AssignService.deleteMany({ 'packageId': clientData.packageId }))
+    for (var i = 0; i < clientData.addSession.length; i++) {
+        var assign = {
+
+            "clientId": clientData._id,
+            "clientName": clientData.clientName,
+            "staffId": clientData.staffId,
+            "phone": clientData.phoneNumber,
+            "date": new Date(clientData.addSession[i].date),
+            "status": 0,
+            "packageId": clientData.packageId,
+            "address": clientData.address,
+            "serviceId": clientData.serviceId,
+            "endTime": clientData.addSession[i].slotEndTime,
+            "startTime": clientData.addSession[i].slotStartTime,
+            "duration": clientData.addSession[i].duration,
+            "slot": clientData.addSession[i].slot,
+            "typeOfTreatment": clientData.typeOfTreatment
+        }
+
+        var saveAssignData = new AssignService(assign);
+        let [err2, assignServiceData] = await handle(saveAssignData.save())
+    }
     if (err) return Promise.reject(err);
     else return Promise.resolve(clientData);
 }
@@ -293,12 +362,85 @@ const requestAdditionalService = async function (data) {
     log.debug(component, 'Requesting Additional Service for Staff by Client', { 'attach': data });
     log.close();
 }
-
+async function saveRecurringSession(data) {
+    var singleArray = [];
+    
+    data.weekDaysArr.forEach(element => {
+        if (element.value == "RRule.MO") {
+            singleArray.push(0)
+        }
+        if (element.value == "RRule.TU") {
+            singleArray.push(1)
+        }
+        if (element.value == "RRule.WE") {
+            singleArray.push(2)
+        }
+        if (element.value == "RRule.TH") {
+            singleArray.push(3)
+        }
+        if (element.value == "RRule.FR") {
+            singleArray.push(4)
+        }
+        if (element.value == "RRule.SA") {
+            singleArray.push(5)
+        }
+        if (element.value == "RRule.SU") {
+            singleArray.push(6)
+        }
+    })
+    let recurringRule = {
+        freq: RRule.WEEKLY,
+        dtstart: new Date(data.startDate),
+        until: new Date(data.endDate),
+        count: 30,
+        interval: 1
+      }
+    recurringRule['byweekday'] = singleArray
+    const rule = new RRule(recurringRule);
+    var recurringdate=[];
+    recurringdate = rule.all()
+    var dateSlot=[]
+    for (let i = 0; i < data.noOfSession; i++) {
+        dateSlot.push(formattedDate(recurringdate[i].toString()))
+      }
+  var slotArr=[];
+  for(var i=0;i<dateSlot.length;i++)
+  {
+  let temp={
+   
+        "staffId":data.staffId,
+        "date":dateSlot[i],
+        "slotId":data.slotId,
+        "duration":data.duration,
+        "typeOfTreatment":data.typeOfTreatment
+  }
+  let [err,assign]=await handle(AssignServiceAPI.getSlotsForAssignService(temp))
+  var slotsData={
+    date:dateSlot[i],
+    slots:assign
+  }
+ slotArr.push(slotsData)
+}
+if (lodash.isEmpty(slotArr)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+return Promise.resolve(slotArr);
+}
+function formattedDate(date) {
+    var d = new Date(date),
+      month = '' + (d.getMonth() + 1),
+      day = '' + d.getDate(),
+      year = d.getFullYear();
+    if (month.length < 2)
+      month = '0' + month;
+    if (day.length < 2)
+      day = '0' + day;
+    return [year, month, day].join('-');
+  }
 module.exports = {
     create: create,
     getClientDatabyId: getClientDatabyId,
     getAllClientDetails: getAllClientDetails,
     UpdateClient: UpdateClient,
     sendOTP: sendOTP,
-    requestAdditionalService: requestAdditionalService
+    requestAdditionalService: requestAdditionalService,
+    saveRecurringSession: saveRecurringSession
 }

@@ -249,14 +249,7 @@ const UpdateStaff = async function (datatoupdate) {
     if (datatoupdate.gender) {
         datatoupdate.defaultImageUrl = genrateDefaultImage(datatoupdate.gender);
     }
-    // if (datatoupdate.userProfileImage != undefined && datatoupdate.userProfileImage != "") {
-    //     if (datatoupdate.userProfileImage.match(/^\s*data:([a-z]+\/[a-z0-9\-\+]+(;[a-z\-]+\=[a-z0-9\-]+)?)?(;base64)?,[a-z0-9\!\$\&\'\,\(\)\*\+\,\;\=\-\.\_\~\:\@\/\?\%\s]*\s*$/i)) {
-    //         var [err, profileImageData] = await handle(profileImageStore(datatoupdate));
-    //         if (profileImageData != undefined) datatoupdate.userProfileImage = profileImageData.userProfileImage;
-    //     } else {
-    //         delete datatoupdate.userProfileImage;
-    //     }
-    // }
+
     delete datatoupdate._id
     let [staffErr, staffData] = await handle(Staff.findOneAndUpdate({ "_id": staffId }, datatoupdate, { new: true, useFindAndModify: false }))
     if (staffErr) return Promise.reject(staffErr);

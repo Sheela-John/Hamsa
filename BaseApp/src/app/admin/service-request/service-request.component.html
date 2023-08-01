@@ -19,11 +19,11 @@
                     </tr>
                 </thead>
                 <tbody class="flex-1 sm:flex-none" >
-                    <tr class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0" *ngFor="let service of serviceData">
-                        <td class="border-grey-light border hover:bg-gray-100 p-3">{{service.patientName}}</td>
+                    <tr class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0" *ngFor="let service of serviceRequestList">
+                        <td class="border-grey-light border hover:bg-gray-100 p-3">{{service.clientName}}</td>
                         <td class="border-grey-light border hover:bg-gray-100 p-3">{{service.date}}</td>
-                        <td class="border-grey-light border hover:bg-gray-100 p-3">{{service.service}}</td>
-                        <td class="border-grey-light border hover:bg-gray-100 p-3">{{service.referenceBy}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 p-3">{{service.serviceName}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 p-3">{{service.staffName}}</td>
                         <td class="border-grey-light border hover:bg-gray-100 p-3" >
                             <span *ngIf="service.status==0">Additional Request</span>
                             <span *ngIf="service.status==1">Reschedule</span>
@@ -31,10 +31,10 @@
                        
                         <td
                             class="border-grey-light border hover:bg-gray-100 p-3 text-red-400 hover:text-red-600 hover:font-medium cursor-pointer">
-                            <button class="btn" *ngIf="!service.isAssigned && service.status==0"(click)="assignServiceRequest(service.id)">Assign</button>&nbsp;&nbsp;
-                            <button class="btn" *ngIf="!service.isAssigned && service.status==1"(click)="assignServiceRequest(service.id)">Reschedule</button>&nbsp;&nbsp;
-                            <button class="btn" *ngIf="service.isAssigned && service.status==0"(click)="assignServiceRequest(service.id)" disabled>Assigned</button>&nbsp;&nbsp;
-                            <button class="btn" *ngIf="service.isAssigned && service.status==1"(click)="assignServiceRequest(service.id)" disabled>Rescheduled</button>&nbsp;&nbsp;
+                            <button class="btn" *ngIf="!service.isAssigned && service.status==0"(click)="assignServiceRequest(service._id)">Assign</button>&nbsp;&nbsp;
+                            <button class="btn" *ngIf="!service.isAssigned && service.status==1"(click)="assignServiceRequest(service._id)">Reschedule</button>&nbsp;&nbsp;
+                            <button class="btn" *ngIf="service.isAssigned && service.status==0"(click)="assignServiceRequest(service._id)" disabled>Assigned</button>&nbsp;&nbsp;
+                            <button class="btn" *ngIf="service.isAssigned && service.status==1"(click)="assignServiceRequest(service._id)" disabled>Rescheduled</button>&nbsp;&nbsp;
                         </td>
                     </tr>
                 </tbody>

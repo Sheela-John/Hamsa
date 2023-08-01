@@ -93,10 +93,10 @@
                     <div>
                         <label for="homeBranch" class="block mb-2 font-bold text-gray-600 ">Home Branch</label>
                         <select class="border border-gray-300 shadow p-2 w-full rounded" formControlName="homeBranch"
-                            (change)="getBranchbyId()">
+                        (change)="getBranchbyId($event)" >
                             <option value="" disabled>--select--</option>+
-                            <option value="{{branchList.BranchId}}" *ngFor="let branchList of BranchNameArr">
-                                {{branchList.BranchName}}
+                            <option value="{{branch._id}}" *ngFor="let branch of branchList" >
+                                {{branch.branchName}}
                             </option>
                         </select>
                         <div class="error-msg-area">

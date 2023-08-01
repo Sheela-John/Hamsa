@@ -22,7 +22,12 @@ router.post('/', async (req, res, next) => {
     if (err) return next(err);
     else return res.status(200).json({ status: true, data: clientData });
 })
-
+router.post('/saveRecurringSession', async (req, res, next) => {
+    if (lodash.isEmpty(req.body)) return next(ERR.MANDATORY_FIELD_MISSING);
+    let [err, clientData] = await handle(ClientAPI.saveRecurringSession(req.body));
+    if (err) return next(err);
+    else return res.status(200).json({ status: true, data: clientData });
+})
     /* Get Client By Id */
     .get('/:id', async (req, res, next) => {
         log.debug(COMPONENT, 'Search for Client by ID'); log.close();

@@ -38,8 +38,8 @@ export class AddEditBranchComponent implements OnInit {
   ngOnInit(): void {
     this.initializebranchForm();
     if (this.routerData != undefined) {
-      // this.getBranchbyId(this.routerData);
-      this.getBranchByIdBase4App(this.routerData)
+       this.getBranchbyId(this.routerData);
+      //this.getBranchByIdBase4App(this.routerData)
       this.showAddEdit = true;
     } else {
       this.showAddEdit = false;

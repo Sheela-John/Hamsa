@@ -4,6 +4,7 @@ import { environment } from 'src/environments/environment';
 import * as Parse from 'parse';
 import { Subject } from 'rxjs';
 import { FlashMessageService } from 'src/app/shared/flash-message/flash-message.service';
+import { ClientService } from 'src/app/services/client.service';
 @Component({
   selector: 'app-client',
   templateUrl: './client.component.html',
@@ -17,7 +18,7 @@ export class ClientComponent implements OnInit {
   public ClientDataArr: any = [];
   public ClientStatusEnableAndDisable: any;
 
-  constructor(private router: Router, private flashMessageService: FlashMessageService, private route: ActivatedRoute) {
+  constructor(private router: Router, public clientService:ClientService,private flashMessageService: FlashMessageService, private route: ActivatedRoute) {
     Parse.initialize(environment.PARSE_APP_ID, environment.PARSE_JS_KEY,);
     (Parse as any).serverURL = environment.PARSE_SERVER_URL
   }
@@ -30,7 +31,7 @@ export class ClientComponent implements OnInit {
       retrieve: true,
       ordering: false
     }
-    this.getAllClientInBase4App()
+    this.getAllClients()
 
   }
 
@@ -41,37 +42,46 @@ export class ClientComponent implements OnInit {
   editClient(clientId, PackageId) {
     this.router.navigateByUrl('admin/client/' + clientId + '/addEditClient/' + PackageId);
   }
-
-  async getAllClientInBase4App() {
-    const branch = Parse.Object.extend('Client');
-    const query = new Parse.Query(branch);
-    try {
-      const clientName = await query.find()
-      for (const ClientData of clientName) {
-        this.ClientDataArr.push(
-          {
-            "ClientName": ClientData.get("ClientName"),
-            "ClientAddress": ClientData.get("Address"),
-            "ClientId": ClientData.id,
-            "status": ClientData.get("ClientStatus"),
-            "UHID": ClientData.get("uhid"),
-            "Email": ClientData.get("Email"),
-            "NoOfSession": ClientData.get("NoOfSession"),
-            "WeeklySession": ClientData.get("WeeklySession"),
-            "Amount": ClientData.get("Amount"),
-            "Phone": ClientData.get("PhoneNumber"),
-            "PackageId": ClientData.get("PackageId")
-          }
-        )
-      }
-      this.dtTrigger.next(null);
+getAllClients()
+{
+  this.clientService.getAllClients().subscribe(res=>{
+    if(res.status)
+    {
+      this.ClientDataArr=res.data;
+      console.log(this.ClientDataArr)
     }
-    catch (error) {
-      alert(`Failed to retrieve the object, with error code: ${error.message}`);
-    }
-  }
+  })
+}
+  // async getAllClientInBase4App() {
+  //   const branch = Parse.Object.extend('Client');
+  //   const query = new Parse.Query(branch);
+  //   try {
+  //     const clientName = await query.find()
+  //     for (const ClientData of clientName) {
+  //       this.ClientDataArr.push(
+  //         {
+  //           "ClientName": ClientData.get("ClientName"),
+  //           "ClientAddress": ClientData.get("Address"),
+  //           "ClientId": ClientData.id,
+  //           "status": ClientData.get("ClientStatus"),
+  //           "UHID": ClientData.get("uhid"),
+  //           "Email": ClientData.get("Email"),
+  //           "NoOfSession": ClientData.get("NoOfSession"),
+  //           "WeeklySession": ClientData.get("WeeklySession"),
+  //           "Amount": ClientData.get("Amount"),
+  //           "Phone": ClientData.get("PhoneNumber"),
+  //           "PackageId": ClientData.get("PackageId")
+  //         }
+  //       )
+  //     }
+  //     this.dtTrigger.next(null);
+  //   }
+  //   catch (error) {
+  //     alert(`Failed to retrieve the object, with error code: ${error.message}`);
+  //   }
+  // }
 
-  //Base4App Enable or Disable Service 
+  // //Base4App Enable or Disable Service 
   async enableDisableClientInBase4App(id) {
     const client = Parse.Object.extend('Client');
     const query = new Parse.Query(client);

@@ -14,6 +14,7 @@ import { environment } from 'src/environments/environment';
 import * as Parse from 'parse';
 import { Observable } from 'rxjs';
 import { map, filter } from 'rxjs/operators'
+import { ServiceRequestService } from 'src/app/services/serviceRequest.service';
 
 
 @Component({
@@ -155,7 +156,8 @@ export class AddEditAssignServiceComponent implements OnInit {
   assignSercieDataArr: any;
   clientData: any;
   public clientList: any=[];
-  constructor(private fb: FormBuilder, public StaffService: StaffService,public ClientService: ClientService, private route: ActivatedRoute, public ServiceService: ServiceService, public BranchService: BranchService, public AssignService: AssignService, private FlashMessageService: FlashMessageService, private router: Router,) {
+  serviceRequestData: any;
+  constructor(private fb: FormBuilder, public StaffService: StaffService,public ClientService: ClientService, private route: ActivatedRoute, public ServiceService: ServiceService, public BranchService: BranchService, public AssignService: AssignService, public ServiceRequestService:ServiceRequestService, private FlashMessageService: FlashMessageService, private router: Router,) {
     Parse.initialize(environment.PARSE_APP_ID, environment.PARSE_JS_KEY,);
     (Parse as any).serverURL = environment.PARSE_SERVER_URL
     this.route.params.subscribe((param) => {
@@ -179,11 +181,11 @@ export class AddEditAssignServiceComponent implements OnInit {
     if (this.timepickerOpened && this.ngxMateriaTimepicker)
       this.ngxMateriaTimepicker.close();
 
-    console.log("this.staff", this.staffList)
+    console.log("this.serviceRequestId", this.serviceRequestId)
 
-    // if (this.serviceRequestId != undefined) {
-    //   this.getServiceRequestFromBack4App(this.serviceRequestId)
-    // }
+     if (this.serviceRequestId != undefined) {
+      this.getServiceRequestById(this.serviceRequestId)
+     }
     if (this.assignServiceId != undefined) {
       this.getAssignServiceById(this.assignServiceId);
     }
@@ -1346,6 +1348,25 @@ export class AddEditAssignServiceComponent implements OnInit {
     return time_slots;
   }
 
+  async getServiceRequestById(id)
+  {
+    this.ServiceRequestService.getServiceRequestById(id).subscribe(res=>{
+     if(res.status){
+      this.serviceRequestData=res.data;
+      console.log("this.serviceRequestData",this.serviceRequestData)
+      this.date(this.formatDate(this.serviceRequestData.get("Date")), 1);
+      this.assignServiceClientForm.get('staffId').patchValue(this.serviceRequestData.clientId)
+      this.assignServiceClientForm.get('clientName').patchValue(this.serviceRequestData.clientId)
+      this.assignServiceClientForm.get('phone').patchValue(this.serviceRequestData.phone)
+      this.assignServiceClientForm.get('address').patchValue(this.serviceRequestData.address)
+      // this.assignServiceClientForm.get('patientType').patchValue(this.serviceRequestData[0].get("typeofTreatment"))
+      // this.assignServiceClientForm.get('branchId').patchValue(branchData[0].id)
+      // this.assignServiceClientForm.get('branchType').patchValue('0')
+      // this.assignServiceClientForm.get('branchAddress').patchValue(branchData[0].get("BranchAddress"))
+      this.assignServiceClientForm.get('service').patchValue(this.serviceRequestData.serviceId)
+     }
+    })
+  }
   async getServiceRequestFromBack4App(id) {
     this.serviceData = [];
 

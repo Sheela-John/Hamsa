@@ -22,7 +22,7 @@
                     </div>
                 </div>
                 <div class="grid sm:grid-cols-1 md:grid-cols-1 ">
-                    <label for="name" class="block mb-2 font-bold text-gray-600 ">Address</label>
+                    <label for="address" class="block mb-2 font-bold text-gray-600 ">Address</label>
                     <input class="border border-gray-300 shadow p-2 w-full rounded" id="inputPhysicalStreet" rows="3"
                         ngx-google-places-autocomplete [options]='options' formControlName="branchAddress"
                         name="branchAddress" #placesRef="ngx-places" (onAddressChange)="handleAddressChange($event)"
@@ -36,9 +36,9 @@
                     </div>
                 </div>
                 <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg" *ngIf="!showAddEdit"
-                    (click)="saveBranchBase4App()">Submit</button>
+                    (click)="saveBranch()">Submit</button>
                 <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg" *ngIf="showAddEdit"
-                    (click)="updateBranchInBase4App()">Update</button>
+                    (click)="updateBranch()">Update</button>
             </form>
         </div>
     </section>
