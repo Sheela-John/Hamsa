@@ -10,8 +10,8 @@ const roleSchema = new mongoose.Schema({
    name:{type:String},
     // startTime: { type: Date },
     // endTime: { type: Date },
-    slots: { type: [slotSchema] }
-    // status: { type: Number, default: 0 } /* 0 - Active ,  1 - Deleted , 2 - Disabled */
+    slots: { type: [slotSchema] },
+    status: { type: Number, default: 0 } /* 0 - Active ,  1 - Deleted , 2 - Disabled */
 }, {
     collection: 'role',
     versionKey: false,

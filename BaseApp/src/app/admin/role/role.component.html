@@ -6,49 +6,69 @@
                     class="fa fa-plus"></i>&nbsp;&nbsp;Add</button>
         </div>
     </div>
-    <section class="flex ">
+    <section class="flex">
         <div class="container">
-            <section class="grid grid-cols-2 gap-4 ">
-                <article class="rounded-m border border-gray-100 box p-4 mt-5 h-fit"style="background-color: #2DD4BF"*ngFor="let role of RoleDataArr; ">
-                    <div class="relative block overflow-hidden rounded-lg border headbox border-gray-100  mb-4 sm:p-6 lg:p-4">
-                        <span
-                            class="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"></span>
-                            
-                        <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3 ml-4 ">    
-                            <div class="font-bold italic text-xl text-left">Role Name :&nbsp;&nbsp;{{role.Role}}</div>
-                        </div>
-                        <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3 ml-5">
-                            <div> <button  class="btn float-right" (click)="editrole(role.RoleId)"  style="background-color: rgb(253 179 18)"><i
-                                class='fa fa-edit fa-xs'></i></button >&nbsp;&nbsp;</div>
-                                <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3 ml-4 float-right">
-                                    <div >
-                                        <button class="btn" style="background-color: green;" (click)="enableDisableRoleInBase4App(role.RoleId)"*ngIf="role.status == 0"
-                                        ><i class="fa fa-unlock" aria-hidden="true"></i></button>
-                                        <button class="btn" style="background-color: red;" (click)="enableDisableRoleInBase4App
-                                        (role.RoleId)"
-                                        *ngIf="role.status == 2"><i class="fa fa-lock" aria-hidden="true"></i></button>
-                                    </div>
-                                </div>
-                        </div>
+            <section class="grid grid-cols-2 gap-4">
+            <article class="rounded-m border border-gray-100 box p-2 mt-4 h-fit" style="background-color: #2DD4BF;"
+                *ngFor="let role of roleList;">
+                <div class="relative block overflow-hidden rounded-lg border headbox border-gray-100 sm:p-6 lg:p-4">
+                    <span
+                        class="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"></span>
 
-                     
+                    <div class="row ">
+                        <div class="col-9">
+                            <div class="font-bold italic text-xl text-left">Role Name :&nbsp;{{role.name}}</div>
+                        </div>
+                        <div class="col-3">
+                            <div class="row">
+                                <div class="col-6">
+                                    <button class="btn float-right" (click)="editrole(role._id)"
+                                        style="background-color: rgb(253 179 18)"><i
+                                            class='fa fa-edit fa-xs'></i></button>&nbsp;&nbsp;
+                                </div>
+                                <div class="col-6">
+                                    <button class="btn" style="background-color: green;"
+                                        (click)="enableDisableRole(role._id)" *ngIf="role.status == 0"><i
+                                            class="fa fa-unlock" aria-hidden="true"></i></button>
+                                    <button class="btn" style="background-color: red;" (click)="enableDisableRole
+                                            (role._id)" *ngIf="role.status == 2"><i class="fa fa-lock"
+                                            aria-hidden="true"></i></button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                  
-        
-                    <ul class="mt-4 space-y-2">
-                        <li *ngFor="let addRole of role.addRole;">
-                            <div class="block h-full rounded-lg border border-gray-700 subbox p-4 hover:border-pink-600"style="background-color: #163339;">
-                                <div class="grid sm:grid-cols-1 md:grid-cols-5 md:gap-3 ml-4 " style="color:white "> 
-                                    <div>Slot Name:{{addRole.slotName}}</div>&nbsp;&nbsp;
-                                    <div>Start Time:{{addRole.startTime}}</div>&nbsp;&nbsp;
-                                    <div>End Time:{{addRole.endTime}}</div>
-                                  
+                </div>
+                <ul class=" space-y-2">
+                    <div class="block h-full rounded-lg border border-gray-700 subbox p-4 hover:border-pink-600"
+                        style="background-color: #163339;">
+                        <div class="row" style="color:white ">
+                            <div class="col-4">
+                                <div>Slot Name</div>&nbsp;&nbsp;
+                            </div>
+                            <div class="col-4">
+                                <div>Start Time</div>&nbsp;&nbsp;
+                            </div>
+                            <div class="col-4">
+                                <div>End Time</div>&nbsp;&nbsp;
+                            </div>
+                        </div>
+                        <li *ngFor="let addRole of role.slots ;">
+                            <div class="row" style="color:white">
+                                <div class="col-4">
+                                    <div>{{addRole.slotName}}</div>&nbsp;&nbsp;
+                                </div>
+                                <div class="col-4">
+                                    <div>{{addRole.startTime}}</div>&nbsp;&nbsp;
+                                </div>
+                                <div class="col-4">
+                                    <div>{{addRole.endTime}}</div>&nbsp;&nbsp;
                                 </div>
                             </div>
                         </li>
-                    </ul>
-                </article>
-            </section>
+                    </div>
+                </ul>
+            </article>
+        </section>
         </div>
     </section>
 </div>

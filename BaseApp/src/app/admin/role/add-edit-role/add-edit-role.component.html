@@ -13,27 +13,27 @@
                     <div>
                         <label for="name" class="block mb-2 font-bold text-gray-600 ">Role Name</label>
                         <input type="text" id="name" name="name" placeholder="Enter Role Name"
-                            class="border border-gray-300 shadow p-2 w-full rounded " formControlName="role">
+                            class="border border-gray-300 shadow p-2 w-full rounded " formControlName="name">
                         <div class="error-msg-area">
-                            <div *ngIf="roleForm.controls['role'].errors && (!roleForm.controls['role'].pristine|| isroleFormSubmitted)"
+                            <div *ngIf="roleForm.controls['name'].errors && (!roleForm.controls['name'].pristine|| isroleFormSubmitted)"
                                 class="error-msg">
-                                <div [hidden]="!roleForm.controls['role'].errors.required">Please Enter Role Name
+                                <div [hidden]="!roleForm.controls['name'].errors.required">Please Enter Role Name
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div>
-                    <h1 class="font-bold text-teal-400 mb-2" style="font-size: x-large;">Add Slot</h1>
+                    <h1 class="font-bold text-teal-400 mb-2 mt-4" style="font-size: x-large;">Add Slot</h1>
                    
                 </div>
-              <ng-container formArrayName="addSlot"
-              *ngFor="let room of roleForm.get('addSlot')['controls']; let i = index;">
+              <ng-container formArrayName="slots"
+              *ngFor="let room of roleForm.get('slots')['controls']; let i = index;">
                 <ng-container [formGroupName]=i  >
                     <div class="grid sm:grid-cols-1 md:grid-cols-4 md:gap-3 ">
                    
                         <div>
-                            <label for="name" class="block mb-2 font-bold text-gray-600 ">Slot Name</label>
+                            <label for="name" class="block mb-2 font-bold text-gray-600 mt-4 ">Slot Name</label>
                             <input type="text" id="name" name="name" placeholder="Enter  Slot Name"
                                 class="border border-gray-300 shadow p-2 w-full rounded " formControlName="slotName">
                             <!-- <div class="error-msg-area">
@@ -53,7 +53,7 @@
                                 [ngxTimepicker]="startrange"  [format]="24">
                             <ngx-material-timepicker #startrange (opened)="startpickerOpened = true;"
                                 [defaultTime]="'06:00 am'" [minutesGap]="5" (timeChanged)="startTimeonChangeHour($event)"></ngx-material-timepicker> -->
-                                <label for="twitter" class="block mb-2 font-bold text-gray-600">Start Time</label>
+                                <label for="twitter" class="block mb-2 font-bold text-gray-600 mt-4">Start Time</label>
                         <input class="border border-gray-300 shadow p-2 w-full rounded " type="text"
                             placeholder="Select Start Time" formControlName="startTime" name="startTime"
                             [ngxTimepicker]="startrange"  [format]="24">
@@ -69,7 +69,7 @@
                             </div> -->
                         </div>
                         <div>
-                            <label for="name" class="block mb-2 font-bold text-gray-600">End Time</label>
+                            <label for="name" class="block mb-2 font-bold text-gray-600 mt-4">End Time</label>
                             <input class="border border-gray-300 shadow p-2 w-full rounded " type="text"
                                 placeholder="Select End Time" formControlName="endTime" name="endTime"
                                 [ngxTimepicker]="Endrange"  [format]="24"  [min]="endMinTime">
@@ -86,8 +86,10 @@
                         </div>
                         <div>
                            
-                                <button class="card-header btn ml-4  mt-4"style="background-color:red;" (click)="RemoveSlot(i)"><i
+                                <button class="card-header btn_delete ml-4  mt-4"(click)="RemoveSlot(i)"><i
                                     class="fa fa-trash"></i></button>
+                               
+                                   
                         </div>
                        
                     </div>
@@ -95,17 +97,20 @@
               </ng-container>
                
                 
-                <div >
+                <div class="row">
+                    <div class="col-9"></div>
                     
+                <div class="col-2">
+                    <button class="block float-right bg-teal-400 text-white mt-4 font-bold p-2 rounded-lg " 
+                    (click)=" saveSlot()">Add Slot</button>&nbsp;
                 </div>
-          
-               
-                <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg mt-5" *ngIf="!showAddEdit"
-                    (click)=" saveRoleBase4App()">Submit</button>
-                <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg mt-5" *ngIf="showAddEdit"
-                    (click)="updateServiceInBase4App()">Update</button>
-                    <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg " 
-                    (click)=" saveSlotBack4App()">Add Slot</button>
+                <div class="col-1">
+                    <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg mt-4" *ngIf="!showAddEdit"
+                    (click)=" saveRole()">Submit</button>
+                    <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg mt-4" *ngIf="showAddEdit"
+                    (click)="updateRole()">Update</button>
+                </div>
+                </div>
             </form>
         </div>
     </section>

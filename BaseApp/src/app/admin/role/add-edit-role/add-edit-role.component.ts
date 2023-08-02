@@ -31,10 +31,8 @@ export class AddEditRoleComponent implements OnInit {
   public diff: number;
   public showError: boolean;
   public slotarr: FormArray;
-  public slotNameArr: any=[];
-  public startTimeArr: any=[];
-  public endTimeArr: any=[];
   public role: any;
+
 
   constructor(private fb: FormBuilder, private router: Router, public RoleService: RoleService, private flashMessageService: FlashMessageService, private route: ActivatedRoute,) {
     this.route.params.subscribe((param) => {
@@ -44,12 +42,12 @@ export class AddEditRoleComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeroleForm();
-   
+
     this.slotarr.push(this.initializeAddSlotForm());
     if (this.routerData != undefined) {
-      // this.getRolebyId(this.routerData);
-      this.getRoleByIdBase4App(this.routerData)
-      
+      this.getRolebyId(this.routerData);
+      // this.getRoleByIdBase4App(this.routerData)
+
       this.showAddEdit = true;
     } else {
       this.showAddEdit = false;
@@ -62,17 +60,16 @@ export class AddEditRoleComponent implements OnInit {
   //initializeRoleForm
   initializeroleForm() {
     this.roleForm = this.fb.group({
-      role: ['', [Validators.required]],
-     
+       name: ['', [Validators.required]],
       // addSlot: this.fb.array([ this.createItem() ]),
-      addSlot: this.fb.array([]),
-      // startTime: ['', [Validators.required]],
+      slots: this.fb.array([]),
+      //  startTime: ['', [Validators.required]],
       // endTime: ['', [Validators.required]],
       // slotName:['', [Validators.required]]
-  
-     
+
+
     });
-    this.slotarr = this.roleForm.get('addSlot') as FormArray
+    this.slotarr = this.roleForm.get('slots') as FormArray
   }
 
 
@@ -80,7 +77,7 @@ export class AddEditRoleComponent implements OnInit {
     return this.fb.group({
       startTime: ['', [Validators.required]],
       endTime: ['', [Validators.required]],
-      slotName:['', [Validators.required]]
+      slotName: ['', [Validators.required]]
     });
   }
   ngOnDestroy() {
@@ -97,12 +94,9 @@ export class AddEditRoleComponent implements OnInit {
     this.isroleFormSubmitted = true;
     console.log(this.roleForm.value, "value")
     if (this.roleForm.valid) {
-      var data = {
-        role: this.roleForm.value.role,
-        startTime: this.roleForm.value.startTime,
-        endTime: this.roleForm.value.endTime
-      }
-      console.log("data", data)
+      
+      var data =this.roleForm.value;
+      console.log("data",data)
       this.RoleService.createRole(data).subscribe((res) => {
         if (res.status) {
           this.flashMessageService.successMessage("Role Created Successfully", 2);
@@ -115,37 +109,55 @@ export class AddEditRoleComponent implements OnInit {
     }
   }
 
+  //save slot
+  saveSlot() {
+    this.slotarr.push(this.initializeAddSlotForm());
+    this.isroleFormSubmitted = true;
+  }
+
   //get-patch Role by Id
   getRolebyId(id) {
     this.RoleService.getRolebyId(id).pipe(takeUntil(this.destroy$)).subscribe(res => {
       if (res.status) {
         this.roleDatavalue = res.data
-        this.roleForm.controls['role'].patchValue(this.roleDatavalue.role);
-        // this.roleForm.controls['startTime'].patchValue(this.roleDatavalue.startTime);
-        // this.roleForm.controls['endTime'].patchValue(this.roleDatavalue.endTime);
+        console.log("this.roleDatavalue",this.roleDatavalue)
+        this.roleForm.controls['name'].patchValue(this.roleDatavalue.name);
+        this.roleDatavalue.slots.forEach(element => {
+          console.log("element",element)
+          //this.roleForm.controls['slotName'].patchValue(element.slotName);
+        });
+        for (let i = 1; i < this.roleDatavalue.slots.length; i++){
+          this.slotarr.push(this.initializeAddSlotForm());
+         }
+         for (let j = 0; j < this.roleDatavalue.slots.length; j++){
+          this.roleForm.controls['slots'].patchValue(this.roleDatavalue.slots);
+         }
       }
     })
   }
   enableEndTIme(event) {
-    console.log(event,"event")
+    console.log(event, "event")
     this.endMinTime = event;
-    console.log("this.endMinTime",this.endMinTime)
+    console.log("this.endMinTime", this.endMinTime)
   }
   //Update Role
-  updateRole(){
+  updateRole() {
     this.isroleFormSubmitted = true;
     this.showError = false;
     this.roleForm.value._id = this.routerData;
+    console.log("this.roleForm.value._id",this.roleForm.value._id)
     var data = {
       _id: this.routerData,
-      role: this.roleForm.controls.role.value,
-      startTime: this.roleForm.controls.startTime.value,
-      endTime: this.roleForm.controls.endTime.value,
+      name: this.roleForm.controls['name'].value,
+       slots: this.roleForm.controls['slots'].value,
+      // endTime: this.roleForm.controls['addSlot'].endTime.value,
     }
+    console.log("role",data)
     if (this.roleForm.valid) {
+      console.log("iam in ")
       this.RoleService.updateRoleById(data).pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
-        if (res.status) {      
-         this.flashMessageService.successMessage('Role Updated Sucessfully', 2);
+        if (res.status) {
+          this.flashMessageService.successMessage('Role Updated Sucessfully', 2);
           this.router.navigateByUrl("admin/role");
         }
         else this.flashMessageService.errorMessage(res.err.message, 2);
@@ -162,70 +174,70 @@ export class AddEditRoleComponent implements OnInit {
   addeditForm() {
     this.router.navigateByUrl('admin/role')
   }
- //-----------------------------------ROLE API INTEGRATION - START -------------------------------------------// 
- //save Role
- async saveRoleBase4App(){
+  //-----------------------------------ROLE API INTEGRATION - START -------------------------------------------// 
+  //save Role
+  async saveRoleBase4App() {
 
-  console.log(this.roleForm.value)
-  console.log(this.initializeAddSlotForm().value)
-  const roleFormValue=this.roleForm.value.addSlot
- 
-  
-  this. role = new Parse.Object("RolePosition");
-  this.role.set("Role", this.roleForm.value.role)
-   this.role.set("AddRole",this.roleForm.value.addSlot)
-   this. role.set("RoleStatus", 0);
-  
+    console.log(this.roleForm.value)
+    console.log(this.initializeAddSlotForm().value)
+    const roleFormValue = this.roleForm.value.addSlot
 
-  try {
-    let result = await  this.role.save()
 
-    this.flashMessageService.successMessage("Role Created Successfully", 2);
-    this.router.navigateByUrl('admin/role')
-  } catch (error) {
-    this.flashMessageService.errorMessage("Error while role Service", 2);
+    this.role = new Parse.Object("RolePosition");
+    this.role.set("Role", this.roleForm.value.role)
+    this.role.set("AddRole", this.roleForm.value.addSlot)
+    this.role.set("RoleStatus", 0);
+
+
+    try {
+      let result = await this.role.save()
+
+      this.flashMessageService.successMessage("Role Created Successfully", 2);
+      this.router.navigateByUrl('admin/role')
+    } catch (error) {
+      this.flashMessageService.errorMessage("Error while role Service", 2);
+    }
   }
- }
-   //Base4App  Role by Id
-   async getRoleByIdBase4App(id){
+  //Base4App  Role by Id
+  async getRoleByIdBase4App(id) {
     // console.log(this.roleForm.get('slotName')['controls'])
     const role = Parse.Object.extend('RolePosition');
     const query = new Parse.Query(role);
-  
+
     query.equalTo('objectId', id);
-   
-     try{
+
+    try {
       const role = await query.get(id)
-      const Role= role.get('Role')
+      const Role = role.get('Role')
       const addRole = role.get('AddRole')
       console.log(addRole)
-        const endTime = role.get('EndTime')
-        for (let i = 1; i < addRole.length; i++) {
-          this.slotarr.push(this.initializeAddSlotForm())
-        }
-        for (let j = 0; j < addRole.length; j++) {
-          var addslot = this.roleForm.get('addSlot') as FormArray;
-          addslot.at(j).patchValue(addRole[j])
-        }
-        this.roleForm.get('role').patchValue(Role)
-        // this.roleForm.get('addSlot').patchValue(addRole)
-     
-     }
-    
+      const endTime = role.get('EndTime')
+      for (let i = 1; i < addRole.length; i++) {
+        this.slotarr.push(this.initializeAddSlotForm())
+      }
+      for (let j = 0; j < addRole.length; j++) {
+        var addslot = this.roleForm.get('addSlot') as FormArray;
+        addslot.at(j).patchValue(addRole[j])
+      }
+      this.roleForm.get('role').patchValue(Role)
+      // this.roleForm.get('addSlot').patchValue(addRole)
+
+    }
+
     catch (error) {
       console.error('Error while fetching ToDo', error);
     }
   }
   //Base4App  Update Role 
-   
-   async updateServiceInBase4App() {
+
+  async updateServiceInBase4App() {
     console.log(this.roleForm.value)
     console.log(this.initializeAddSlotForm().value)
-    this .role = new Parse.Object("RolePosition");
+    this.role = new Parse.Object("RolePosition");
     this.role.set('objectId', this.routerData);
     this.role.set("Role", this.roleForm.value.role)
-    this.role.set("AddRole",this.roleForm.value.addSlot)
-    this. role.set("RoleStatus", 0);
+    this.role.set("AddRole", this.roleForm.value.addSlot)
+    this.role.set("RoleStatus", 0);
     try {
       let result = await this.role.save();
       this.flashMessageService.successMessage("Role Updated Successfully", 2);
@@ -239,14 +251,14 @@ export class AddEditRoleComponent implements OnInit {
       .at(empIndex)
       .get('addSlot') as FormArray;
   }
-  saveSlotBack4App(){
-    this.slotarr.push(this. initializeAddSlotForm());
-    this.isroleFormSubmitted=true
+  saveSlotBack4App() {
+    this.slotarr.push(this.initializeAddSlotForm());
+    this.isroleFormSubmitted = true
   }
-  RemoveSlot(i){
+  RemoveSlot(i) {
     const control = <FormArray>this.roleForm.controls['addSlot'];
-      control.removeAt(i);
+    control.removeAt(i);
   }
- 
+
   //-----------------------------------ROLE API INTEGRATION - END -------------------------------------------// 
 }

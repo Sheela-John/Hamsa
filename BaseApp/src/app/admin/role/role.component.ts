@@ -41,8 +41,8 @@ export class RoleComponent implements OnInit {
       retrieve: true,
       ordering: false
     }
-    // this.getAllRole();
-    this.getAllRolebase4App()
+    this.getAllRole();
+    // this.getAllRolebase4App()
   }
 
   //getAll Role
@@ -51,6 +51,7 @@ export class RoleComponent implements OnInit {
       if (res.status) {
         this.roleList = res.data;
         this.dtTrigger.next(null);
+        console.log(this.roleList ,"this.roleList ")
       }
     })
   }
@@ -68,8 +69,10 @@ export class RoleComponent implements OnInit {
   // Enable or Disable Role         // 0 - enable, 2 - disable (status)
   enableDisableRole(id) {
     var roleId = id;
+    console.log("roleId",roleId)
     this.roleService.enableDisableRole(roleId).subscribe(res => {
       if (res.status) {
+        console.log("res.status",res.status)
         if (res.data.status == 0) {
           this.flashMessageService.successMessage("Role Enabled Successfully", 2);
           this.getAllRole();
