@@ -96,7 +96,7 @@
                 <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
                     <div>
                         <label for="staffRole" class="block mb-2 font-bold text-gray-600">Role</label>
-                        <select class="border border-gray-300 shadow p-2 w-full rounded" formControlName="staffRole" (change)="getRolebyIdBack4App($event)">
+                        <select class="border border-gray-300 shadow p-2 w-full rounded" formControlName="staffRole" (change)="getRolebyId($event)">
                             <option value="">--select--</option>+
                             <option value="{{role._id}}" *ngFor="let role of roleDataList">
                                 {{role.name}}

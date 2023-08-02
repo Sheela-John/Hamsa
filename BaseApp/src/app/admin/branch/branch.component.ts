@@ -59,7 +59,6 @@ export class BranchComponent implements OnInit {
       }
     })
   }
-
   // Enable or Disable Branch         // 0 - enable, 2 - disable (status)
   enableDisableBranch(id) {
     var roleId = id;
@@ -79,74 +78,5 @@ export class BranchComponent implements OnInit {
       }
     })
   }
-   //----------------------------------- Back4App BRANCH API INTEGRATION - START -------------------------------------------//
-   //Get All Branch In Base4App
-   async getAllBranchInBase4App() {
-    const branch = Parse.Object.extend('Branch');
-    const query = new Parse.Query(branch);
-  
-  
-    try {
-      const branchName = await query.find()
-      branchName.forEach(element => {
-        this.branchId.push(element.id);
-      });
-      for (const branchData of branchName) {
-        this.BranchName.push(branchData.get("BranchName"));
-        this.BranchAddress.push(branchData.get("BranchAddress"));
-        this.BranchStatus.push(branchData.get("BranchStatus"))
-      }
-  
-      this.dtTrigger.next(null);
-      for (let i = 0; i < this.branchId.length; i++) {
-        console.log(this.BranchStatus[i])
-       
-
-        this.BranchDataArr.push(
-          {
-            "BranchName": this.BranchName[i],
-            "BranchAddress": this.BranchAddress[i],
-            "BranchId": this.branchId[i],
-            "status": this.BranchStatus[i]
-          }
-        )
-      
-      }
-    }
-    catch (error) {
-      alert(`Failed to retrieve the object, with error code: ${error.message}`);
-    }
-  
-  }
-   //EnableDisable in Branch In Base4App
-   async enableDisableBranchInBase4App(id) {
-    const branch = Parse.Object.extend('Branch');
-    const query = new Parse.Query(branch);
-    query.equalTo('objectId', id);
-    console.log(id)
-    try {
-      const branch = await query.get(id);
-      this.BranchStatusEnableAndDisable= branch.get("BranchStatus");
-      console.log( this.BranchStatusEnableAndDisable)
-      this.BranchStatusEnableAndDisable = (this.BranchStatusEnableAndDisable == 0) ? 2 :0
-      branch.set("BranchStatus",this.BranchStatusEnableAndDisable );
-        let result = await branch.save()
-        branch.set("BranchStatus",this.BranchStatusEnableAndDisable );
-        const statusService= branch.get("BranchStatus");
-        if(statusService==0){
-          this.flashMessageService.successMessage("Branch Enabled Successfully", 2);
-          window.location.reload()
-        }
-        if(statusService==2){
-          this.flashMessageService.errorMessage(" Branch Disabled Successfully", 2);
-          window.location.reload()
-        }
-      } 
-   catch(error){
-    this.flashMessageService.errorMessage("Error   ", 2);
-   }
-   
-  }
-
-    //----------------------------------- Back4App BRANCH API INTEGRATION - END -------------------------------------------//
+ 
 }

@@ -67,57 +67,6 @@ getAllServiceRequest()
   })
 }
 
-async getServiceRequestFromBack4App()
-{
-  this.serviceData=[];
-  console.log("inside")
-  const service = Parse.Object.extend('RequestService');
-  const query = new Parse.Query(service);
-  const serviceData = await query.find()
- 
-  for(const service of serviceData)
-  {
-    console.log("serviceData",service.get("ServiceId"))  ; 
-        const staff = Parse.Object.extend('Staff');
-        const query1 = new Parse.Query(staff);
-        query1.equalTo('objectId',service.get("StaffId"));
-        const staffData = await query1.find()
-
-
-        const client = Parse.Object.extend('Client');
-        const query2 = new Parse.Query(client);
-        query1.equalTo('objectId',service.get("ClientId"));
-        const ClientData = await query2.find()
-
-       
-        const service2 = Parse.Object.extend('Service');
-        const query3 = new Parse.Query(service2);
-        query3.equalTo('objectId',service.get("ServiceId"));
-        const ServiceData1 = await query3.find()
-     console.log("ServiceData1",ServiceData1)
-        var data={
-          id:service.id,
-          patientName:ClientData[0].get("ClientName"),
-          date:service.get("Date"),
-          service:ServiceData1[0].get("ServiceName"),
-          referenceBy:staffData[0].get("StaffName"),
-          status:service.get("Status"),
-          isAssigned:service.get("isAssigned"),
-        }
-       this.serviceData.push(data);
-  }
-  console.log("data", this.serviceData);
-  for(var i=0;i<this.serviceData.length;i++)
-  {
-    if(this.serviceData[i].status==0)
-    {
-      this.status=true;
-    }
-    else{
-      this.status=false;
-    }
-  }
-}
  assignServiceRequest(id){
   this.serviceId=id;
   console.log("this",this.serviceId);

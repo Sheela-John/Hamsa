@@ -42,11 +42,6 @@ const handle = (promise) => {
 }
 
 const entryAttendence = async (attendenceData) => {
-    attendenceData.date = new Date(attendenceData.date);
-    let someDate = attendenceData.date
-    let copiedAppointmentDate = new Date(someDate.getTime());
-    attendenceData['date'] = copiedAppointmentDate;
-    attendenceData['inTime'] = new Date();
     var saveModel = new Attendence(attendenceData);
     let [err, attendenceDataSaved] = await handle(saveModel.save())
     if (err) return Promise.reject(err);

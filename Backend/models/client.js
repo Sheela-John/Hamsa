@@ -86,8 +86,11 @@ const clientSchema = new mongoose.Schema({
    status:{
     type:Number,
     default:0
+   },
+   isDeleted:{
+    type:Number,
+    default:0
    }
-
 }, {
     collection: 'client',
     versionKey: false,

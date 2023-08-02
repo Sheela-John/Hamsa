@@ -100,7 +100,6 @@ async function create(clientData) {
                     let [err, client] = await handle(saveModel.save())
                     for (var i = 0; i < client.addSession.length; i++) {
                         var assignData = {
-
                             "clientId": client._id,
                             "clientName": client.clientName,
                             "staffId": client.staffId,
@@ -190,11 +189,7 @@ async function checkForExistingUser(loginCred) {
     let query =
         [{
             $match: {
-                $and: [{
-                    $or: [
-                        { 'email': loginCred.email }]
-                    // { 'phone': loginCred.phone }]
-                }]
+                'empId': loginCred.empId
             }
         }]
     return new Promise((resolve, reject) => {
@@ -218,13 +213,14 @@ async function getClientDatabyId(clientId) {
     log.debug(component, 'Getting Client Data by Id');
     log.close();
     let [clientErr, clientData] = await handle(Client.findOne({ '_id': clientId }).lean());
-    let [Err, assignServiceData] = await handle(AssignService.find({ 'packageId': clientData.packageId }).lean());
+    let [Err, assignServiceData] = await handle(AssignService.find({ 'packageId': clientData.packageId }).sort({ "date": 1 }).lean());
     var sessionArray = [];
     for (var i = 0; i < assignServiceData.length; i++) {
         var temp = {
             date: assignServiceData[i].date,
             startTime: assignServiceData[i].startTime,
-            endTime: assignServiceData[i].endTime
+            endTime: assignServiceData[i].endTime,
+            duration: assignServiceData[i].duration
         }
         sessionArray.push(temp)
     }
@@ -364,7 +360,7 @@ const requestAdditionalService = async function (data) {
 }
 async function saveRecurringSession(data) {
     var singleArray = [];
-    
+
     data.weekDaysArr.forEach(element => {
         if (element.value == "RRule.MO") {
             singleArray.push(0)
@@ -394,47 +390,59 @@ async function saveRecurringSession(data) {
         until: new Date(data.endDate),
         count: 30,
         interval: 1
-      }
+    }
     recurringRule['byweekday'] = singleArray
     const rule = new RRule(recurringRule);
-    var recurringdate=[];
+    var recurringdate = [];
     recurringdate = rule.all()
-    var dateSlot=[]
+    var dateSlot = []
     for (let i = 0; i < data.noOfSession; i++) {
         dateSlot.push(formattedDate(recurringdate[i].toString()))
-      }
-  var slotArr=[];
-  for(var i=0;i<dateSlot.length;i++)
-  {
-  let temp={
-   
-        "staffId":data.staffId,
-        "date":dateSlot[i],
-        "slotId":data.slotId,
-        "duration":data.duration,
-        "typeOfTreatment":data.typeOfTreatment
-  }
-  let [err,assign]=await handle(AssignServiceAPI.getSlotsForAssignService(temp))
-  var slotsData={
-    date:dateSlot[i],
-    slots:assign
-  }
- slotArr.push(slotsData)
-}
-if (lodash.isEmpty(slotArr)) return Promise.reject(ERR.NO_RECORDS_FOUND);
-return Promise.resolve(slotArr);
+    }
+    var slotArr = [];
+    for (var i = 0; i < dateSlot.length; i++) {
+        let temp = {
+
+            "staffId": data.staffId,
+            "date": dateSlot[i],
+            "slotId": data.slotId,
+            "duration": data.duration,
+            "typeOfTreatment": data.typeOfTreatment
+        }
+        let [err, assign] = await handle(AssignServiceAPI.getSlotsForAssignService(temp))
+        var slotsData = {
+            date: dateSlot[i],
+            slots: assign
+        }
+        slotArr.push(slotsData)
+    }
+    if (lodash.isEmpty(slotArr)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+    return Promise.resolve(slotArr);
 }
 function formattedDate(date) {
     var d = new Date(date),
-      month = '' + (d.getMonth() + 1),
-      day = '' + d.getDate(),
-      year = d.getFullYear();
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
     if (month.length < 2)
-      month = '0' + month;
+        month = '0' + month;
     if (day.length < 2)
-      day = '0' + day;
+        day = '0' + day;
     return [year, month, day].join('-');
-  }
+}
+async function enableDisableClient(id) {
+    // clientApi.clientDetails(req, 'DELETE SPOC');
+    log.debug(component, 'Enable and Disable SPOC');
+    log.close();
+    let [err, singleStaffData] = await handle(Client.findOne({ _id: id }));
+    let status = (singleStaffData.isDeleted == 0) ? 1 : 0;
+    let [error, spoc] = await handle(Client.findByIdAndUpdate({ _id: singleStaffData._id }, { "$set": { "isDeleted": status } }, { new: true, useFindAndModify: false }));
+    let [loginErr, staffLogin] = await handle(Login.find({ user: id }));
+    let loginstatus = (staffLogin[0].status == 0) ? 1 : 0;
+    let [loginError, data] = await handle(Login.findByIdAndUpdate({ _id: staffLogin[0]._id }, { "$set": { "status": loginstatus } }, { new: true, useFindAndModify: false }));
+    if (loginError) return Promise.reject(error);
+    return Promise.resolve(data);
+}
 module.exports = {
     create: create,
     getClientDatabyId: getClientDatabyId,
@@ -442,5 +450,6 @@ module.exports = {
     UpdateClient: UpdateClient,
     sendOTP: sendOTP,
     requestAdditionalService: requestAdditionalService,
-    saveRecurringSession: saveRecurringSession
+    saveRecurringSession: saveRecurringSession,
+    enableDisableClient: enableDisableClient
 }

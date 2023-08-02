@@ -29,18 +29,7 @@ export class SettingComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeSettingsForm();
-    // this.getSettingsById(this.routerData)
     this.getAllSettings()
-    // if (this.routerData != undefined) {
-    //   this.getSettingsById(this.routerData);
-    //   this.showAddEdit = true;
-    // } else {
-    //   this.showAddEdit = false;
-    // }
-
-    // this.getAllSettings();
-    // this.getByStaffId(this.routerData);
-
   }
 
   //initializeSettingForm
@@ -48,46 +37,7 @@ export class SettingComponent implements OnInit {
     this.settingForm = this.fb.group({
       averageDistance: ['', [Validators.required]],
     });
-    // this.getSettingsById(id);
   }
-
-  // //Get all Settings
-  // async getAllSettings() {
-  //   console.log("Inside Function");
-  //   const settings = Parse.Object.extend('Settings');
-  //   const query = new Parse.Query(settings);
-  //   try {
-  //     const settingsData = await query.find();
-  //     console.log("dfvfdv:", settingsData);
-  //     if (settingsData.length != 0) {
-  //       this.settingsId = settingsData[0].id;
-  //       this.getSettingsByIdBase4App(this.settingsId);
-  //     }
-  //   } catch (err) {
-  //     alert(`Failed to retrieve the object, with error code: ${err.message}`);
-  //   }
-  // }
-
-  //Save Settings
-
-  // async SaveSettingsBase4App() {
-  //   this.isSettingFormSubmitted = true;
-  //   const setting = new Parse.Object("Setting");
-  //   const user: Parse.User = new Parse.User();
-  //   setting.set("averageDistance", this.settingForm.value.averageDistance)
-  //    try {
-  //     let userResult: Parse.User = await user.signUp();
-  // if(userResult){
-  //   let result = await setting.save()
-  // }
-
-  //     this.flashMessageService.successMessage("Setting Created Successfully", 2);
-  //     this.router.navigateByUrl('admin/settings')
-  //   } catch (error) {
-  //     this.flashMessageService.errorMessage("Error while Creating Setting", 2);
-  //   }
-  // }
-
 
   //Save Settings
   SaveSettings() {
@@ -108,32 +58,6 @@ export class SettingComponent implements OnInit {
       })
     }
   }
-
-  // getAllSettings() {
-
-  //   // console.log("id",id);
-  //   this.SettingService.getAllSettings().subscribe(res => {
-  //     if (res.status) {
-  //       this.showAddEdit = true;
-  //       this.settingsData = res.data;
-        
-
-  //     }
-  //     console.log("this.staffData", this.settingsData)
-  //   })
-  // }
-
-
-  // getSettingsById(id) {
-  //   this.SettingService.getSettingsById(id).subscribe((res) => {
-  //     console.log("response:", res.data);
-  //     if (res.status) {
-  //       this.settingForm.patchValue(res.data);
-  //     }
-  //   })
-  // }
-
-
 
   getAllSettings() {
     this.SettingService.getAllSettings().subscribe(res => {

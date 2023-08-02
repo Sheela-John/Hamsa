@@ -28,8 +28,9 @@ async function login(loginCred, password, role) {
     log.debug(component, 'Inside Login Functionality', role);
     log.close();
     let data = {
-        empId: loginCred,
+        userName: loginCred,
         password: password,
+        role:role
     }
     /* checking email availability */
     let [err, user] = await handle(StaffAPI.checkLoginAvailablity(data));
@@ -47,34 +48,34 @@ async function login(loginCred, password, role) {
     })
 }
 
-const checkPasswordDoctor = async (userId, password) => {
-    log.debug(component, 'Inside Password checking functionality'); log.close();
-    let query = [
-        {
-            $match: { '_id': mongoose.Types.ObjectId(userId) }
-        },
-        {
-            $lookup: {
-                from: 'login',
-                localField: '_id',
-                foreignField: 'Staff',
-                as: 'loginData'
-            }
-        }
-    ];
-    let [doctorErr, doctordata] = await handle(DoctorModel.aggregate(query));
-    return new Promise((resolve, reject) => {
-        if (doctorErr) return reject(doctorErr);
-        else {
-            if (doctordata[0].loginData[0].password == security.hash(doctordata[0].createdDate, password)) {
-                return resolve(true);
-            }
-            else {
-                return resolve(false);
-            }
-        }
-    })
-}
+// const checkPasswordDoctor = async (userId, password) => {
+//     log.debug(component, 'Inside Password checking functionality'); log.close();
+//     let query = [
+//         {
+//             $match: { '_id': mongoose.Types.ObjectId(userId) }
+//         },
+//         {
+//             $lookup: {
+//                 from: 'login',
+//                 localField: '_id',
+//                 foreignField: 'Staff',
+//                 as: 'loginData'
+//             }
+//         }
+//     ];
+//     let [doctorErr, doctordata] = await handle(DoctorModel.aggregate(query));
+//     return new Promise((resolve, reject) => {
+//         if (doctorErr) return reject(doctorErr);
+//         else {
+//             if (doctordata[0].loginData[0].password == security.hash(doctordata[0].createdDate, password)) {
+//                 return resolve(true);
+//             }
+//             else {
+//                 return resolve(false);
+//             }
+//         }
+//     })
+// }
 
 /* Change password - Requires Old password and new password */
 async function changePassword(request) {
@@ -89,12 +90,12 @@ async function changePassword(request) {
         else if (userData) {
             (async () => {
                 if (userData.role == "PORTAL_STAFF") {
-                    var [usererr, usrData] = await handle(Staff.findOne({ 'empId': userData['empId'] }))
+                    var [usererr, usrData] = await handle(Staff.findOne({ 'email': userData['email'] }))
                     if (usererr) return reject(usererr);
                     userData.user = usrData;
                 }
                 if (userData.role == "PORTAL_ADMIN") {
-                    var [usererr, usrData] = await handle(Staff.findOne({ 'empId': userData['empId'] }))
+                    var [usererr, usrData] = await handle(Staff.findOne({ 'email': userData['email'] }))
                     if (usererr) return reject(usererr);
                     userData.user = usrData;
                 }

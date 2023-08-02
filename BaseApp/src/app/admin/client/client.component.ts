@@ -52,6 +52,22 @@ getAllClients()
     }
   })
 }
+enableDisableClient(id)
+{
+ this.clientService.ebableDisableClient(id).subscribe(res=>{
+  if(res.status)
+  {
+    this.flashMessageService.successMessage("Client Enabled Successfully", 2);
+    window.location.reload()
+  }
+  else{
+    this.flashMessageService.errorMessage("Client Disabled Successfully", 2);
+    window.location.reload()
+  }
+ })
+
+ 
+}
   // async getAllClientInBase4App() {
   //   const branch = Parse.Object.extend('Client');
   //   const query = new Parse.Query(branch);

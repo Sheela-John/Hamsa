@@ -12,7 +12,14 @@ export class ClientService {
     public getAllClients() {
         return this.clientDataService.getAllClients();
     }
-
+    public getClientById(id)
+    {
+       return this.clientDataService.getClientbyId(id);
+    }
+    public ebableDisableClient(id)
+    {
+        return this.clientDataService.enableDisableClient(id);
+    }
     // //Create Branch
     // public createBranch(data) {
     //     return this.branchDataService.createBranch(data);

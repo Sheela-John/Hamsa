@@ -86,5 +86,10 @@ router.post('/saveRecurringSession', async (req, res, next) => {
         if (err) return next(err);
         else return res.status(200).json({ status: true, data: requestData, message: "Additional Service Request Send Successfully" })
     })
+    .get('/enableanddisable/:id', async (req, res, next) => {
+        let [enableDisableErr, enableDisableData] = await handle(ClientAPI.enableDisableClient(req.params.id));
+        if (enableDisableErr) return res.status(200).json(lodash.merge({ status: false }, enableDisableErr));
+        else return res.status(200).json({ status: true, "data": enableDisableData });
+    })
 
 module.exports = router;

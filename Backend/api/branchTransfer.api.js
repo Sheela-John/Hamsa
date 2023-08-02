@@ -3,6 +3,7 @@ const component = "Branch Transfer API";
 const models = require('../models');
 const Security = require("../util/security");
 const BranchTransfer = models.BranchTransfer;
+const Branch=models.Branch;
 const lodash = require('lodash');
 const ERR = require('../errors.json');
 const uuid = require('../util/misc');
@@ -43,17 +44,7 @@ const handle = (promise) => {
 /* Create BranchTransfer */
 
 async function create(branchTransferData) {
-
     console.log('Creating a Branch Transfer', branchTransferData);
-
-
-    const latitude = branchTransferData.latitude;
-    const longitude = branchTransferData.longitude;
-
-
-    branchTransferData['startTime']
-    branchTransferData['endTime']
-
     var saveModel = new BranchTransfer(branchTransferData);
     let [err, branchTransferDataSaved] = await handle(saveModel.save());
     if (err) {
@@ -81,6 +72,24 @@ async function getBranchTransferDataById(branchTransferDataId) {
     log.debug(component, 'Getting Branch Transfer Data by Id');
     log.close();
     let [branchTransferErr, branchTransferData] = await handle(BranchTransfer.findOne({ '_id': branchTransferDataId }).lean());
+    console.log(branchTransferData)
+    let [branchErr, branchData] = await handle(Branch.findOne({ '_id': branchTransferData.branchId }).lean());
+    branchTransferData.branchAddress=branchData.branchAddress;
+    if (branchTransferErr) return Promise.reject(branchTransferErr);
+    if (lodash.isEmpty(branchTransferData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+    return Promise.resolve(branchTransferData);
+}
+
+async function getBranchTransferByStaffId(id)
+{
+    log.debug(component, 'Getting Branch Transfer Data by Id');
+    log.close();
+    let [branchTransferErr, branchTransferData] = await handle(BranchTransfer.find({ 'staffId': id ,isDeleted:0}).lean());
+    for(var i=0;i<branchTransferData.length;i++)
+    {
+        let [branchErr, branchData] = await handle(Branch.findOne({ '_id': branchTransferData[i].branchId }).lean());
+        branchTransferData[i].branchName=branchData.branchName;
+    }
     if (branchTransferErr) return Promise.reject(branchTransferErr);
     if (lodash.isEmpty(branchTransferData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(branchTransferData);
@@ -99,6 +108,18 @@ const UpdatebranchTransferData = async function (datatoupdate) {
 
 //Enabe Disable Branch Transfer By Id
 
+async function deleteBranchTransfer(id) {
+
+    log.debug(component, 'Enable and Disable Branch Transfer');
+    log.close();
+    let [err, singleData] = await handle(BranchTransfer.findOne({ _id: id }));
+    if (err) return Promise.reject(err);
+    let status = (singleData.isDeleted == 0) ? 1 : 0;
+    let [error, branchTransferData] = await handle(BranchTransfer.findByIdAndUpdate({ _id: singleData._id }, { "$set": { "isDeleted": status } }, { new: true, useFindAndModify: false }));
+    if (error) return Promise.reject(error);
+    return Promise.resolve(branchTransferData);
+}
+
 const enableDisablebranchTransferData = async (branchTransferDataId) => {
     log.debug(component, 'Enable and Disable functionality');
     log.close();
@@ -116,5 +137,7 @@ module.exports = {
     getAllBranchTransferDetails: getAllBranchTransferDetails,
     getBranchTransferDataById:getBranchTransferDataById,
     UpdatebranchTransferData:UpdatebranchTransferData,
-    enableDisablebranchTransferData:enableDisablebranchTransferData
+    enableDisablebranchTransferData:enableDisablebranchTransferData,
+    getBranchTransferByStaffId:getBranchTransferByStaffId,
+    deleteBranchTransfer:deleteBranchTransfer
 }

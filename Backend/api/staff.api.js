@@ -4,6 +4,7 @@ const models = require('../models');
 const Security = require("../util/security");
 const Staff = models.Staff;
 const Branch=models.Branch;
+const BranchTransfer=models.BranchTransfer;
 const Role=models.Role;
 const Login = models.Login;
 const LeaveRequest = models.LeaveRequest;
@@ -69,7 +70,7 @@ async function create(staffData) {
             async.waterfall([
                 saveStaff,
                 createLoginCredentials,
-                loginStaff
+               // loginStaff
                 // sendEmail,
             ], function (err, result) {
                 if (err) return reject(err);
@@ -80,18 +81,31 @@ async function create(staffData) {
                     staffData.role = "PORTAL_STAFF";
                     var saveModel = new Staff(staffData);
                     let [err, staff] = await handle(saveModel.save())
+                    var branchData={
+                        "staffId":staff._id,
+                        "startDate":staff.createdAt,
+                        "branchId":staff.branchId
+                    }
+                    console.log("branchData",branchData)
+                    var branchModel=new BranchTransfer(branchData);
+                    let[branchErr,branchTransferData]= await handle(branchModel.save())
+                    console.log("branchTransferData",branchTransferData)
                     if (err) cb(err, null);
                     else {
-                        staff.password = staffData.password;
-                        staff.savepassword = staffData.password;
-                        cb(null, staff);
+                       // staff = staff.toObject();
+                         staff.password = staff.empId;
+                        // staff.savepassword = staff.email.split('@')[0];
+                        console.log()
+                        cb(null,staff)
                     }
                 })();
             }
             function createLoginCredentials(staffDatafromFunction, cb) {
                 log.debug(component, 'Inside Create Login Functionality', { attach: staffDatafromFunction });
                 (async () => {
+                    console.log(staffDatafromFunction.password,"staffDatafromFunction.password")
                     let staffDataModel = {};
+                    staffDataModel['userName'] = staffDatafromFunction.staffName;
                     staffDataModel['empId'] = staffDatafromFunction.empId;
                     staffDataModel['email'] = staffDatafromFunction.email;
                     staffDataModel['role'] = "PORTAL_STAFF";
@@ -108,15 +122,15 @@ async function create(staffData) {
                     }
                 })();
             }
-            function loginStaff(staffData, cb) {
-                (async () => {
-                    let [err, loginStaff] = await handle(userLogin(staffData.empId, staffData.savepassword, 'PORTAL_STAFF'));
-                    if (err) cb(err, null);
-                    else {
-                        cb(null, staffData);
-                    }
-                })();
-            }
+            // function loginStaff(staffData, cb) {
+            //     (async () => {
+            //         let [err, loginStaff] = await handle(userLogin(staffData.empId, staffData.savepassword, 'PORTAL_STAFF'));
+            //         if (err) cb(err, null);
+            //         else {
+            //             cb(null, staffData);
+            //         }
+            //     })();
+            // }
             // function sendEmail(staff, cb) {
             //     if ((staffData.email != '') && (staffData.email != undefined)) {
             //         let subject = 'Verification Code';
@@ -154,7 +168,7 @@ async function checkForExistingUser(loginCred) {
             $match: {
                 $and: [{
                     $or: [
-                        { 'empId': loginCred.empId }]
+                        { 'email': loginCred.email }]
                     // { 'phone': loginCred.phone }]
                 }]
             }
@@ -180,9 +194,8 @@ async function userLogin(loginCred, password, role) {
     log.debug(component, 'Inside Login Functionality', role);
     log.close();
     let data = {
-        empId: loginCred,
+        email: loginCred,
         password: password,
-        role: role
     }
     /* checking email availability */
     let [err, staff] = await handle(checkLoginAvailablity(data));
@@ -201,30 +214,13 @@ async function userLogin(loginCred, password, role) {
 
 async function checkLoginAvailablity(loginCred) {
     let query = [];
-    if (loginCred.role == 'PORTAL_ADMIN') {
         query =
             [
                 {
-                    $match: {'empId': loginCred.empId
-                       // $and: [{ 'empId': loginCred.empId },
-                        //{ 'role': loginCred.role }]
-
+                    $match: {'userName': loginCred.userName
                     }
                 }
             ]
-    }
-    else {
-        query =
-            [
-                {
-                    $match: {'empId': loginCred.empId
-                        // $and: [{ 'empId': loginCred.empId },
-                        // { 'role': loginCred.role }]
-
-                    }
-                }
-            ]
-    }
     return new Promise((resolve, reject) => {
         Login.aggregate(query).collation({ locale: "en", strength: 2 }).exec((err, staff) => {
             if (err) {
@@ -301,6 +297,12 @@ async function getStaffDataById(staffId) {
     log.debug(component, 'Getting Staff Data by Id');
     log.close();
     let [staffErr, staffData] = await handle(Staff.findOne({ '_id': staffId }).lean());
+  
+        let [err, branchData] = await handle(Branch.findOne({_id:staffData.branchId}).lean());
+        let [err1, roleData] = await handle(Role.findOne({_id:staffData.staffRole}).lean());
+        staffData.branchName=branchData.branchName;
+        staffData.staffRoleName=roleData.name;
+    
     if (staffErr) return Promise.reject(staffErr);
     if (lodash.isEmpty(staffData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(staffData);
@@ -323,19 +325,21 @@ async function getAllStaffDetails() {
     return Promise.resolve(staffData);
 }
 
-/* Enable / Disable Staff By Staff Id */
-const enableDisableStaff = async (contactId) => {
-    log.debug(component, 'Enable and Disable functionality');
-    log.close();
-    let [enableDisableErr, enableDisableData] = await handle(Staff.findOne({ "_id": contactId }));
-    if (enableDisableErr) return Promise.reject(enableDisableErr);
-    if (enableDisableData.status == 0) var query = { "$set": { "status": 2 } }
-    else var query = { "$set": { "status": 0 } }
-    let [err, enableDisableValue] = await handle(Staff.findOneAndUpdate({ "_id": contactId }, query, { new: true, useFindAndModify: false }))
-    if (err) return Promise.reject(err);
-    else return Promise.resolve(enableDisableValue);
-}
 
+async function enableDisableStaff(id) {
+    // clientApi.clientDetails(req, 'DELETE SPOC');
+    log.debug(component, 'Enable and Disable SPOC');
+    log.close();
+    let [err, singleStaffData] = await handle(Staff.findOne({ _id: id }));
+    let status = (singleStaffData.isDeleted == 0) ? 1 : 0;
+    let [error, spoc] = await handle(Staff.findByIdAndUpdate({ _id: singleStaffData._id }, { "$set": { "isDeleted": status } }, { new: true, useFindAndModify: false }));
+    let [loginErr, staffLogin] = await handle(Login.find({ user: id }));
+    console.log(staffLogin,"staffLogin")
+    let loginstatus = (staffLogin[0].status == 0) ? 1 : 0;
+    let [loginError, data] = await handle(Login.findByIdAndUpdate({ _id: staffLogin[0]._id }, { "$set": { "status": loginstatus } }, { new: true, useFindAndModify: false }));
+    if (loginError) return Promise.reject(error);
+    return Promise.resolve(data);
+}
 async function checkForExistingUserForSendingEmail(loginCred) {
     let query =
         [{

@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 
 const attendenceSchema = new mongoose.Schema({
     date: { type: Date },
-    isPresent: { type: Boolean, default: false },
+    switchStatus: { type: String},
     staffId: { type: String },
-    inTime: { type: Date },
-    outTime: { type: Date }
+    startTime: { type: String },
+    endTime: { type: String }
 }, {
     collection: 'attendence',
     versionKey: false,

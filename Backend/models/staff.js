@@ -28,6 +28,10 @@ const staffSchema = new mongoose.Schema({
    },
    branchId:{
     type:String
+   },
+   isDeleted:{
+    type:Number,
+    default:0
    }
 }, {
     collection: 'staff',

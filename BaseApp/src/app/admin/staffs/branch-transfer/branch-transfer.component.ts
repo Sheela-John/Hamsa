@@ -8,6 +8,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import * as Parse from 'parse';
 import { FlashMessageService } from 'src/app/shared/flash-message/flash-message.service';
+import { BranchTransferService } from 'src/app/services/branchTransfer.service';
 @Component({
   selector: 'app-branch-transfer',
   templateUrl: './branch-transfer.component.html',
@@ -49,17 +50,15 @@ export class BranchTransferComponent implements OnInit {
   branchNamedata: any;
   StaffId: any;
   public minDate = new Date();
-  public isEnableDisable: boolean=false;
+  public isEnableDisable: boolean = false;
   startDateData: any;
   endDateData: any;
 
-  constructor(private router: Router, private fb: FormBuilder, public BranchService: BranchService, private flashMessageService: FlashMessageService, private route: ActivatedRoute) {
+  constructor(private router: Router, private fb: FormBuilder, public branchTransferService: BranchTransferService, public BranchService: BranchService, private flashMessageService: FlashMessageService, private route: ActivatedRoute) {
     this.route.params.subscribe((param) => {
       this.StaffId = param['staffId'];
       this.routerData = param['branchTranferId'];
-      console.log(  this.StaffId)
       this.minDate.setDate(this.minDate.getDate());
-      console.log(this.StaffId)
     })
 
     Parse.initialize(environment.PARSE_APP_ID, environment.PARSE_JS_KEY,);
@@ -68,10 +67,10 @@ export class BranchTransferComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeBranchTransferForm();
-     this.getAllBranch();
-   // this.getAllBranchInBase4App()
+    this.getAllBranch();
+    //  // this.getAllBranchInBase4App()
     if (this.routerData != undefined) {
-      this.getBranchTranferByIdBase4App(this.routerData)
+      this.getBranchTranferById(this.routerData)
       this.showAddEdit = true;
     } else {
       this.showAddEdit = false;
@@ -81,11 +80,9 @@ export class BranchTransferComponent implements OnInit {
   //Initialize Staff Form
   initializeBranchTransferForm() {
     this.branchTransferForm = this.fb.group({
-
-      branchTransferType: ['', Validators.required],
+      branchTransferType: [, Validators.required],
       startDate: ['', Validators.required],
       endDate: ['',],
-
       startTime: [''],
       endTime: [''],
       branchId: ['', Validators.required],
@@ -114,12 +111,37 @@ export class BranchTransferComponent implements OnInit {
       }
     })
   }
-
+  getBranchTranferById(id) {
+    this.branchTransferService.getBranchTransferbyId(id).subscribe(res => {
+      if (res.data) {
+        this.BranchDatavalue = res.data
+        console.log("this.BranchDatavalue", this.BranchDatavalue)
+        this.branchTransferForm.controls['branchId'].patchValue(this.BranchDatavalue.branchId);
+        this.branchTransferForm.controls['branchTransferType'].patchValue(this.BranchDatavalue.branchTransferType);
+        this.branchTypeChange();
+        if(this.BranchDatavalue.branchTransferType==0)
+        {
+        this.branchTransferForm.controls['startDate'].patchValue(this.formattedDate(this.BranchDatavalue.startDate));
+        this.branchTransferForm.controls['endDate'].patchValue(this.formattedDate(this.BranchDatavalue.endDate));
+        }
+        else{
+          this.branchTransferForm.controls['startDate'].patchValue(this.formattedDate(this.BranchDatavalue.startDate));
+        }
+        if(this.BranchDatavalue.startDate==this.BranchDatavalue.endDate)
+        {
+           this.branchTransferForm.controls['startTime'].patchValue(this.BranchDatavalue.startTime);
+           this.branchTransferForm.controls['endTime'].patchValue(this.BranchDatavalue.endTime);
+        }
+        this.branchTransferForm.controls['branchAddress'].patchValue(this.BranchDatavalue.branchAddress);
+      }
+    })
+  }
   //getBranchbyId to patch branchaddress while selecting Branch
-  getBranchbyId() {
-    var id = this.branchTransferForm.value.branchId
+  getBranchbyId(event) {
+    var id = event.target.value
     this.BranchService.getBranchbyId(id).subscribe(res => {
       if (res.status) {
+        console.log(res.data, "sS")
         this.BranchDatavalue = res.data
         this.branchTransferForm.controls['branchAddress'].patchValue(this.BranchDatavalue.branchAddress);
       }
@@ -140,11 +162,10 @@ export class BranchTransferComponent implements OnInit {
   //branchTypeshow Based on Flied
   branchTypeChange() {
     var type = this.branchTransferForm.value.branchTransferType
-    console.log(type, "type")
+    console.log(typeof (type), "type")
     if (type == 0) {
       this.ishidden = true;
     }
-
     else {
       this.ishidden = false;
       this.branchTransferForm.controls['startTime'].setValue('')
@@ -158,10 +179,21 @@ export class BranchTransferComponent implements OnInit {
       this.isShowDate = false;
     }
   }
-
+  formattedDate(date) {
+    var d = new Date(date),
+      month = '' + (d.getMonth() + 1),
+      day = '' + d.getDate(),
+      year = d.getFullYear();
+    if (month.length < 2)
+      month = '0' + month;
+    if (day.length < 2)
+      day = '0' + day;
+    return [day, month, year].join('-');
+  }
   //dateSame show Time
   dateValueSame() {
-    if (this.sDate != '' && this.eDate != '') {
+    console.log("this.sDate",this.sDate,this.eDate)
+    if (this.sDate !=undefined && this.eDate != undefined) {
       console.log("fff")
       console.log(this.startDateData, this.endDateData)
       if (this.sDate == this.eDate) {
@@ -169,7 +201,7 @@ export class BranchTransferComponent implements OnInit {
         this.isShowTime = true;
       } else {
         console.log(false)
-        this.isShowTime =false
+        this.isShowTime = false
       }
     }
   }
@@ -181,20 +213,18 @@ export class BranchTransferComponent implements OnInit {
   }
   //getStarttime
   dateSame(eve) {
-    this.startDateData=eve
-if(eve!=undefined)
-{
-    this.sDate =eve.toLocaleString("en-ca").slice(0, 10)
-}
+    this.startDateData = eve
+    if (eve != undefined) {
+      this.sDate =this.formattedDate(eve)// eve.toLocaleString("en-ca").slice(0, 10)
+    }
     this.dateValueSame()
   }
 
   //getEndtime
   dateSame1(eve) {
-    this.endDateData=eve;
-    if(eve!=undefined)
-    {
-    this.eDate =eve.toLocaleString("en-ca").slice(0, 10)
+    this.endDateData = eve;
+    if (eve != undefined) {
+      this.eDate = this.formattedDate(eve)//eve.toLocaleString("en-ca").slice(0, 10)
     }
     this.dateValueSame()
   }
@@ -210,176 +240,169 @@ if(eve!=undefined)
   }
 
   updateBranchTransfer() {
+    var id = this.routerData
+    this.isbranchTransferFormSubmitted = true;
+    this.branchTransferForm.value._id = this.routerData;
+    this.branchTransferForm.value.startDate=this.sDate;
+    this.branchTransferForm.value.endDate=this.eDate;
+    if (this.branchTransferForm.valid) {
+      this.branchTransferService.updateBranchTransferById(this.branchTransferForm.value).subscribe(res => {
+        if (res.status) {
+          this.flashMessageService.successMessage("Branch Transfer Updated Successfully", 2);
+          this.router.navigateByUrl('admin/staff/viewStaff-branchTransfer/' + this.StaffId)
+        }
+        else {
+          this.flashMessageService.errorMessage('Error while updating branch Transfer');
+        }
+      })
+    }
+  }
+  addBranchTransfer()
+  {
+    if (this.branchTransferForm.valid) {
+      this.branchTransferForm.value.staffId=this.StaffId;
+      this.branchTransferForm.value.startDate=this.sDate;
+      this.branchTransferForm.value.endDate=this.eDate;
+      this.branchTransferService.createBranchTransfer(this.branchTransferForm.value).subscribe(res=>
+        {
+          if(res.status)
+          {
+            this.flashMessageService.successMessage("Branch Transfer Created Successfully", 2);
+            this.router.navigateByUrl('admin/staff/viewStaff-branchTransfer/' + this.StaffId)
+          }
+          else{
+            this.flashMessageService.errorMessage("Error  in Creating Branch Transfer", 2);
+          }
+        })
+    }
   }
   //**************************************************Base4App  API Intergration Start***************************************************** */
   //Add branch transfer Base4 App
   async addBranchTransferBase4App() {
-    console.log(this.branchTransferForm.value)
-    console.log(this.startDateData,this.endDateData)
-    this.isbranchTransferFormSubmitted = true
-    if (this.branchTransferForm.valid) {
-      const staff = new Parse.Object("BranchTransfer");
-      staff.set('StaffId', this.StaffId)
-      staff.set('BranchTransferType', this.branchTransferForm.value.branchTransferType)
-      staff.set("EndDate", this.endDateData);
-      staff.set("StartDate", this.startDateData)
-      staff.set("StartTime", this.branchTransferForm.value.startTime)
-      staff.set("EndTime", this.branchTransferForm.value.endTime)
-      staff.set("Phone", this.branchTransferForm.value.phone)
-      staff.set("BranchAddress", this.branchTransferForm.value.branchAddress);
-      staff.set("BranchId", this.branchTransferForm.value.branchId);
-      staff.set("Status", 0);
+      console.log(this.branchTransferForm.value)
+      console.log(this.startDateData, this.endDateData)
+      this.isbranchTransferFormSubmitted = true
+      if (this.branchTransferForm.valid) {
+        const staff = new Parse.Object("BranchTransfer");
+        staff.set('StaffId', this.StaffId)
+        staff.set('BranchTransferType', this.branchTransferForm.value.branchTransferType)
+        staff.set("EndDate", this.endDateData);
+        staff.set("StartDate", this.startDateData)
+        staff.set("StartTime", this.branchTransferForm.value.startTime)
+        staff.set("EndTime", this.branchTransferForm.value.endTime)
+        staff.set("Phone", this.branchTransferForm.value.phone)
+        staff.set("BranchAddress", this.branchTransferForm.value.branchAddress);
+        staff.set("BranchId", this.branchTransferForm.value.branchId);
+        staff.set("Status", 0);
+        try {
+          let result = await staff.save()
 
-
-      try {
-        let result = await staff.save()
-
-        this.flashMessageService.successMessage("Branch Transfer Created Successfully", 2);
-        this.router.navigateByUrl('admin/staff/viewStaff-branchTransfer/' + this.StaffId)
-      } catch (error) {
-        this.flashMessageService.errorMessage("Error while Creating Branch Transfer", 2);
+          this.flashMessageService.successMessage("Branch Transfer Created Successfully", 2);
+          this.router.navigateByUrl('admin/staff/viewStaff-branchTransfer/' + this.StaffId)
+        } catch (error) {
+          this.flashMessageService.errorMessage("Error while Creating Branch Transfer", 2);
+        }
       }
     }
-  }
   //Get All Branch In Base4App
   async getAllBranchInBase4App() {
-    const branch = Parse.Object.extend('Branch');
-    const query = new Parse.Query(branch);
-    try {
-      const branchName = await query.find()
-      branchName.forEach(element => {
-        this.branchId.push(element.id);
-      });
-      for (const branchData of branchName) {
-        this.BranchName.push(branchData.get("BranchName"));
-        this.BranchStatus.push(branchData.get("BranchStatus"))
+      const branch = Parse.Object.extend('Branch');
+      const query = new Parse.Query(branch);
+      try {
+        const branchName = await query.find()
+        branchName.forEach(element => {
+          this.branchId.push(element.id);
+        });
+        for (const branchData of branchName) {
+          this.BranchName.push(branchData.get("BranchName"));
+          this.BranchStatus.push(branchData.get("BranchStatus"))
+        }
+        for (let i = 0; i < this.branchId.length; i++) {
+          console.log(this.BranchStatus)
+          this.BranchDataArr.push(
+            {
+              "BranchName": this.BranchName[i],
+              "Branchstatus": this.BranchStatus[i],
+              "BranchId": this.branchId[i]
+            }
+
+          )
+        }
+        console.log(this.BranchDataArr)
+        for (let i = 0; i < this.branchId.length; i++) {
+          if (this.BranchStatus[i] == 0)
+            this.BranchNameArr.push({
+              "BranchName": this.BranchName[i],
+              "BranchId": this.branchId[i]
+            })
+        }
+        console.log(this.BranchNameArr)
       }
-      for (let i = 0; i < this.branchId.length; i++) {
-        console.log(this.BranchStatus)
-        this.BranchDataArr.push(
-          {
-            "BranchName": this.BranchName[i],
-            "Branchstatus": this.BranchStatus[i],
-            "BranchId": this.branchId[i]
-          }
-
-        )
+      catch (error) {
+        alert(`Failed to retrieve the object, with error code: ${error.message}`);
       }
-      console.log(this.BranchDataArr)
-      for (let i = 0; i < this.branchId.length; i++) {
-        if (this.BranchStatus[i] == 0)
-          this.BranchNameArr.push({
-            "BranchName": this.BranchName[i],
-            "BranchId": this.branchId[i]
-          })
-      }
-      console.log(this.BranchNameArr)
-    }
-    catch (error) {
-      alert(`Failed to retrieve the object, with error code: ${error.message}`);
+
     }
 
-  }
-  //Base4App  staff by Id
-  async getBranchTranferByIdBase4App(id) {
-    const staffs = Parse.Object.extend('BranchTransfer');
-    const query = new Parse.Query(staffs);
-
-    query.equalTo('objectId', id);
-    console.log(id)
-    try {
-      const staff = await query.get(id)
-      // const Role= role.get('Role')
-      // const startTime = role.get('StartTime')
-      //   const endTime = role.get('EndTime')
-      // this.roleForm.get('role').patchValue(Role)
-      // this.roleForm.get('startTime').patchValue(startTime)
-      // this.roleForm.get('endTime').patchValue(endTime)
-      const branchType = staff.get("BranchTransferType")
-      this.endDate = staff.get("EndDate");
-      this.startDate = staff.get("StartDate",)
-      this.startTime = staff.get("StartTime")
-      this.EndTime = staff.get("EndTime");
-      const address = staff.get("BranchAddress")
-      const Branch = staff.get("BranchId");
-      console.log(this.startDate,this.endDate)
-     
-      // this.isEnableDisable=(this.startDate==this.endDate)?true:false
-      this.branchTransferForm.get("branchTransferType").patchValue(branchType)
-      this.branchTransferForm.get("startDate").patchValue(this.startDate)
-      // this.branchTransferForm.get('endDate').patchValue(this.endDate)
-      this.branchTransferForm.get("endDate").patchValue(this.endDate)
-      this.branchTransferForm.get("startTime").patchValue(this.startTime)
-      this.branchTransferForm.get("endTime").patchValue(this.EndTime)
-      this.branchTransferForm.get('branchId').patchValue(Branch)
-      this.branchTransferForm.get("branchAddress").patchValue(address)
-      this.branchTypeChange()
-      this.dateValueSame()
-    }
-
-    catch (error) {
-      console.error('Error while fetching ToDo', error);
-    }
-  }
   //Update Branch Transfer
   async updateBranchTransferInBase4App() {
-    this.isbranchTransferFormSubmitted = true
-    if (this.branchTransferForm.valid) {
-      const staff = new Parse.Object("BranchTransfer");
-      staff.set('objectId', this.routerData);
-      console.log(this.routerData)
-      staff.set('StaffId', this.StaffId)
-      staff.set('BranchTransferType', this.branchTransferForm.value.branchTransferType)
-      staff.set("EndDate", this.endDateData);
-      staff.set("StartDate",this.startDateData)
-      staff.set("StartTime", this.branchTransferForm.value.startTime)
-      staff.set("EndTime", this.branchTransferForm.value.endTime)
-      staff.set("Phone", this.branchTransferForm.value.phone)
-      staff.set("BranchAddress", this.branchTransferForm.value.branchAddress);
-      staff.set("BranchId", this.branchTransferForm.value.branchId);
-      staff.set("Status", 0);
-      try {
-        let result = await staff.save();
-        this.flashMessageService.successMessage("Branch Transfer Updated Successfully", 2);
-        this.router.navigateByUrl('admin/staff/viewStaff-branchTransfer/' + this.StaffId)
-      } catch (error) {
-        this.flashMessageService.errorMessage("Error while Updating Branch Transfer", 2);
+      this.isbranchTransferFormSubmitted = true
+      if (this.branchTransferForm.valid) {
+        const staff = new Parse.Object("BranchTransfer");
+        staff.set('objectId', this.routerData);
+        console.log(this.routerData)
+        staff.set('StaffId', this.StaffId)
+        staff.set('BranchTransferType', this.branchTransferForm.value.branchTransferType)
+        staff.set("EndDate", this.endDateData);
+        staff.set("StartDate", this.startDateData)
+        staff.set("StartTime", this.branchTransferForm.value.startTime)
+        staff.set("EndTime", this.branchTransferForm.value.endTime)
+        staff.set("Phone", this.branchTransferForm.value.phone)
+        staff.set("BranchAddress", this.branchTransferForm.value.branchAddress);
+        staff.set("BranchId", this.branchTransferForm.value.branchId);
+        staff.set("Status", 0);
+        try {
+          let result = await staff.save();
+          this.flashMessageService.successMessage("Branch Transfer Updated Successfully", 2);
+          this.router.navigateByUrl('admin/staff/viewStaff-branchTransfer/' + this.StaffId)
+        } catch (error) {
+          this.flashMessageService.errorMessage("Error while Updating Branch Transfer", 2);
+        }
       }
     }
-  }
   async getBranchbyIdBack4App(e) {
 
-    var branchId = this.branchTransferForm.value.branchId
-    console.log(branchId)
-    const branch = Parse.Object.extend('Branch');
-    const query = new Parse.Query(branch);
+      var branchId = this.branchTransferForm.value.branchId
+      console.log(branchId)
+      const branch = Parse.Object.extend('Branch');
+      const query = new Parse.Query(branch);
 
-    query.equalTo('objectId', branchId);
-    console.log(branchId)
-    try {
-      const results = await query.find();
+      query.equalTo('objectId', branchId);
+      console.log(branchId)
+      try {
+        const results = await query.find();
 
-      for (const branch of results) {
+        for (const branch of results) {
 
-        const BranchAddress = branch.get('BranchAddress')
-        const BranchName = branch.get('BranchName')
-        this.homeBranchLatitude = branch.get('Latitude')
-        this.homeBranchLongitude = branch.get('Longitude')
-        console.log(this.homeBranchLatitude, this.homeBranchLongitude)
+          const BranchAddress = branch.get('BranchAddress')
+          const BranchName = branch.get('BranchName')
+          this.homeBranchLatitude = branch.get('Latitude')
+          this.homeBranchLongitude = branch.get('Longitude')
+          console.log(this.homeBranchLatitude, this.homeBranchLongitude)
 
-        console.log(BranchName)
-        this.branchNamedata = BranchName
-        console.log(this.branchNamedata)
-        this.branchTransferForm.get('branchAddress').patchValue(BranchAddress)
+          console.log(BranchName)
+          this.branchNamedata = BranchName
+          console.log(this.branchNamedata)
+          this.branchTransferForm.get('branchAddress').patchValue(BranchAddress)
 
+        }
+
+
+      } catch (error) {
+        console.error('Error while fetching ToDo', error);
       }
 
 
-    } catch (error) {
-      console.error('Error while fetching ToDo', error);
     }
-
-
+    //**************************************************Base4App  API Intergration end***************************************************** */
   }
-  //**************************************************Base4App  API Intergration end***************************************************** */
-}

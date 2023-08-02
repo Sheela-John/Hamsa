@@ -2,8 +2,8 @@
     <div class="card">
         <div class="card-header">
             <h2 class="card-header heading text-2xl font-bold">Branch Transfer</h2>
-            <!-- <button class="card-header btn float-right" (click)="backTostaff()"><i
-                    class="fa fa-reply"></i>&nbsp;Back</button> -->
+            <button class="card-header btn float-right" (click)="backTostaff()"><i
+                    class="fa fa-reply"></i>&nbsp;Back</button>
         </div>
     </div>
     <section class="flex items-center justify-center">
@@ -13,12 +13,12 @@
                     <div>
                         <label for="name" class="block mb-2 font-bold text-gray-600 ">Select Branch</label>
                         <div class="flex items-center mr-4">
-                            <input id="teal-radio" type="radio" value="0" formControlName="branchTransferType"
+                            <input id="teal-radio" type="radio" [value]=0 formControlName="branchTransferType"
                                 name="branchTransferType" (change)="branchTypeChange()"
                                 class="w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 focus:ring-teal-500 dark:focus:ring-teal-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                             <label for="teal-radio"
                                 class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Temporary</label>
-                            <input id="teal-radio" checked type="radio" checked value="1"  name="branchTransferType" (change)="branchTypeChange()"
+                            <input id="teal-radio" checked type="radio" checked [value]=1  name="branchTransferType" (change)="branchTypeChange()"
                                 formControlName="branchTransferType"
                                 class="w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 focus:ring-teal-500 dark:focus:ring-teal-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 ml-4"> 
                             
@@ -29,7 +29,7 @@
                             <div *ngIf="branchTransferForm.controls['branchTransferType'].errors && (!branchTransferForm.controls['branchTransferType'].pristine|| isbranchTransferFormSubmitted)"
                                 class="error-msg">
                                 <div [hidden]="!branchTransferForm.controls['branchTransferType'].errors.required">
-                                    Please Enter Time
+                                    Please Enter Branch Transfer
                                 </div>
                             </div>
                         </div>
@@ -40,7 +40,7 @@
                             formControlName="startDate" bsDatepicker
                             [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
                             (bsValueChange)="dateSame($event)" [minDate]="minDate" (input)="inputdobValidator($event)"
-                             placeholder="DD-MM-YYYY">
+                            placeholder="DD-MM-YYYY">
                         <div class="error-msg-area">
                             <div *ngIf="branchTransferForm.controls['startDate'].errors && (!branchTransferForm.controls['startDate'].pristine|| isbranchTransferFormSubmitted)"
                                 class="error-msg">
@@ -100,7 +100,7 @@
                             formControlName="startDate" bsDatepicker
                             [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
                             (bsValueChange)="dateSame($event)" [minDate]="minDate" (input)="inputdobValidator($event)"
-                             placeholder="DD-MM-YYYY">
+                            placeholder="DD-MM-YYYY">
                             <!-- <input type="date" class="border border-gray-300 shadow p-2 w-full rounded "
                                 placeholder="Select Start Date" formControlName="startDate" (change)="dateSame($event.target)"> -->
                             <div class="error-msg-area">
@@ -115,7 +115,7 @@
                         <div>
                             <label for="endDate" class="block mb-2 font-bold text-gray-600">End Date</label>
                             <input type="text" class="form-control data-picker-color user-font"
-                            formControlName="startDate" bsDatepicker
+                            formControlName="endDate" bsDatepicker
                             [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
                             (bsValueChange)="dateSame1($event)" [minDate]="minDate" (input)="inputdobValidator($event)"
                              placeholder="DD-MM-YYYY">
@@ -168,11 +168,11 @@
                         <label for="branchId" class="block mb-2 font-bold text-gray-600">Branch
                             Name</label>
                         <select class="border border-gray-300 shadow p-2 w-full rounded"
-                            formControlName="branchId" (change)="getBranchbyIdBack4App($event)">
+                            formControlName="branchId" (change)="getBranchbyId($event)">
                             <option value="">--select--</option>+
 
-                            <option value="{{branchList.BranchId}}" *ngFor="let branchList of BranchNameArr">
-                                {{branchList.BranchName}}
+                            <option value="{{branch._id}}" *ngFor="let branch of branchList">
+                                {{branch.branchName}}
                             </option>
                         </select>
                         <div class="error-msg-area">
@@ -204,9 +204,9 @@
                     </div>
                 </div>
                 <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg" *ngIf="!showAddEdit"
-                    (click)="addBranchTransferBase4App()">Submit</button>
+                    (click)="addBranchTransfer()">Submit</button>
                 <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg" *ngIf="showAddEdit"
-                    (click)="updateBranchTransferInBase4App()">Update</button>
+                    (click)="updateBranchTransfer()">Update</button>
             </form>
 
         </div>

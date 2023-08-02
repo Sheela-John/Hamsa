@@ -27,12 +27,12 @@ export class ClientDataService {
     //     }), catchError(error => throwError(error)))
     // }
 
-    // //Get Branch By Id 
-    // public getBranchbyId(branchId): Observable<any> {
-    //     return this.httpClient.get('branch/' + branchId).pipe(tap(res => {
-    //         return res;
-    //     }), catchError(error => throwError(error)));
-    // }
+    //Get Client By Id 
+    public getClientbyId(clientId): Observable<any> {
+        return this.httpClient.get('client/' + clientId).pipe(tap(res => {
+            return res;
+        }), catchError(error => throwError(error)));
+    }
 
     // //Update Branch By Id
     // public updateBranchById(updateBranchDataId): Observable<any> {
@@ -41,10 +41,10 @@ export class ClientDataService {
     //     }), catchError(error => throwError(error)));
     // }
 
-    // //Enable or Disable Branch
-    // public enableDisableBranch(id): Observable<any> {
-    //     return this.httpClient.get('branch/enableanddisable/' + id).pipe(tap(res => {
-    //         return res;
-    //     }), catchError(error => throwError(error)));
-    // }
+    //Enable or Disable Branch
+    public enableDisableClient(id): Observable<any> {
+        return this.httpClient.get('client/enableanddisable/' + id).pipe(tap(res => {
+            return res;
+        }), catchError(error => throwError(error)));
+    }
 }

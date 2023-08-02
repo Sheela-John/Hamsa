@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 
 const loginSchema = new mongoose.Schema({
     email: { type: String },
+    userName:{type:String},
     phone: { type: String },
     empId: { type: String }, // For Staff
     ipNumber: { type: String }, // For Client

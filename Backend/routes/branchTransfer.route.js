@@ -58,7 +58,20 @@ router.post('/', async (req, res, next) => {
                 return res.json({ status: true, data: branchTransferData });
             }
         })
-
+        .get('/getBranchTransferByStaffId/:id', async (req, res, next) => {
+            log.debug(COMPONENT, 'Search for Branch Transfer by Staff ID'); log.close();
+            let [err, branchTransferData] = await handle(branchTransferApi.getBranchTransferByStaffId(req.params.id));
+            if (err) {
+                log.error(COMPONENT, 'Get Branch Transfer by Staff Id error', { attach: err });
+                log.close();
+                return res.json({ status: false, err: Object.assign(ERR.UNKNOWN, { message: err.message }) });
+            }
+            else {
+                log.debug(COMPONENT, 'Branch Transfer found');
+                log.close();
+                return res.json({ status: true, data: branchTransferData });
+            }
+        })
         
     /* Update Branch API */
     .put('/:_id', async (req, res, next) => {
@@ -76,5 +89,18 @@ router.post('/', async (req, res, next) => {
         if (enableDisableErr) return res.status(200).json(lodash.merge({ status: false }, enableDisableErr));
         else return res.status(200).json({ status: true, "data": enableDisableData });
     })
-    
+    .delete('/deleteBranchTransfer/:_id', async (req, res, next) => {
+        log.debug(COMPONENT, 'Delete BranchTransferData '); log.close();
+        let [err, mentorData] = await handle(branchTransferApi.deleteBranchTransfer(req.params._id));
+        if (err) {
+            log.error(COMPONENT, 'Change BranchTransfer status error', { attach: err });
+            log.close();
+            return res.json({ status: false, err: Object.assign(ERR.UNKNOWN, { message: err.message }) });
+        }
+        else {
+            log.debug(COMPONENT, 'Changing BranchTransfer Status');
+            log.close();
+            return res.json({ "status": true, data: mentorData, "message": "BranchTransfer Status Changed!" })
+        }
+    });
 module.exports = router;

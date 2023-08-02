@@ -35,17 +35,17 @@
                 </div> -->
             </div>
 
-            <ul class="mt-4 space-y-2" *ngFor="let branch of this.branchTransferArr">
+            <ul class="mt-4 space-y-2" *ngFor="let branch of this.branchTransferData">
                 <li>
                     <div class="block h-full rounded-lg border border-gray-700 subbox p-4 hover:border-pink-600">
                         <div class="grid sm:grid-cols-1 md:grid-cols-6 md:gap-3 ml-4 " style="color:white">
-                            <div>{{branch.BranchTranfer}}</div>
-                            <div>{{branch.BranchName}}</div>
+                            <div>{{branch.Type}}</div>
+                            <div>{{branch.branchName}}</div>
                             <div>{{branch.startDate}} {{branch.startTime}}</div>
                             <div>{{branch.endDate}}  {{branch.endTime}} </div>
-                            <div> <button  class="btn" (click)="editBranchTransfer(branch.BranchTranferId)" style="background-color: rgb(253 179 18)"><i
+                            <div> <button  class="btn" (click)="editBranchTransfer(branch._id)" style="background-color: rgb(253 179 18)"><i
                                 class='fa fa-edit fa-xs'></i></button></div>
-                                <div> <button  class="btn" (click)="deleteBranchTransfer(branch,branch.BranchTranferId)" style="background-color: rgb(253, 45, 18)"><i
+                                <div> <button  class="btn" (click)="deleteBranchTransfer(branch._id)" style="background-color: rgb(253, 45, 18)"><i
                                     class='fa fa-trash fa-xs'></i></button></div>
                         </div>
                     </div>
