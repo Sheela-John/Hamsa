@@ -37,7 +37,12 @@ router.post('/assignedServicesbyStaff/date', async (req, res, next) => {
     if (err) return next(err);
     else return res.status(200).json({ status: true, data: assignServiceData });
 })
-
+router.post('/travelDistance', async (req, res, next) => {
+    if (lodash.isEmpty(req.body)) return next(ERR.MANDATORY_FIELD_MISSING);
+    let [err, assignServiceData] = await handle(AssignServiceAPI.travelDistance(req.body));
+    if (err) return next(err);
+    else return res.status(200).json({ status: true, data: assignServiceData });
+})
 /* Get All Assigned Services */
 router.get('/allAssignedServices', async (req, res, next) => {
     let [err, assignServiceData] = await handle(AssignServiceAPI.getAllAssignedServices());
@@ -149,9 +154,9 @@ router.put('/updateClient/:id', async (req, res, next) => {
 })
 
 /* Update Branch Service */
-router.put('/updateBranch/:id', async (req, res, next) => {
-    req.body.clientBranchId = req.params.id;
-    let [err, updateData] = await handle(AssignServiceAPI.updateBranch(req.body));
+router.put('/updateAssignService/:id', async (req, res, next) => {
+    req.body.assignServiceId = req.params.id;
+    let [err, updateData] = await handle(AssignServiceAPI.updateAssignService(req.body));
     if (err) return next(err);
     else return res.status(200).json({ status: true, data: updateData });
 })

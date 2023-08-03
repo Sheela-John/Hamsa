@@ -64,8 +64,26 @@ const assignServiceSchema = new mongoose.Schema({
    otherBranchId:{
     type:String
    },
+   slatitude:{
+    type:Number
+   },
+   slongitude:{
+    type:Number
+   },
+   elatitude:{
+    type:Number
+   },
+   elongitude:{
+    type:Number
+   },
    bookedCount:{
     type:Number
+   },
+   travelDistanceinKM:{
+    type:Number
+   },
+   travelDuration:{
+    type:String
    }
 }, {
     collection: 'assignService',

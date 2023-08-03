@@ -253,5 +253,9 @@
     "MOBILE_NUMBER_NOT_REGISTERED": {
         "code": 160,
         "message": "Mobile Number Not Registered with Us"
+    },
+    "NUMBER_OF_DAYS": {
+        "code": 161,
+        "message": "Number of Days shoud not be greater than 31 days"
     }
 }

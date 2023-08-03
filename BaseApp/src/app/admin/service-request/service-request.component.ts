@@ -64,6 +64,7 @@ getAllServiceRequest()
         this.serviceRequestList[i].date=this.formatDate( this.serviceRequestList[i].date)
       }
     }
+    console.log(this.serviceRequestList,"this.serviceRequestList")
   })
 }
 

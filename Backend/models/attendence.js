@@ -4,8 +4,10 @@ const attendenceSchema = new mongoose.Schema({
     date: { type: Date },
     switchStatus: { type: String},
     staffId: { type: String },
-    startTime: { type: String },
-    endTime: { type: String }
+    startTime: { type: String,default:"09:00" },
+    endTime: { type: String,default:"17:30" },
+    inTime:{type:String},
+    outTime:{type:String}
 }, {
     collection: 'attendence',
     versionKey: false,

@@ -1012,11 +1012,13 @@ const getAssignedServicesofBranchById = async (serviceBranchId) => {
 }
 
 /* To Update Assinged Service fot Client - API */
-const updateClient = async function (datatoupdate) {
+const updateAssignService = async function (datatoupdate) {
     log.debug(component, 'Update Assinged Service fot Client', { 'attach': datatoupdate }); log.close();
-    let clientId = datatoupdate.clientServiceId;
-    delete datatoupdate.clientServiceId
-    let [clientErr, clientData] = await handle(AssignServiceForClient.findOneAndUpdate({ "_id": clientId }, datatoupdate, { new: true, useFindAndModify: false }))
+    let assignServiceId = datatoupdate.assignServiceId;
+    let[err, travelDistanceValue]=await handle(travelDistance(datatoupdate));
+    datatoupdate.travelDistanceinKM=travelDistanceValue.distance;
+    datatoupdate.travelDuration=travelDistanceValue.duration;
+    let [clientErr, clientData] = await handle(AssignService.findOneAndUpdate({ "_id": assignServiceId }, datatoupdate, { new: true, useFindAndModify: false }))
     if (clientErr) return Promise.reject(clientErr);
     else return Promise.resolve(clientData);
 }
@@ -1171,60 +1173,54 @@ var makeTimeIntervals = function (start_Time, end_Time, increment) {
     return r;
 };
 const pad = function (n) { return (n < 10) ? '0' + n.toString() : n; };
-/* Find the appointments and matching slot timing to push appointment into that slot */
-/* Will check the clinician start time appointment date */
-// var matchBookedSlots = function (blockedSlots, userPerSlot, timeZone, intervals, appointmentDate, clinicanBlockedSession) {
 
-//     if (typeof appointmentDate == 'string') appointmentDate = new Date(appointmentDate);
-//     let copiedDate = new Date(appointmentDate.getTime());
-//     var slotstartTime = copiedDate.setUTCHours(intervals.startTime.split(':')[0], intervals.startTime.split(':')[1]);
-//     var date = newDate(timeZone);
-//     if (slotstartTime < date) {
-//         intervals.slotExpired = true;
-//     }
-//     blockedSlots.forEach(element => {
-//         var startTime = pad(new Date(element.clinicianStartTime).getUTCHours()) + ':' + pad(new Date(element.clinicianStartTime).getUTCMinutes())
-//         var endTime = pad(new Date(element.clinicianEndTime).getUTCHours()) + ':' + pad(new Date(element.clinicianEndTime).getUTCMinutes())
-
-
-
-//         /*Previously If statement for Duration Per Slot*/
-//         // if ((startTime == intervals['startTime']) && (endTime == intervals['endTime']) && (appointmentDate.getTime() == new Date(element.appointmentDate).getTime())) {
-//         //     if (element.appointmentStatus !== 0) intervals.occupiedSlots += 1;
-//         //     if (element.pushed == undefined) intervals['appointmentDetails'].push(element);
-//         //     element.pushed = true;
-//         //     if (intervals.occupiedSlots == userPerSlot) {
-//         //         intervals.booked = true;
-//         //     } else intervals.booked = false;
-//         // }
-
-//         /*Modified If Statement for Appointment 30,45,60 mins*/
-//         if (((intervals['startTime']) < (endTime)) && ((intervals['endTime']) > (startTime)) && (appointmentDate.getTime() == new Date(element.appointmentDate).getTime())) {
-//             if (element.appointmentStatus !== 0) intervals.occupiedSlots += 1;
-//             if (element.pushed == undefined) intervals['appointmentDetails'].push(element);
-//             element.pushed = true;
-//             if (intervals.occupiedSlots == userPerSlot) {
-//                 intervals.booked = true;
-//             } else intervals.booked = false;
-//         }
-
-
-//     });
-//     clinicanBlockedSession.forEach(blockedElements => {
-//         var clinicianBlockedStartTime = pad(new Date(blockedElements.blockEventStartTime).getUTCHours()) + ':' + pad(new Date(blockedElements.blockEventStartTime).getUTCMinutes())
-//         var clinicianBlockedEndTime = pad(new Date(blockedElements.blockEventEndTime).getUTCHours()) + ':' + pad(new Date(blockedElements.blockEventEndTime).getUTCMinutes())
-
-//         if ((appointmentDate.getTime() == new Date(blockedElements.blockEventStartDate).getTime())) {
-//             if ((blockedElements.status !== 0) && ((intervals['startTime']) < (clinicianBlockedEndTime)) && ((intervals['endTime']) > (clinicianBlockedStartTime))) {
-//                 intervals.clinicianBlocked = true;
-//             }
-//             else {
-//                 intervals.clinicianBlocked = false;
-//             }
-//         }
-//     })
-//     return intervals;
-// }
+const travelDistance = async (data) => {
+   console.log("inside")
+    return new Promise((resolve, reject) => {
+        const options = {
+            method: 'POST',
+            body: {
+                "origin": {
+                    "location": {
+                        "latLng": {
+                            "latitude": data.slatitude, // Home Branch Latitude 
+                            "longitude": data.slongitude  // Home Branch Longitude
+                        }
+                    }
+                },
+                "destination": {
+                    "location": {
+                        "latLng": {
+                            "latitude": data.elatitude,
+                            "longitude": data.elongitude
+                        }
+                    }
+                },
+            },
+            url: 'https://routes.googleapis.com/directions/v2:computeRoutes',
+            headers: {
+                'X-Goog-Api-Key': 'AIzaSyCX_9dtirFHcsQY8zjjR86cettocdHOT50',
+                'Content-Type': 'application/json',
+                'X-Goog-FieldMask': 'routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline'
+            },
+            json: true //Parse the JSON string in the response
+        };
+        request(options, function (error, response, body) {
+            if (error){
+            console.log(error);
+             return reject(error);
+            }
+            log.debug('Travel Distance response', { attach: response.body }); log.close();
+            (async () => {
+                var value={
+                    duration: response.body.routes[0].duration,
+                    distance:response.body.routes[0].distanceMeters / 1000
+                }  
+               return resolve(value)
+            })();
+        });
+    });
+}
 module.exports = {
     assignServiceClient: assignServiceClient,
     assignServiceBranch: assignServiceBranch,
@@ -1243,7 +1239,8 @@ module.exports = {
     serviceOnEnd: serviceOnEnd,
     getAssignedServicesById: getAssignedServicesById,
     getAssignedServicesofBranchById: getAssignedServicesofBranchById,
-    updateClient: updateClient,
+    updateAssignService: updateAssignService,
     getAssignServiceDataByStaffIdAndDate: getAssignServiceDataByStaffIdAndDate,
-    getSlotsForAssignService: getSlotsForAssignService
+    getSlotsForAssignService: getSlotsForAssignService,
+    travelDistance:travelDistance
 }
