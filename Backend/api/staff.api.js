@@ -438,6 +438,7 @@ async function createAdmin(adminData) {
                 log.debug(component, 'Inside Create Login Functionality', { attach: adminDatafromFunction });
                 (async () => {
                     let staffDataModel = {};
+                    staffDataModel['userName']=adminDatafromFunction.staffName;
                     staffDataModel['empId'] = adminDatafromFunction.empId;
                     staffDataModel['email'] = adminDatafromFunction.email;
                     staffDataModel['role'] = "PORTAL_ADMIN";
