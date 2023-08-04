@@ -1,15 +1,16 @@
 <div class="main bg-white p-6 rounded-lg shadow-lg">
-    <div class="card">
-        <div class="card-header">
-            <h2 class="card-header heading text-2xl font-bold">Role List</h2>
-            <button class="card-header btn float-right" (click)="addRole()"><i
-                    class="fa fa-plus"></i>&nbsp;&nbsp;Add</button>
-        </div>
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-header heading text-2xl font-bold">Role List</h2>
+      <button class="card-header btn float-right" (click)="addRole()">
+        <i class="fa fa-plus"></i>&nbsp;&nbsp;Add
+      </button>
     </div>
-    <section class="flex">
+  </div>
+  <!-- <section class="flex mt-2">
         <div class="container">
             <section class="grid grid-cols-2 gap-4">
-            <article class="rounded-m border border-gray-100 box p-2 mt-4 h-fit" style="background-color: #2DD4BF;"
+            <article class="rounded-m border border-gray-100 box p-2  h-fit" style="background-color: #2DD4BF;"
                 *ngFor="let role of roleList;">
                 <div class="relative block overflow-hidden rounded-lg border headbox border-gray-100 sm:p-6 lg:p-4">
                     <span
@@ -27,7 +28,7 @@
                                             class='fa fa-edit fa-xs'></i></button>&nbsp;&nbsp;
                                 </div>
                                 <div class="col-6">
-                                    <button class="btn" style="background-color: green;"
+                                    <buttonc style="background-color: green;"
                                         (click)="enableDisableRole(role._id)" *ngIf="role.status == 0"><i
                                             class="fa fa-unlock" aria-hidden="true"></i></button>
                                     <button class="btn" style="background-color: red;" (click)="enableDisableRole
@@ -70,6 +71,274 @@
             </article>
         </section>
         </div>
-    </section>
+    </section> -->
+
+  <section>
+    <div class="container">
+      <section id="blog_area" class="pt-5">
+        <div id="masonry">
+          <div class="card" *ngFor="let role of roleList">
+            <!-- <span
+                class="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"></span>                         -->
+
+            <div class="card__content">
+              <!-- <h4 class="card__title">
+                        Card 1 Title
+                    </h4> -->
+
+              <div
+                class="mt-2 card__content-jcenter rounded-m border border-gray-100 box p-2 h-fit"
+                style="background-color: #2dd4bf"
+              >
+                <!-- <span -->
+                <!-- class="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"></span>  -->
+                  <div class="row">
+                    <div class="fw-bold col-8 mt-1">
+                      Role Name :&nbsp;{{ role.name }}
+                    </div>
+                    <div class="col-1">
+                      <button
+                        class="btn float-right"
+                        (click)="editrole(role._id)"
+                        style="
+                          background-color: rgb(253 179 18);
+                          padding: 0px 4px;
+                        "
+                      >
+                        <i class="fa fa-edit fa-xs"></i></button
+                      >&nbsp;&nbsp;
+                    </div>
+                    <div class="col-1">
+                      <button
+                        style="background-color: green; padding: 0px 4px"
+                        class="btn"
+                        (click)="enableDisableRole(role._id)"
+                        *ngIf="role.status == 0"
+                      >
+                        <i
+                          class="fa fa-unlock"
+                          style="font-size: small"
+                          aria-hidden="true"
+                        ></i>
+                      </button>
+                      <button
+                        style="background-color: red; padding: 0px 4px"
+                        class="btn"
+                        (click)="enableDisableRole(role._id)"
+                        *ngIf="role.status == 2"
+                      >
+                        <i class="fa fa-lock" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                    <ul class="space-y-2">
+                      <div style="background-color: #163339; padding: 15px">
+                        <div class="row" style="color: white">
+                          <div class="col-4">
+                            <div>Slot Name</div>
+                            &nbsp;&nbsp;
+                          </div>
+                          <div class="col-4">
+                            <div>Start Time</div>
+                            &nbsp;&nbsp;
+                          </div>
+                          <div class="col-4">
+                            <div>End Time</div>
+                            &nbsp;&nbsp;
+                          </div>
+                        </div>
+                        <li *ngFor="let addRole of role.slots">
+                          <div class="row" style="color: white">
+                            <div class="col-4">
+                              <div>{{ addRole.slotName }}</div>
+                              &nbsp;&nbsp;
+                            </div>
+                            <div class="col-4">
+                              <div>{{ addRole.startTime }}</div>
+                              &nbsp;&nbsp;
+                            </div>
+                            <div class="col-4">
+                              <div>{{ addRole.endTime }}</div>
+                              &nbsp;&nbsp;
+                            </div>
+                          </div>
+                        </li>
+                      </div>
+                    </ul>
+                  </div>
+             
+                <!-- <article class="rounded-m border border-gray-100 box p-2  h-fit" style="background-color: #2DD4BF;"
+                        *ngFor="let role of roleList;">
+                        <div class="relative block overflow-hidden rounded-lg border headbox border-gray-100 sm:p-6 lg:p-4">
+                            <span
+                                class="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"></span>
+        
+                            <div class="row ">
+                                <div class="col-9">
+                                    <div class="font-bold italic text-xl text-left">Role Name :&nbsp;{{role.name}}</div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <button class="btn float-right" (click)="editrole(role._id)"
+                                                style="background-color: rgb(253 179 18)"><i
+                                                    class='fa fa-edit fa-xs'></i></button>&nbsp;&nbsp;
+                                        </div>
+                                        <div class="col-6">
+                                            <button class="btn" style="background-color: green;"
+                                                (click)="enableDisableRole(role._id)" *ngIf="role.status == 0"><i
+                                                    class="fa fa-unlock" aria-hidden="true"></i></button>
+                                            <button class="btn" style="background-color: red;" (click)="enableDisableRole
+                                                    (role._id)" *ngIf="role.status == 2"><i class="fa fa-lock"
+                                                    aria-hidden="true"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <ul class=" space-y-2">
+                            <div class="block h-full rounded-lg border border-gray-700 subbox p-4 hover:border-pink-600"
+                                style="background-color: #163339;">
+                                <div class="row" style="color:white ">
+                                    <div class="col-4">
+                                        <div>Slot Name</div>&nbsp;&nbsp;
+                                    </div>
+                                    <div class="col-4">
+                                        <div>Start Time</div>&nbsp;&nbsp;
+                                    </div>
+                                    <div class="col-4">
+                                        <div>End Time</div>&nbsp;&nbsp;
+                                    </div>
+                                </div>
+                                <li *ngFor="let addRole of role.slots ;">
+                                    <div class="row" style="color:white">
+                                        <div class="col-4">
+                                            <div>{{addRole.slotName}}</div>&nbsp;&nbsp;
+                                        </div>
+                                        <div class="col-4">
+                                            <div>{{addRole.startTime}}</div>&nbsp;&nbsp;
+                                        </div>
+                                        <div class="col-4">
+                                            <div>{{addRole.endTime}}</div>&nbsp;&nbsp;
+                                        </div>
+                                    </div>
+                                </li>
+                            </div>
+                        </ul>
+                    </article> -->
+              </div>
+              <!-- <span>
+                        <a href="#">Read more</a>
+                    </span> -->
+            </div>
+          </div>
+          <!-- <div class="card">
+              <div class="card__img">
+                  <a href="#">
+                      <img class="img-fluid" src="https://picsum.photos/501/250/?random" alt="Image 1">
+                  </a>
+                  <div class="card__date">
+                      <span>Jan. 1st 19</span>
+                  </div>
+              </div>
+              <div class="card__content">
+                  <h4 class="card__title">
+                      Card 2 Title
+                  </h4>
+                  <p class="card__content-jcenter">
+                    Soleo saepe ante oculos ponere, idque libenter crebris usurpare sermonibus, omnis nostrorum imperatorum, omnis exterarum gentium potentissimorumque populorum, omnis clarissimorum regum res gestas, cum tuis nec contentionum magnitudine nec numero proeliorum nec varietate regionum nec celeritate conficiendi nec dissimilitudine bellorum posse conferri; nec vero disiunctissimas terras citius passibus cuiusquam potuisse peragrari, quam tuis non dicam cursibus, sed victoriis lustratae sunt.
+                  </p>
+                  <span>
+                  <a href="#">Read more</a>
+              </span>
+              </div>
+          </div>
+            <div class="card">
+              <div class="card__img">
+                  <a href="#">
+                      <img class="img-fluid" src="https://picsum.photos/505/225/?random" alt="Image 1">
+                  </a>
+                  <div class="card__date">
+                      <span>Jan. 1st 19</span>
+                  </div>
+              </div>
+              <div class="card__content">
+                  <h4 class="card__title">
+                      Card 3 Title
+                  </h4>
+                  <p class="card__content-jcenter">
+                      Cuius acerbitati uxor grave accesserat incentivum, germanitate Augusti turgida supra modum, quam Hannibaliano regi fratris filio antehac Constantinus iunxerat pater, Megaera quaedam mortalis, inflammatrix saevientis adsidua, humani cruoris avida nihil mitius quam maritus; qui paulatim eruditiores facti processu temporis ad nocendum per clandestinos versutosque rumigerulos conpertis leviter addere quaedam male suetos falsa et placentia sibi discentes, adfectati regni vel artium nefandarum calumnias insontibus adfligebant.
+                  </p>
+                  <span>
+                  <a href="#">Read more</a>
+              </span>
+              </div>
+          </div>
+            <div class="card">
+              <div class="card__img">
+                  <a href="#">
+                      <img class="img-fluid" src="https://picsum.photos/500/230/?random" alt="Image 1">
+                  </a>
+                  <div class="card__date">
+                      <span>Jan. 1st 19</span>
+                  </div>
+              </div>
+              <div class="card__content">
+                  <h4 class="card__title">
+                      Card 4 Title
+                  </h4>
+                  <p class="card__content-jcenter">
+                      Hac ex causa conlaticia stipe Valerius humatur ille Publicola et subsidiis amicorum mariti inops cum liberis uxor alitur Reguli et dotatur ex aerario filia Scipionis, cum nobilitas florem adultae virginis diuturnum absentia pauperis erubesceret patris.
+                  </p>
+                  <span>
+                  <a href="#">Read more</a>
+              </span>
+              </div>
+          </div>
+            <div class="card">
+              <div class="card__img">
+                  <a href="#">
+                      <img class="img-fluid" src="https://picsum.photos/600/300/?random" alt="Image 1">
+                  </a>
+                  <div class="card__date">
+                      <span>Jan. 1st 19</span>
+                  </div>
+              </div>
+              <div class="card__content">
+                  <h4 class="card__title">
+                      Card 5 Title
+                  </h4>
+                  <p class="card__content-jcenter">
+                      Saepissime igitur mihi de amicitia cogitanti maxime illud considerandum videri solet, utrum propter imbecillitatem atque inopiam desiderata sit amicitia, ut dandis recipiendisque meritis quod quisque minus per se ipse posset, id acciperet ab alio vicissimque redderet, an esset hoc quidem proprium amicitiae, sed antiquior et pulchrior et magis a natura ipsa profecta alia causa. Amor enim, ex quo amicitia nominata est, princeps est ad benevolentiam coniungendam. Nam utilitates quidem etiam ab iis percipiuntur saepe qui simulatione amicitiae coluntur et observantur temporis causa, in amicitia autem nihil fictum est, nihil simulatum et, quidquid est, id est verum et voluntarium.
+                  </p>
+                  <span>
+                  <a href="#">Read more</a>
+              </span>
+              </div>
+          </div>
+            <div class="card">
+                  <div class="card__img">
+                      <a href="#">
+                          <img class="img-fluid" src="https://picsum.photos/600/400/?random" alt="Image 1">
+                      </a>
+                      <div class="card__date">
+                          <span>Jan. 1st 19</span>
+                      </div>
+                  </div>
+                  <div class="card__content">
+                      <h4 class="card__title">
+                          Card 6 Title
+                      </h4>
+                      <p class="card__content-jcenter">
+                          Et quia Mesopotamiae tractus omnes crebro inquietari sueti praetenturis et stationibus servabantur agrariis, laevorsum flexo itinere Osdroenae subsederat extimas partes, novum parumque aliquando temptatum commentum adgressus. quod si impetrasset, fulminis modo cuncta vastarat. erat autem quod cogitabat huius modi.
+                      </p>
+                      <span>
+                      <a href="#">Read more</a>
+                  </span>
+                  </div>
+              </div> -->
+        </div>
+      </section>
+    </div>
+  </section>
 </div>
 <app-flash-message></app-flash-message>
