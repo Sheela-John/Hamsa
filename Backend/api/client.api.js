@@ -189,7 +189,7 @@ async function checkForExistingUser(loginCred) {
     let query =
         [{
             $match: {
-                'empId': loginCred.empId
+                'emial': loginCred.email
             }
         }]
     return new Promise((resolve, reject) => {
@@ -213,6 +213,7 @@ async function getClientDatabyId(clientId) {
     log.debug(component, 'Getting Client Data by Id');
     log.close();
     let [clientErr, clientData] = await handle(Client.findOne({ '_id': clientId }).lean());
+    console.log(clientData)
     let [Err, assignServiceData] = await handle(AssignService.find({ 'packageId': clientData.packageId }).sort({ "date": 1 }).lean());
     var sessionArray = [];
     for (var i = 0; i < assignServiceData.length; i++) {
@@ -224,6 +225,12 @@ async function getClientDatabyId(clientId) {
         }
         sessionArray.push(temp)
     }
+    let [err, branchData] = await handle(Branch.findOne({ _id: clientData.homeBranchId }).lean());
+    let [err1, staffData] = await handle(Staff.findOne({ _id: clientData.staffId }).lean());
+    let [err2, serviceData] = await handle(Service.findOne({ _id: clientData.serviceId }).lean());
+    clientData.homeBranchAddress = branchData.branchAddress;
+    clientData.staffName = staffData.staffName;
+    clientData.serviceName = serviceData.serviceName;
     clientData.session = sessionArray
     if (clientErr) return Promise.reject(clientErr);
     if (lodash.isEmpty(clientData)) return Promise.reject(ERR.NO_RECORDS_FOUND);

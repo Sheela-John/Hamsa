@@ -102,57 +102,7 @@ export class AssignServiceComponent implements OnInit {
   addAssignService() {
     this.router.navigateByUrl('admin/assignService/addEditAssignService')
   }
-  //Get All Branch In Base4App
-  async getAllAssignInBase4App() {
-    const assignService = Parse.Object.extend('AssignService');
-    const query = new Parse.Query(assignService);
-    try {
-      const assignService = await query.find()
-      assignService.forEach(element => {
-        this.assignServiceId.push(element.id);
-      });
-      for (const assignServicehData of assignService) {
-        const client = Parse.Object.extend('Client');
-        const query1 = new Parse.Query(client);
-        query.equalTo('objectId', assignServicehData.get("ClientId"));
-        const clientData = await query1.find();
-     
-
-        const staff = Parse.Object.extend('Staff');
-        const query2 = new Parse.Query(staff);
-        query.equalTo('objectId', assignServicehData.get("StaffId"));
-        const staffData = await query2.find();
-    
-
-        const branch = Parse.Object.extend('Branch');
-        const query3 = new Parse.Query(branch);
-        query.equalTo('objectId', assignServicehData.get("BranchId"));
-        const branchData = await query3.find();
-      
-        this.assignServiceArr.push(
-                    {
-                      "id": assignServicehData.id,
-                      "ClientName":clientData[0].get("ClientName"),
-                      "staffName":staffData[0].get("StaffName"),
-                      "Phone": assignServicehData.get("Phone"),
-                      "Address":assignServicehData.get("Address"),
-                      "SlotTime":assignServicehData.get("SlotTime"),
-                      "Date":this.formatDate(assignServicehData.get("Date"),),
-                      "Service":assignServicehData.get("Sercie"),
-                      "Status":assignServicehData.get("Status"),
-                      "Branch":branchData[0].id,
-                      "BranchName":branchData[0].get("BranchName"),
-                      "StartTime": this.getTime(assignServicehData.get("StartTime")),
-                      "endTime": this.getTime(assignServicehData.get("EndTime"))
-                    }
-                  )
-      }
-    }
-    catch (error) {
-      alert(`Failed to retrieve the object, with error code: ${error.message}`);
-    }
-
-  }
+ 
 
   edit(id) {
 console.log(id)

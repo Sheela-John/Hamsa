@@ -157,6 +157,8 @@ export class AddEditAssignServiceComponent implements OnInit {
   clientData: any;
   public clientList: any=[];
   serviceRequestData: any;
+  assignServiceArray: any=[];
+  clientByIdData: any;
   constructor(private fb: FormBuilder, public StaffService: StaffService,public ClientService: ClientService, private route: ActivatedRoute, public ServiceService: ServiceService, public BranchService: BranchService, public AssignService: AssignService, public ServiceRequestService:ServiceRequestService, private FlashMessageService: FlashMessageService, private router: Router,) {
     Parse.initialize(environment.PARSE_APP_ID, environment.PARSE_JS_KEY,);
     (Parse as any).serverURL = environment.PARSE_SERVER_URL
@@ -167,11 +169,12 @@ export class AddEditAssignServiceComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
+   
     this.initializeassignServiceForm();
+    
     this.getAllStaffs();
-    this.getAllServices();
-    // this.initializeassignServiceBranchForm();
+    this.getAllServices()
+    this.initializeassignServiceBranchForm();
     this.getAllBranch();
     this.getAllClient();
     if (this.startpickerOpened && this.ngxMaterialStartTimepicker)
@@ -189,7 +192,7 @@ export class AddEditAssignServiceComponent implements OnInit {
     if (this.assignServiceId != undefined) {
       this.getAssignServiceById(this.assignServiceId);
     }
-    // this.initializeassignServiceClientForm();
+     this.initializeassignServiceClientForm();
 
     // this.clickClient()
     // this.getAllStaffbase4App()
@@ -298,14 +301,18 @@ export class AddEditAssignServiceComponent implements OnInit {
 
   //getAll Services
   getAllServices() {
+    var arr=[];
     this.ServiceService.getAllServices().subscribe(res => {
       if (res.status) {
         this.serviceData = res.data;
         this.serviceData.forEach(serviceValue => {
           if (serviceValue.status == 0) {
-            this.serviceList.push(serviceValue);
+            arr.push(serviceValue);
           }
         });
+        console.log("arr",arr)
+        this.serviceList=arr;
+        console.log("this.serviceList",this.serviceList)
       }
     })
   }
@@ -350,7 +357,16 @@ export class AddEditAssignServiceComponent implements OnInit {
       }
     })
   }
-
+getAllAssignServceByStaffIdAndDate(data)
+{
+  this.AssignService.getAssignServiceDataByStaffIdAndDate(data).subscribe(res=>{
+if(res.status)
+{
+  this.assignServiceArray=res.data;
+}
+console.log("this.assignServiceArray",this.assignServiceArray)
+  })
+}
   //getAllAssignService For both allClient and allBranch 
   getAllAssignService() {
     this.AssignService.getAllAssignServiceAllClient().subscribe(res => {
@@ -967,96 +983,27 @@ export class AddEditAssignServiceComponent implements OnInit {
     }
 
   }
-  async getClientIdBack4App($event) {
-
-    var clientId = this.assignServiceClientForm.value.clientName
-    const client = Parse.Object.extend('Client');
-
-
-    const query = new Parse.Query(client);
-
-    query.equalTo('objectId', clientId);
-
-    try {
-      const client = await query.get(clientId)
-
-      const ClientId1 = client.get('objectId')
-      const ClientName = client.get('ClientName')
-      const PhoneNumber = client.get('PhoneNumber')
-      const Address = client.get('Address')
-      this.HomeBranch = client.get('HomeBranch')
-      const HomeBranchaddress = client.get('HomeBranchaddress')
-      const NoOfSession = client.get('NoOfSession')
-      const WeeklySession = client.get('WeeklySession')
-      const Amount = client.get('Amount')
-      const StartDate = client.get('StartDate')
-      const staff = client.get('staff')
-      this.addSession = client.get('AddSession')
-      const service = client.get('Service')
-      this.addressLongitude = client.get('ClientAddressLongitude')
-      this.addressLatitude = client.get('ClientAddressLatitude')
-
-
-      this.ClientNameData = ClientName
-
-
-      this.assignServiceClientForm.get('address').patchValue(Address)
-      this.assignServiceClientForm.get('phone').patchValue(PhoneNumber)
-      this.assignServiceClientForm.get('service').patchValue(service)
-
-      this.assignServiceClientForm.get('branchId').patchValue(this.HomeBranch)
-      this.assignServiceClientForm.get('branchAddress').patchValue(HomeBranchaddress)
-      this.handleAddressChange(Address)
-
-      this.addSession.forEach(element => {
-        if ((element.date.toLocaleString("en-CA").slice(0, 10) == this.sdate) && (staff == this.getstaff) && (clientId == clientId)) {
-          this.assignServiceClientForm.get('slot').patchValue(element.slot)
-          this.assignServiceClientForm.get('duration').patchValue(element.duration)
-          this.assignServiceClientForm.get('slotTime').patchValue(element.slotTime)
-
-
-        }
-        // this.addSession.forEach(element => {
-        //   console.log(element.date)
-        //  });
-      });
-
-      // this.addSessionBasedOnSessionCount(NoOfSession)
-      // var staffId 
-      // staffId.target.value = this.staff;
-
-
-    }
-
-    catch (error) {
-      console.error('Error while fetching ToDo', error);
-    }
-    const branch = Parse.Object.extend('Branch');
-    const query1 = new Parse.Query(branch);
-    console.log(this.HomeBranch)
-    query1.equalTo('objectId', this.HomeBranch);
-
-    try {
-      const results = await query1.find();
-
-      for (const branch of results) {
-
-        const BranchAddress = branch.get('BranchAddress')
-        const BranchName = branch.get('BranchName')
-        this.homeBranchLatitude = branch.get('Latitude')
-        this.homeBranchLongitude = branch.get('Longitude')
-        console.log(BranchName)
-        this.branchNamedata = BranchName
-        console.log(this.branchNamedata)
-        this.assignServiceClientForm.get('branchAddress').patchValue(BranchAddress)
-
+  async getClientById(event) {
+    console.log("event",event.target.value)
+    
+    var id=event.target.value;
+    console.log("id",id)
+    this.ClientService.getClientById(id).subscribe(res=>{
+      if(res.status)
+      {
+        this.clientByIdData=res.data;
       }
-
-
-    } catch (error) {
-      console.error('Error while fetching ToDo', error);
-    }
-
+      this.assignServiceClientForm.controls['phone'].patchValue(this.clientByIdData.phoneNumber);
+      this.assignServiceClientForm.get('address').patchValue(this.clientByIdData.address)
+      this.assignServiceClientForm.get('service').patchValue(this.clientByIdData.serviceId)
+      if(this.clientByIdData.homeBranchId)
+      {
+      this.assignServiceClientForm.get('branchType').patchValue(0)
+      }
+      this.assignServiceClientForm.get('branchAddress').patchValue(this.clientByIdData.homeBranchaddress)
+      this.assignServiceClientForm.get('type').patchValue(this.clientByIdData.typeofTreatment)
+      this.handleAddressChange(this.clientByIdData.address)
+    })
   }
   async getotherBranchbyId() {
     console.log(this.assignServiceClientForm.value.otherBranchId)
@@ -1076,8 +1023,6 @@ export class AddEditAssignServiceComponent implements OnInit {
         this.assignServiceClientForm.get('otherBranchAddress').patchValue(BranchAddress)
 
       }
-
-
     } catch (error) {
       console.error('Error while fetching ToDo', error);
     }
@@ -1279,52 +1224,58 @@ export class AddEditAssignServiceComponent implements OnInit {
   async date(e, status) {
     console.log("DAte", e, "this.formatDate(e)", e)
     if (status == 0) {
-      this.AssignServiceDate = this.formatDate(e);
+      this.AssignServiceDate = this.formattedDate(e);
     }
     else {
       this.AssignServiceDate = e;
     }
-    console.log("this.AssignServiceDate", this.AssignServiceDate, this.staffIdData1)
-    this.sdate = new Date(e)
-    console.log(this.sdate)
-    // this.isShowSlotTime = true
-    this.AssignServiceData = []
-    let parseQuery = new Parse.Query('AssignService');
-    parseQuery.contains('StaffId', this.staffIdData1);
-    parseQuery.equalTo('Date', this.sdate);
-    var queryResults = await parseQuery.find();
-    console.log(queryResults);
-    for (let i = 0; i < queryResults.length; i++) {
-      var assignserviceData = {
-        StaffName: queryResults[i].get("StaffName"),
-        ClientName: queryResults[i].get('ClientName'),
-        Address: queryResults[i].get("Address"),
-        Date: queryResults[i].get('Date').toLocaleString("en-CA").slice(0, 10),
-        Phone: queryResults[i].get("Phone"),
-        Service: queryResults[i].get("Service"),
-        StartTime: this.getTime(queryResults[i].get('StartTime')),
-        EndTime: this.getTime(queryResults[i].get('EndTime')),
-        Status: queryResults[i].get("Status"),
-        Action: queryResults[i].id,
-      }
-
-      console.log(assignserviceData)
-      this.AssignServiceData.push(assignserviceData)
-      console.log(this.AssignServiceData)
+    var data={
+      staffId:this.staffIdData1,
+      date:this.AssignServiceDate
     }
+    console.log("data",data)
+    this.getAllAssignServceByStaffIdAndDate(data);
+    // console.log("this.AssignServiceDate", this.AssignServiceDate, this.staffIdData1)
+    // this.sdate = new Date(e)
+    // console.log(this.sdate)
+    // // this.isShowSlotTime = true
+    // this.AssignServiceData = []
+    // let parseQuery = new Parse.Query('AssignService');
+    // parseQuery.contains('StaffId', this.staffIdData1);
+    // parseQuery.equalTo('Date', this.sdate);
+    // var queryResults = await parseQuery.find();
+    // console.log(queryResults);
+    // for (let i = 0; i < queryResults.length; i++) {
+    //   var assignserviceData = {
+    //     StaffName: queryResults[i].get("StaffName"),
+    //     ClientName: queryResults[i].get('ClientName'),
+    //     Address: queryResults[i].get("Address"),
+    //     Date: queryResults[i].get('Date').toLocaleString("en-CA").slice(0, 10),
+    //     Phone: queryResults[i].get("Phone"),
+    //     Service: queryResults[i].get("Service"),
+    //     StartTime: this.getTime(queryResults[i].get('StartTime')),
+    //     EndTime: this.getTime(queryResults[i].get('EndTime')),
+    //     Status: queryResults[i].get("Status"),
+    //     Action: queryResults[i].id,
+    //   }
+
+    //   console.log(assignserviceData)
+    //   this.AssignServiceData.push(assignserviceData)
+    //   console.log(this.AssignServiceData)
+    // }
 
 
-    for (let result of queryResults) {
-      // You access `Parse.Objects` attributes by using `.get`
-      console.log(queryResults[0]);
-    };
+    // for (let result of queryResults) {
+    //   // You access `Parse.Objects` attributes by using `.get`
+    //   console.log(queryResults[0]);
+    // };
 
   }
   parseTime(s) {
     var c = s.split(':');
     return parseInt(c[0]) * 60 + parseInt(c[1]);
   }
-
+//-------------------------------------------------------------------------------------------------------------------------------
   convertHours(mins) {
     var hour = Math.floor(mins / 60);
     var mins: any = mins % 60;

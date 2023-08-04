@@ -16,16 +16,22 @@
                         <select class="border border-gray-300 shadow p-2 w-full rounded"
                             (change)="dividBySlotTime($event)" formControlName="staffId" placeholder="--select--" >
                             <option value="">--select--</option>
-                            <option value="{{branch._id}}" *ngFor="let branch of staffList">
-                                {{branch.staffName}}
+                            <option value="{{staffList[0]._id}}" >
+                                {{staffList[0].staffName}}
+                            </option>
+                            <option value="{{staffList[1]._id}}" >
+                                {{staffList[1].staffName}}
+                            </option>
+                            <option value="{{staffList[2]._id}}" >
+                                {{staffList[2].staffName}}
                             </option>
                         </select>
-                        <select class="border border-gray-300 shadow p-2 w-full rounded"   (change)="dividBySlotTime($event)" formControlName="staffId">
+                        <!-- <select class="border border-gray-300 shadow p-2 w-full rounded"   (change)="dividBySlotTime($event)" formControlName="staffId">
                             <option value="">--select--</option>+
                             <option value="{{role._id}}" *ngFor="let role of staffList">
                                 {{role._id}}
                             </option>
-                        </select>
+                        </select> -->
                     </div>
                     <div>
                         <label for="name" class="block mb-2 font-bold text-gray-600 ">Date</label>
@@ -67,11 +73,14 @@
                                         formControlName="clientName" placeholder="Enter Client Name">
                                         <app-header (searchcriteria)="searchThis($event)"></app-header> -->
                                     <select class="border border-gray-300 shadow p-2 w-full rounded"
-                                        (change)="getClientIdBack4App($event)" formControlName="clientName"
+                                        (change)="getClientById($event)" formControlName="clientName"
                                         placeholder="--select--">
                                         <option value="">--select--</option>
-                                        <option value="{{client._id}}" *ngFor="let client of clientList">
-                                            {{client.clientName}}
+                                        <option value="{{clientList[0]._id}}">
+                                            {{clientList[0].clientName}}
+                                        </option>
+                                        <option value="{{clientList[1]._id}}">
+                                            {{clientList[1].clientName}}
                                         </option>
                                     </select>
                                     <!-- <div class="error-msg-area">
@@ -120,24 +129,24 @@
                                 <div>
                                     <label for="name" class="block mb-2 font-bold text-gray-600 ">Type</label>
                                     <div class="flex items-center mr-4">
-                                        <input id="teal-radio" type="radio" value="0" name="colored-radio"
+                                        <input id="teal-radio" type="radio" value=0 name="colored-radio"
                                             formControlName="patientType" (change)="changeOP($event)"
                                             class="w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 focus:ring-teal-500 dark:focus:ring-teal-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                         <label for="teal-radio"
                                             class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Home
                                         </label>
-                                        <input id="teal-radio" type="radio" value="1" name="colored-radio"
+                                        <input id="teal-radio" type="radio" value=1 name="colored-radio"
                                             formControlName="patientType" (change)="changeOP($event)"
                                             class="w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 focus:ring-teal-500 dark:focus:ring-teal-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                         <label for="teal-radio"
                                             class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">OP
                                         </label>
-                                        <input id="teal-radio" type="radio" value="2" name="colored-radio"
+                                        <input id="teal-radio" type="radio" value=2 name="colored-radio"
                                             formControlName="patientType" (change)="changeOP($event)"
                                             class="w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 focus:ring-teal-500 dark:focus:ring-teal-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 ml-4">
                                         <label for="teal-radio"
                                             class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Online</label>
-                                        <input id="teal-radio" type="radio" value="3" name="colored-radio"
+                                        <input id="teal-radio" type="radio" value=3 name="colored-radio"
                                             formControlName="patientType" (change)="changeOP($event)"
                                             class="w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 focus:ring-teal-500 dark:focus:ring-teal-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 ml-4">
                                         <label for="teal-radio"
@@ -147,7 +156,7 @@
                                         <label for="teal-radio"
                                             class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
                                         </label>
-                                        <input id="teal-radio" type="radio" value="4" name="colored-radio"
+                                        <input id="teal-radio" type="radio" value=4 name="colored-radio"
                                             formControlName="patientType" (change)="changeOP($event)"
                                             class="w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 focus:ring-teal-500 dark:focus:ring-teal-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                         <label for="teal-radio"
@@ -171,13 +180,13 @@
                                 <div>
                                     <label for="name" class="block mb-2 font-bold text-gray-600 ">Select Branch</label>
                                     <div class="flex items-center mr-4">
-                                        <input id="teal-radio" type="radio" value="0" name="colore-radio"
+                                        <input id="teal-radio" type="radio" value=0 name="colore-radio"
                                             formControlName="branchType"
                                             class="w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 focus:ring-teal-500 dark:focus:ring-teal-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                         <label for="teal-radio"
                                             class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Home
                                             Branch</label>
-                                        <input id="teal-radio" type="radio" value="1" name="colore-radio"
+                                        <input id="teal-radio" type="radio" value=1 name="colore-radio"
                                             formControlName="branchType"
                                             class="w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 focus:ring-teal-500 dark:focus:ring-teal-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 ml-4">
                                         <label for="teal-radio"
@@ -197,9 +206,11 @@
                                     <select class="border border-gray-300 shadow p-2 w-full rounded"
                                         formControlName="service">
                                         <option value="">--select--</option>
-                                        <option value="{{serviceList.serviceName}}"
-                                            *ngFor="let serviceList of seviceArr">
-                                            {{serviceList.serviceName}}
+                                        <option value="{{serviceList[0]._id}}">
+                                            {{serviceList[0].serviceName}}
+                                        </option>
+                                        <option value="{{serviceList[1]._id}}">
+                                            {{serviceList[1].serviceName}}
                                         </option>
                                     </select>
                                     <div class="error-msg-area">
@@ -443,27 +454,27 @@
                                         </tr>
                                     </thead>
                                     <tbody class="flex-1 sm:flex-none"
-                                        *ngFor="let assignServiceList of this.AssignServiceData">
+                                        *ngFor="let assignServiceList of this.assignServiceArray">
                                         <tr class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0">
                                             <td class="border-grey-light border hover:bg-gray-100 p-3">
-                                                {{assignServiceList.StaffName}}</td>
+                                                {{assignServiceList.staffName}}</td>
                                             <td class="border-grey-light border hover:bg-gray-100 p-3">
-                                                {{assignServiceList.Date}}
+                                                {{assignServiceList.date}}
                                             </td>
                                             <td class="border-grey-light border hover:bg-gray-100 p-3">
-                                                {{assignServiceList.ClientName}}</td>
+                                                {{assignServiceList.clientName}}</td>
                                             <td class="border-grey-light border hover:bg-gray-100 p-3">
-                                                {{assignServiceList.Phone}}</td>
+                                                {{assignServiceList.phone}}</td>
                                             <td class="border-grey-light border hover:bg-gray-100 p-3">
-                                                {{assignServiceList.Address}}
+                                                {{assignServiceList.address}}
                                             </td>
                                             <td class="border-grey-light border hover:bg-gray-100 p-3">
-                                                {{assignServiceList.Service}}</td>
+                                                {{assignServiceList.serviceName}}</td>
                                             <td class="border-grey-light border hover:bg-gray-100 p-3">
-                                                {{assignServiceList.StartTime}}</td>
+                                                {{assignServiceList.startTime}}</td>
 
                                             <td class="border-grey-light border hover:bg-gray-100 p-3">
-                                                {{assignServiceList.EndTime}}
+                                                {{assignServiceList.endTime}}
                                             </td>
                                             <td class="border-grey-light border hover:bg-gray-100 p-3">
                                                 <button class="btn" style="background-color: rgb(177, 9, 87);"

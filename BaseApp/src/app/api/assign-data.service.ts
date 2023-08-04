@@ -65,4 +65,10 @@ export class AssignDataService {
             return res;
         }), catchError(error => throwError(error)));
     }
+      //Get All Assign Service
+      public getAssignServiceDataByStaffIdAndDate(data): Observable<any> {
+        return this.httpClient.post('assignService/getAssignServiceDataByStaffIdAndDate',data).pipe(tap(res => {
+            return res;
+        }), catchError(error => throwError(error)));
+    }
 }

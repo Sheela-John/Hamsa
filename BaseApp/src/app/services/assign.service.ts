@@ -46,4 +46,8 @@ export class AssignService {
     public getAllAssignService() {
         return this.AssignDataService.getAllAssignService();
     }
+    public getAssignServiceDataByStaffIdAndDate(data)
+    {
+        return this.AssignDataService.getAssignServiceDataByStaffIdAndDate(data);
+    }
 }
