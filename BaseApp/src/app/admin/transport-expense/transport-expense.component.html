@@ -1,39 +1,80 @@
 <div class="main bg-white p-6 rounded-lg shadow-lg">
-    <div class="card">
-        <div class="card-header">
-            <h2 class="card-header heading text-2xl font-bold">Transport Expense</h2>
-            <button class="card-header btn float-right" (click)="addTransportExpense()"><i
-                    class="fa fa-plus"></i>&nbsp;&nbsp;Add</button>
-        </div>
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-header heading text-2xl font-bold">Transport Expense List</h2>
+      <button class="card-header btn float-right" (click)="addTransportExpense()">
+        <i class="fa fa-plus"></i>&nbsp;&nbsp;Add
+      </button>
     </div>
-    <section class="flex items-center justify-center">
-        <div class="container">
-            <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger"
-                class="w-full flex flex-row flex-no-wrap sm:bg-white rounded-lg overflow-hidden sm:shadow-lg my-5">
-                <thead class="text-white">
-                    <tr
-                        class="bg-teal-400 flex flex-col flex-no wrap sm:table-row rounded-l-lg sm:rounded-none mb-2 sm:mb-0">
-                        <th class="p-3 text-left"> Travel Expense Mode</th>
-                        <th class="p-3 text-left">Travel Expense Cost</th>
-                        <th class="p-3 text-left" width="110px"> Action</th>
-                    </tr>
-                </thead>
-                <tbody class="flex-1 sm:flex-none">
-                    <tr class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0"
-                        *ngFor="let travelExpense of travelExpenseArr">
-                        <td class="border-grey-light border hover:bg-gray-100 p-3">{{travelExpense.travelExpenseMode}}
-                        </td>
-                        <td class="border-grey-light border hover:bg-gray-100 p-3">{{travelExpense.travelExpenseCost}}
-                        </td>
-                        <td
-                            class="border-grey-light border hover:bg-gray-100 p-3 text-red-400 hover:text-red-600 hover:font-medium cursor-pointer">
-                            <button class="btn" (click)="editTransportExpense(travelExpense.id)"><i
-                                    class='fa fa-edit'></i></button>&nbsp;&nbsp;
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+  </div>
+  <section>
+    <div class="container">
+      <section id="blog_area" class="pt-5">
+        <div id="masonry">
+          <div class="card" *ngFor="let travelExpense of travelExpenseArr">
+            <div class="card__content">
+              <div class="mt-2 card__content-jcenter rounded-m border border-gray-100 box p-2 h-fit"
+                style="background-color: #2dd4bf">
+                <div class="row">
+                  <div class="row">
+                    <div class="fw-bold col-10 
+            mt-1">
+                      Travel Expense Mode :&nbsp;{{travelExpense.travelExpenseMode}}
+                    </div>
+                    <div class="col-1 mt-2">
+                      <button class="btn float-right" (click)="editTransportExpense(travelExpense._id)" style="
+                  background-color: rgb(253 179 18);
+                  padding: 0px 4px;">
+                        <i class="fa fa-edit fa-xs"></i></button>&nbsp;&nbsp;
+                    </div>
+                  </div>
+                  <div class="row" style="margin-top: -45px;">
+                    <div class="fw-bold col-8 mt-1">
+                      Cost Type :&nbsp;{{getCostTypeString(travelExpense.costType)}}
+                    </div>
+                    <div class="col-1"></div>
+                  </div>
+                  <ul>
+                    <div style="background-color: #163339; padding: 15px;">
+                      <div class="row" style="color: white;">
+                        <div class="col-4">
+                          <div>From (km)</div>
+                          &nbsp;&nbsp;
+                        </div>
+                        <div class="col-4">
+                          <div>To (km)</div>
+                          &nbsp;&nbsp;
+                        </div>
+                        <div class="col-4">
+                          <div>Cost</div>
+                          &nbsp;&nbsp;
+                        </div>
+                      </div>
+                      <li *ngFor="let distance of travelExpense.distance">
+                        <div class="row" style="color: white">
+                          <div class="col-4">
+                            <div>{{ distance.from }}</div>
+                            &nbsp;&nbsp;
+                          </div>
+                          <div class="col-4">
+                            <div>{{ distance.to }}</div>
+                            &nbsp;&nbsp;
+                          </div>
+                          <div class="col-4">
+                            <div>{{ distance.cost }}</div>
+                            &nbsp;&nbsp;
+                          </div>
+                        </div>
+                      </li>
+                    </div>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-    </section>
+      </section>
+    </div>
+  </section>
 </div>
 <app-flash-message></app-flash-message>

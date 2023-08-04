@@ -87,7 +87,6 @@ export class AddEditStaffComponent implements OnInit {
       phone: ['',Validators.required],
       staffRole: ['', Validators.required],
       branchId: ['', Validators.required],
-      // Address: ['', Validators.required]
     })
   }
   //Navigation for Back Button
@@ -131,6 +130,7 @@ export class AddEditStaffComponent implements OnInit {
     this.getAllBranch();
     this.getAllRole();
   }
+
   getAllBranch()
   {
     this.branchService.getAllBranches().subscribe(res=>{
@@ -142,6 +142,7 @@ export class AddEditStaffComponent implements OnInit {
       }
     })
   }
+  
   getAllRole()
   {
     this.roleService.getAllRole().subscribe(res=>{
@@ -164,9 +165,10 @@ export class AddEditStaffComponent implements OnInit {
     })
   }
   addStaff() {
-    this.isStaffFormSubmitted = false;
+    this.isStaffFormSubmitted = true;
     if (this.staffForm.valid) {
      
+
       var data = this.staffForm.value;
 console.log("data",data)
       //save api

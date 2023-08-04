@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { FlashMessageService } from 'src/app/shared/flash-message/flash-message.service';
+import { TransportExpenseService } from 'src/app/services/transportExpense.service';
 import { environment } from 'src/environments/environment';
 import * as Parse from 'parse';
 import { Subject } from 'rxjs';
@@ -12,16 +13,18 @@ import { Subject } from 'rxjs';
 })
 
 export class TransportExpenseComponent {
+  public travelList: any;
   public dtOptions: DataTables.Settings = {};
   public dtTrigger: Subject<any> = new Subject<any>();
   public travelExpenseArr: any = [];
 
-  constructor(private router: Router, public flashMessageService: FlashMessageService) {
+  constructor(private router: Router, public TransportExpenseService: TransportExpenseService, public flashMessageService: FlashMessageService) {
     Parse.initialize(environment.PARSE_APP_ID, environment.PARSE_JS_KEY,);
     (Parse as any).serverURL = environment.PARSE_SERVER_URL
   }
 
   ngOnInit(): void {
+    console.log(this.travelExpenseArr)
     this.dtOptions = {
       pagingType: 'simple_numbers',
       searching: true,
@@ -29,7 +32,9 @@ export class TransportExpenseComponent {
       retrieve: true,
       ordering: false
     }
-    this.getAllTransportExpense();
+    // this.getAllTransportExpense();
+
+    this.getAlltravelExpense()
   }
 
   //Add Transport Expense
@@ -42,23 +47,18 @@ export class TransportExpenseComponent {
     this.router.navigateByUrl('admin/edit-transport-expense/' + id);
   }
 
-  //Get All Transport Expense
-  async getAllTransportExpense() {
-    const travelExpense = Parse.Object.extend('TravelExpense');
-    const query = new Parse.Query(travelExpense);
-    try {
-      const travelExpenseData = await query.find()
-      for (const travelExpense of travelExpenseData) {
-        this.travelExpenseArr.push({
-          id: travelExpense.id,
-          travelExpenseMode: travelExpense.get("travelExpenseMode"),
-          travelExpenseCost: travelExpense.get("travelExpenseCost")
-        })
+  //Get All TravelExpense
+  getAlltravelExpense() {
+    this.TransportExpenseService.getAlltravelExpense().subscribe(res => {
+      if (res.status) {
+        this.travelExpenseArr = res.data;
+        this.dtTrigger.next(null);
+        console.log(this.travelExpenseArr, "this.travelExpenseArr ")
       }
-      this.dtTrigger.next(null);
-    }
-    catch (error) {
-      alert(`Failed to retrieve the object, with error code: ${error.message}`);
-    }
+    })
   }
+  getCostTypeString(costType: number): string {
+    return costType === 0 ? 'Per Km' : 'By Distance';
+  }
+
 }
