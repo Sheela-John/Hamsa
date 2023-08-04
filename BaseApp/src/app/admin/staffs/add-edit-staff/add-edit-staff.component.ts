@@ -61,6 +61,8 @@ export class AddEditStaffComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeStaffForm();
+    this.getAllBranch();
+    this.getAllRole();
     console.log("this.routerData",this.routerData)
     if (this.routerData != undefined) {
       this.getByStaffId(this.routerData);
