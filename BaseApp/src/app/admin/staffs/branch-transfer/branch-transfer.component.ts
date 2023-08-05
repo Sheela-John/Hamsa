@@ -53,6 +53,7 @@ export class BranchTransferComponent implements OnInit {
   public isEnableDisable: boolean = false;
   startDateData: any;
   endDateData: any;
+  public branchTransferType: any;
 
   constructor(private router: Router, private fb: FormBuilder, public branchTransferService: BranchTransferService, public BranchService: BranchService, private flashMessageService: FlashMessageService, private route: ActivatedRoute) {
     this.route.params.subscribe((param) => {
@@ -82,7 +83,7 @@ export class BranchTransferComponent implements OnInit {
     this.branchTransferForm = this.fb.group({
       branchTransferType: [, Validators.required],
       startDate: ['', Validators.required],
-      endDate: ['',],
+      endDate: [''],
       startTime: [''],
       endTime: [''],
       branchId: ['', Validators.required],
@@ -119,18 +120,16 @@ export class BranchTransferComponent implements OnInit {
         this.branchTransferForm.controls['branchId'].patchValue(this.BranchDatavalue.branchId);
         this.branchTransferForm.controls['branchTransferType'].patchValue(this.BranchDatavalue.branchTransferType);
         this.branchTypeChange();
-        if(this.BranchDatavalue.branchTransferType==0)
-        {
-        this.branchTransferForm.controls['startDate'].patchValue(this.formattedDate(this.BranchDatavalue.startDate));
-        this.branchTransferForm.controls['endDate'].patchValue(this.formattedDate(this.BranchDatavalue.endDate));
+        if (this.BranchDatavalue.branchTransferType == 0) {
+          this.branchTransferForm.controls['startDate'].patchValue(this.formattedDate(this.BranchDatavalue.startDate));
+          this.branchTransferForm.controls['endDate'].patchValue(this.formattedDate(this.BranchDatavalue.endDate));
         }
-        else{
+        else {
           this.branchTransferForm.controls['startDate'].patchValue(this.formattedDate(this.BranchDatavalue.startDate));
         }
-        if(this.BranchDatavalue.startDate==this.BranchDatavalue.endDate)
-        {
-           this.branchTransferForm.controls['startTime'].patchValue(this.BranchDatavalue.startTime);
-           this.branchTransferForm.controls['endTime'].patchValue(this.BranchDatavalue.endTime);
+        if (this.BranchDatavalue.startDate == this.BranchDatavalue.endDate) {
+          this.branchTransferForm.controls['startTime'].patchValue(this.BranchDatavalue.startTime);
+          this.branchTransferForm.controls['endTime'].patchValue(this.BranchDatavalue.endTime);
         }
         this.branchTransferForm.controls['branchAddress'].patchValue(this.BranchDatavalue.branchAddress);
       }
@@ -173,7 +172,8 @@ export class BranchTransferComponent implements OnInit {
       this.branchTransferForm.controls['endDate'].setValue('')
     }
     if (this.startDate != 'undefined' && this.endDate != 'undefined') {
-      this.isShowDate = true
+      this.isShowDate = true;
+      this.branchTransferForm.controls['endDate'].setValidators([Validators.required]);
     }
     else {
       this.isShowDate = false;
@@ -192,13 +192,15 @@ export class BranchTransferComponent implements OnInit {
   }
   //dateSame show Time
   dateValueSame() {
-    console.log("this.sDate",this.sDate,this.eDate)
-    if (this.sDate !=undefined && this.eDate != undefined) {
+    console.log("this.sDate", this.sDate, this.eDate)
+    if (this.sDate != undefined && this.eDate != undefined) {
       console.log("fff")
       console.log(this.startDateData, this.endDateData)
       if (this.sDate == this.eDate) {
         console.log(true)
         this.isShowTime = true;
+        this.branchTransferForm.controls['startTime'].setValidators([Validators.required]);
+        this.branchTransferForm.controls['endTime'].setValidators([Validators.required]);
       } else {
         console.log(false)
         this.isShowTime = false
@@ -215,7 +217,7 @@ export class BranchTransferComponent implements OnInit {
   dateSame(eve) {
     this.startDateData = eve
     if (eve != undefined) {
-      this.sDate =this.formattedDate(eve)// eve.toLocaleString("en-ca").slice(0, 10)
+      this.sDate = this.formattedDate(eve)// eve.toLocaleString("en-ca").slice(0, 10)
     }
     this.dateValueSame()
   }
@@ -243,8 +245,8 @@ export class BranchTransferComponent implements OnInit {
     var id = this.routerData
     this.isbranchTransferFormSubmitted = true;
     this.branchTransferForm.value._id = this.routerData;
-    this.branchTransferForm.value.startDate=this.sDate;
-    this.branchTransferForm.value.endDate=this.eDate;
+    this.branchTransferForm.value.startDate = this.sDate;
+    this.branchTransferForm.value.endDate = this.eDate;
     if (this.branchTransferForm.valid) {
       this.branchTransferService.updateBranchTransferById(this.branchTransferForm.value).subscribe(res => {
         if (res.status) {
@@ -257,23 +259,24 @@ export class BranchTransferComponent implements OnInit {
       })
     }
   }
-  addBranchTransfer()
-  {
+  addBranchTransfer() {
+    this.isbranchTransferFormSubmitted = true;
     if (this.branchTransferForm.valid) {
-      this.branchTransferForm.value.staffId=this.StaffId;
-      this.branchTransferForm.value.startDate=this.sDate;
-      this.branchTransferForm.value.endDate=this.eDate;
-      this.branchTransferService.createBranchTransfer(this.branchTransferForm.value).subscribe(res=>
-        {
-          if(res.status)
-          {
-            this.flashMessageService.successMessage("Branch Transfer Created Successfully", 2);
-            this.router.navigateByUrl('admin/staff/viewStaff-branchTransfer/' + this.StaffId)
-          }
-          else{
-            this.flashMessageService.errorMessage("Error  in Creating Branch Transfer", 2);
-          }
-        })
+      console.log("iam inside branch")
+      this.branchTransferForm.value.branchTransferType = this.branchTransferType;
+      console.log("this.branchTransferType", this.branchTransferType)
+      this.branchTransferForm.value.staffId = this.StaffId;
+      this.branchTransferForm.value.startDate = this.sDate;
+      this.branchTransferForm.value.endDate = this.eDate;
+      this.branchTransferService.createBranchTransfer(this.branchTransferForm.value).subscribe(res => {
+        if (res.status) {
+          this.flashMessageService.successMessage("Branch Transfer Created Successfully", 2);
+          this.router.navigateByUrl('admin/staff/viewStaff-branchTransfer/' + this.StaffId)
+        }
+        else {
+          this.flashMessageService.errorMessage("Error  in Creating Branch Transfer", 2);
+        }
+      })
     }
   }
 }

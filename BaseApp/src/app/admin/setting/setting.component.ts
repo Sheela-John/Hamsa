@@ -41,9 +41,9 @@ export class SettingComponent implements OnInit {
 
   //Save Settings
   SaveSettings() {
-    this.isSettingFormSubmitted = false;
+    console.log("i am in")
+    this.isSettingFormSubmitted = true;
     if (this.settingForm.valid) {
-
       var data = this.settingForm.value;
       console.log("data", data)
 

@@ -11,7 +11,7 @@
             <form novalidate="" [formGroup]="branchTransferForm">
                 <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
                     <div>
-                        <label for="name" class="block mb-2 font-bold text-gray-600 ">Select Branch</label>
+                        <label for="name" class="block mb-2 font-bold text-gray-600 ">Select Branch<span class="required">*</span></label>
                         <div class="flex items-center mr-4">
                             <input id="teal-radio" type="radio" [value]=0 formControlName="branchTransferType"
                                 name="branchTransferType" (change)="branchTypeChange()"
@@ -35,7 +35,7 @@
                         </div>
                     </div>
                     <div *ngIf="!ishidden">
-                        <label for="startDate" class="block mb-2 font-bold text-gray-600">Start Date</label>
+                        <label for="startDate" class="block mb-2 font-bold text-gray-600">Start Date<span class="required">*</span></label>
                         <input type="text" class="form-control data-picker-color user-font"
                             formControlName="startDate" bsDatepicker
                             [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
@@ -45,7 +45,7 @@
                             <div *ngIf="branchTransferForm.controls['startDate'].errors && (!branchTransferForm.controls['startDate'].pristine|| isbranchTransferFormSubmitted)"
                                 class="error-msg">
                                 <div [hidden]="!branchTransferForm.controls['startDate'].errors.required">
-                                    Please Enter Time
+                                    Please Enter Start Date
                                 </div>
                             </div>
                         </div>
@@ -95,7 +95,7 @@
                     </div> -->
                     <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3" *ngIf="ishidden ">
                         <div>
-                            <label for="startDate" class="block mb-2 font-bold text-gray-600">Start Date</label>
+                            <label for="startDate" class="block mb-2 font-bold text-gray-600">Start Date<span class="required">*</span></label>
                             <input type="text" class="form-control data-picker-color user-font"
                             formControlName="startDate" bsDatepicker
                             [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
@@ -113,7 +113,7 @@
                             </div>
                         </div>
                         <div>
-                            <label for="endDate" class="block mb-2 font-bold text-gray-600">End Date</label>
+                            <label for="endDate" class="block mb-2 font-bold text-gray-600">End Date<span class="required">*</span></label>
                             <input type="text" class="form-control data-picker-color user-font"
                             formControlName="endDate" bsDatepicker
                             [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
@@ -132,7 +132,7 @@
                 </div>
                 <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3 " *ngIf="isShowTime && ishidden " >
                     <div>
-                        <label for="twitter" class="block mb-2 font-bold text-gray-600">Start Time</label>
+                        <label for="twitter" class="block mb-2 font-bold text-gray-600">Start Time<span class="required">*</span></label>
                         <input class="border border-gray-300 shadow p-2 w-full rounded " type="text"
                             placeholder="Select Start Time" formControlName="startTime" name="startTime"
                             [ngxTimepicker]="startrange"  [format]="24">
@@ -147,7 +147,7 @@
                         </div>
                     </div>
                     <div >
-                        <label for="name" class="block mb-2 font-bold text-gray-600">End Time</label>
+                        <label for="name" class="block mb-2 font-bold text-gray-600">End Time<span class="required">*</span></label>
                         <input class="border border-gray-300 shadow p-2 w-full rounded " type="text"
                             placeholder="Select End Time" formControlName="endTime" name="endTime"
                             [ngxTimepicker]="Endrange" [format]="24" >
@@ -166,7 +166,7 @@
                 <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
                     <div>
                         <label for="branchId" class="block mb-2 font-bold text-gray-600">Branch
-                            Name</label>
+                            Name<span class="required">*</span></label>
                         <select class="border border-gray-300 shadow p-2 w-full rounded"
                             formControlName="branchId" (change)="getBranchbyId($event)">
                             <option value="">--select--</option>+
@@ -187,11 +187,11 @@
                     </div>
                     <div>
                         <label for="address" class="block mb-2 font-bold text-gray-600">Branch
-                            Address</label>
-                        <input class="border border-gray-300 shadow p-2 w-full rounded" id="branchAddress"
+                            Address<span class="required">*</span></label>
+                        <textarea class="border border-gray-300 shadow p-2 w-full rounded" id="branchAddress"
                             rows="3" ngx-google-places-autocomplete [options]='options'
                             formControlName="branchAddress" name="branchAddress" #placesRef="ngx-places"
-                            (onAddressChange)="handleAddressChange($event)" autocomplete="false" />
+                            (onAddressChange)="handleAddressChange($event)" autocomplete="false"></textarea>
                         <div class="error-msg-area">
                             <div *ngIf="branchTransferForm.controls['branchAddress'].errors && (!branchTransferForm.controls['branchAddress'].pristine|| isbranchTransferFormSubmitted)"
                                 class="error-msg">

@@ -11,7 +11,7 @@
             <form class="form" novalidate="" [formGroup]="roleForm">
                 <div class="grid sm:grid-cols-1 md:grid-cols-1 md:gap-3 ">
                     <div>
-                        <label for="name" class="block mb-2 font-bold text-gray-600 ">Role Name</label>
+                        <label for="name" class="block mb-2 font-bold text-gray-600 ">Role Name<span class="required">*</span></label>
                         <input type="text" id="name" name="name" placeholder="Enter Role Name"
                             class="border border-gray-300 shadow p-2 w-full rounded " formControlName="name">
                         <div class="error-msg-area">
@@ -39,7 +39,7 @@
                         <div class="grid sm:grid-cols-1 md:grid-cols-4 md:gap-3 ">
 
                             <div>
-                                <label for="name" class="block mb-2 font-bold text-gray-600 mt-4 ">Slot Name</label>
+                                <label for="name" class="block mb-2 font-bold text-gray-600 mt-4 ">Slot Name<span class="required">*</span></label>
                                 <input type="text" id="name" name="name" placeholder="Enter  Slot Name"
                                     class="border border-gray-300 shadow p-2 w-full rounded "
                                     formControlName="slotName">
@@ -55,7 +55,7 @@
                                 </div>
                             </div>
                             <div>
-                                <label for="twitter" class="block mb-2 font-bold text-gray-600 mt-4">Start Time</label>
+                                <label for="twitter" class="block mb-2 font-bold text-gray-600 mt-4">Start Time<span class="required">*</span></label>
                                 <input class="border border-gray-300 shadow p-2 w-full rounded " type="text"
                                     placeholder="Select Start Time" formControlName="startTime" name="startTime"
                                     [ngxTimepicker]="startrange" [format]="24">
@@ -74,7 +74,7 @@
                                     </div>
                             </div>
                             <div>
-                                <label for="name" class="block mb-2 font-bold text-gray-600 mt-4">End Time</label>
+                                <label for="name" class="block mb-2 font-bold text-gray-600 mt-4">End Time<span class="required">*</span></label>
                                 <input class="border border-gray-300 shadow p-2 w-full rounded " type="text"
                                     placeholder="Select End Time" formControlName="endTime" name="endTime"
                                     [ngxTimepicker]="Endrange" [format]="24" [min]="endMinTime">
