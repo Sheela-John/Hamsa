@@ -4,6 +4,7 @@ const models = require('../models');
 const Security = require("../util/security");
 const serviceRequest = models.ServiceRequest;
 const Service = models.Services;
+const AssignService = models.AssignService;
 const Staff = models.Staff;
 const Client = models.Client;
 const lodash = require('lodash');
@@ -45,6 +46,10 @@ async function create(serviceRequestData) {
     log.debug(component, 'Creating a Services', { 'attach': serviceRequestData }); log.close();
     var saveModel = new serviceRequest(serviceRequestData);
     let [err, serviceRequestDataSaved] = await handle(saveModel.save())
+    if(serviceRequestDataSaved.status==1)
+    {
+        let [error, assignServiceData] = await handle(AssignService.findByIdAndUpdate({ _id: serviceRequestData.assignServiceId }, { "$set": { "status": 2 } }, { new: true, useFindAndModify: false }));
+    }
     if (err) return Promise.reject(err);
     else return Promise.resolve(serviceRequestDataSaved)
 }

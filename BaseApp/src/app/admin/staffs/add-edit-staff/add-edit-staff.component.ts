@@ -170,7 +170,7 @@ export class AddEditStaffComponent implements OnInit {
      
 
       var data = this.staffForm.value;
-console.log("data",data)
+    console.log("data",data)
       //save api
       this.staffService.addStaff(data).subscribe((res) => {
         if (res.status) {

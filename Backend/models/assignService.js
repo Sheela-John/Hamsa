@@ -41,7 +41,8 @@ const assignServiceSchema = new mongoose.Schema({
     type:String
    },
    status:{
-    type:Number
+    type:Number,
+    default:0 //0-upcoming   1-completed 2 - reschedule
    },
    duration:{
     type:String
@@ -56,7 +57,7 @@ const assignServiceSchema = new mongoose.Schema({
     type:String
    },
    typeOfTreatment:{
-    type:String
+    type:Number
    },
    onlineLink:{
     type:String
@@ -83,6 +84,13 @@ const assignServiceSchema = new mongoose.Schema({
     type:Number
    },
    travelDuration:{
+    type:String
+   },
+   rating:{
+    type:Number,
+    default:0
+   },
+   feedBack:{
     type:String
    }
 }, {

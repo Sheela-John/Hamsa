@@ -18,7 +18,7 @@ const clientSchema = new mongoose.Schema({
     type:String
    },
    packageId:{
-    type:String
+    type:Array
    },
    clientHomeBranchLogitude:{
     type:String

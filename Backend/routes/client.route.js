@@ -86,6 +86,12 @@ router.post('/saveRecurringSession', async (req, res, next) => {
         if (err) return next(err);
         else return res.status(200).json({ status: true, data: requestData, message: "Additional Service Request Send Successfully" })
     })
+    .post('/generatePackageId/:id', async (req, res, next) => {
+       // if (lodash.isEmpty(req.body)) return next(ERR.MANDATORY_FIELD_MISSING);
+        let [err, requestData] = await handle(ClientAPI.generatePackageId(req.params.id));
+        if (err) return next(err);
+        else return res.status(200).json({ status: true, data: requestData, message: "Package Id Generated Successfully" })
+    })
     .get('/enableanddisable/:id', async (req, res, next) => {
         let [enableDisableErr, enableDisableData] = await handle(ClientAPI.enableDisableClient(req.params.id));
         if (enableDisableErr) return res.status(200).json(lodash.merge({ status: false }, enableDisableErr));

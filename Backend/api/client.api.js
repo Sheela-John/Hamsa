@@ -86,8 +86,7 @@ async function create(clientData) {
             async.waterfall([
                 saveClient,
                 createLoginCredentials
-                // loginClient
-                // sendEmail,
+            
             ], function (err, result) {
                 if (err) return reject(err);
                 return resolve(result);
@@ -96,6 +95,11 @@ async function create(clientData) {
                 (async () => {
                     clientData.role = "PORTAL_CLIENT";
                     clientData.packageId = Math.floor((Math.random() * 100000000000) + 1);
+                    let [Err, assignServiceData] = await handle(AssignService.find({ 'packageId': clientData.packageId }).lean());
+                    if(assignServiceData.length!=0)
+                    {
+                        clientData.packageId = Math.floor((Math.random() * 100000000000) + 1);
+                    }
                     var saveModel = new Client(clientData);
                     let [err, client] = await handle(saveModel.save())
                     for (var i = 0; i < client.addSession.length; i++) {
@@ -213,9 +217,12 @@ async function getClientDatabyId(clientId) {
     log.debug(component, 'Getting Client Data by Id');
     log.close();
     let [clientErr, clientData] = await handle(Client.findOne({ '_id': clientId }).lean());
-    console.log(clientData)
-    let [Err, assignServiceData] = await handle(AssignService.find({ 'packageId': clientData.packageId }).sort({ "date": 1 }).lean());
-    var sessionArray = [];
+console.log(clientData.packageId)
+var sessionArray = [];
+for(var j=0;j<clientData.packageId.length;j++)
+{
+    let [Err, assignServiceData] = await handle(AssignService.find({ 'packageId': clientData.packageId[j] }).sort({ "date": 1 }).lean());
+    
     for (var i = 0; i < assignServiceData.length; i++) {
         var temp = {
             date: assignServiceData[i].date,
@@ -223,8 +230,12 @@ async function getClientDatabyId(clientId) {
             endTime: assignServiceData[i].endTime,
             duration: assignServiceData[i].duration
         }
+        console.log("temp",temp)
         sessionArray.push(temp)
+        console.log("sessionArray",sessionArray)
     }
+}
+
     let [err, branchData] = await handle(Branch.findOne({ _id: clientData.homeBranchId }).lean());
     let [err1, staffData] = await handle(Staff.findOne({ _id: clientData.staffId }).lean());
     let [err2, serviceData] = await handle(Service.findOne({ _id: clientData.serviceId }).lean());
@@ -450,6 +461,14 @@ async function enableDisableClient(id) {
     if (loginError) return Promise.reject(error);
     return Promise.resolve(data);
 }
+async function generatePackageId(id){
+    console.log(id)
+    var packageIdValue = Math.floor((Math.random() * 100000000000) + 1);
+    console.log(packageIdValue)
+    let [err2, clientData] = await handle(Client.findOneAndUpdate({ _id: id,  }, { $push: { 'packageId':packageIdValue } }, { new: true, useFindAndModify: false }).lean());
+    console.log("clientData",clientData)
+
+}
 module.exports = {
     create: create,
     getClientDatabyId: getClientDatabyId,
@@ -458,5 +477,6 @@ module.exports = {
     sendOTP: sendOTP,
     requestAdditionalService: requestAdditionalService,
     saveRecurringSession: saveRecurringSession,
-    enableDisableClient: enableDisableClient
+    enableDisableClient: enableDisableClient,
+    generatePackageId:generatePackageId
 }

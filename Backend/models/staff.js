@@ -32,6 +32,9 @@ const staffSchema = new mongoose.Schema({
    isDeleted:{
     type:Number,
     default:0
+   },
+   role:{
+    type:String
    }
 }, {
     collection: 'staff',

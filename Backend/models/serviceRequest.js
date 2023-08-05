@@ -19,7 +19,9 @@ const serviceRequestSchema = new mongoose.Schema({
    serviceId:{
     type:String
    },
-
+   assignServiceId:{
+    type:String
+   }
 }, {
     collection: 'serviceRequest',
     versionKey: false,

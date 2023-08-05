@@ -43,18 +43,6 @@ const handle = (promise) => {
 /* Create Branch */
 async function create(branchData) {
     log.debug(component, 'Creating a Branch', { 'attach': branchData }); log.close();
-    const options = {
-        provider: 'google',
-        httpAdapter: 'https',
-        // Optional depending on the providers
-        // fetch: customFetchImplementation,
-        apiKey: 'AIzaSyCX_9dtirFHcsQY8zjjR86cettocdHOT50', // for Mapquest, OpenCage, Google Premier
-        formatter: null // 'gpx', 'string', ...
-    };
-    const geocoder = NodeGeocoder(options);
-    const res = await geocoder.geocode(branchData.branchAddress);
-    branchData['latitude'] = res[0].latitude;
-    branchData['longitude'] = res[0].longitude;
     var saveModel = new Branch(branchData);
     let [err, branchDataSaved] = await handle(saveModel.save())
     if (err) return Promise.reject(err);

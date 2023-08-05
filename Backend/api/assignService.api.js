@@ -100,10 +100,10 @@ const assignServiceClient = async (assignServiceData) => {
                     latitude: res[0].latitude,
                     longitude: res[0].longitude
                 }
-           
+
                 var saveModel = new Client(clientData);
                 let [err, clientDataSaved] = await handle(saveModel.save())
-         
+
                 if (err) return Promise.reject(err);
                 assignServiceData['clientId'] = clientDataSaved._id;
                 assignServiceData['bookedCount'] = 1;
@@ -123,7 +123,7 @@ const assignServiceClient = async (assignServiceData) => {
                 saveData.save().then((assignService) => {
                     log.debug(component, 'Saved Assign Service successfully');
                     log.close();
-               
+
                     return resolve(assignService);
                 }).catch((err) => {
                     log.error(component, 'Error while saving Assign Service data', { attach: err });
@@ -1015,9 +1015,9 @@ const getAssignedServicesofBranchById = async (serviceBranchId) => {
 const updateAssignService = async function (datatoupdate) {
     log.debug(component, 'Update Assinged Service fot Client', { 'attach': datatoupdate }); log.close();
     let assignServiceId = datatoupdate.assignServiceId;
-    let[err, travelDistanceValue]=await handle(travelDistance(datatoupdate));
-    datatoupdate.travelDistanceinKM=travelDistanceValue.distance;
-    datatoupdate.travelDuration=travelDistanceValue.duration;
+    let [err, travelDistanceValue] = await handle(travelDistance(datatoupdate));
+    datatoupdate.travelDistanceinKM = travelDistanceValue.distance;
+    datatoupdate.travelDuration = travelDistanceValue.duration;
     let [clientErr, clientData] = await handle(AssignService.findOneAndUpdate({ "_id": assignServiceId }, datatoupdate, { new: true, useFindAndModify: false }))
     if (clientErr) return Promise.reject(clientErr);
     else return Promise.resolve(clientData);
@@ -1031,17 +1031,16 @@ async function getAssignServiceDataByStaffIdAndDate(data) {
     let someDate = new Date(data.date);
     let copiedAppointmentDate = new Date(someDate.getTime());
     let [Err, assignServiceData] = await handle(AssignService.find({ 'staffId': data.staffId, date: copiedAppointmentDate }).lean());
-    if(assignServiceData.length!=0)
-    {
-    for (var i = 0; i < assignServiceData.length; i++) {
-        let [err, clientData] = await handle(Client.findOne({ _id: assignServiceData[i].clientId }).lean());
-        let [err1, staffData] = await handle(Staff.findOne({ _id: assignServiceData[i].staffId }).lean());
-        let [err2, serviceData] = await handle(Service.findOne({ _id: assignServiceData[i].serviceId }).lean());
-        assignServiceData[i].clientName = clientData.clientName;
-        assignServiceData[i].staffName = staffData.staffName;
-        assignServiceData[i].serviceName = serviceData.serviceName;
+    if (assignServiceData.length != 0) {
+        for (var i = 0; i < assignServiceData.length; i++) {
+            let [err, clientData] = await handle(Client.findOne({ _id: assignServiceData[i].clientId }).lean());
+            let [err1, staffData] = await handle(Staff.findOne({ _id: assignServiceData[i].staffId }).lean());
+            let [err2, serviceData] = await handle(Service.findOne({ _id: assignServiceData[i].serviceId }).lean());
+            assignServiceData[i].clientName = clientData.clientName;
+            assignServiceData[i].staffName = staffData.staffName;
+            assignServiceData[i].serviceName = serviceData.serviceName;
+        }
     }
-}
     if (Err) return Promise.reject(Err);
     if (lodash.isEmpty(assignServiceData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(assignServiceData);
@@ -1055,7 +1054,8 @@ async function getSlotsForAssignService(data) {
     var slotTime = [];
     var temp;
     let [err2, bookedSlots] = await handle(getAssignServiceDataByStaffIdAndDate(data));
-    var typeOfTreamentArray = ["1", "3", "4"];
+
+    var typeOfTreamentArray = [1, 3, 4];
     for (var i = 0; i < roleData.slots.length; i++) {
         if (roleData.slots[i]._id == data.slotId) {
             temp = {
@@ -1077,65 +1077,98 @@ async function getSlotsForAssignService(data) {
         }
     }
     var count = 0;
-    if(bookedSlots)
-    {
-    for (var i = 0; i < bookedSlots.length; i++) {
-        if (typeOfTreamentArray.includes(bookedSlots[i].typeOfTreatment)) {
-            count = count + 1
+    if (bookedSlots) {
+        for (var i = 0; i < bookedSlots.length; i++) {
+            if (typeOfTreamentArray.includes(bookedSlots[i].typeOfTreatment)) {
+                count = count + 1
+            }
         }
     }
-}
-    if(bookedSlots)
-    {
-    for (var i = 0; i < bookedSlots.length; i++) {
-        if (bookedSlots[i].date == new Date(data.date)) {
-            if (typeOfTreamentArray.includes(data.typeOfTreatment)) {
-                for (var j = 0; j < final.length; j++) {
-                    var start = bookedSlots[i].startTime.split(' ')[0];
-                    var end = bookedSlots[i].endTime.split(' ')[0];
-                    if (final[j].slot.includes(start) || final[j].slot.includes(end)) {
+    if (bookedSlots) {
+        for (var i = 0; i < bookedSlots.length; i++) {
+            if (bookedSlots[i].date == new Date(data.date)) {
+                if (typeOfTreamentArray.includes(data.typeOfTreatment)) {
+                    for (var j = 0; j < final.length; j++) {
+                        var start = bookedSlots[i].startTime.split(' ')[0];
+                        var end = bookedSlots[i].endTime.split(' ')[0];
+                        var bHr = (start.split(':')[0]);
+                        var bMin = (start.split(':')[1]);
+
+                        var AST = Number(bHr + bMin);
+                        var bHr1 = (end.split(':')[0]);
+                        var bMin1 = (end.split(':')[1]);
+
+                        var AET = Number(bHr1 + bMin1);
+                        if (bookedSlots[i].typeOfTreatment == 2) {
+                            AET = AET + 15;
+                        }
+                        var sHr = (final[j].slot.split('-')[0].split(':')[0]);
+                        var sMin = (final[j].slot.split('-')[0].split(':')[1]);
+                        var eHr = (final[j].slot.split('-')[1].split(':')[0])
+                        var eMin = (final[j].slot.split('-')[1].split(':')[1])
+
+
+                        var IST = Number(sHr + sMin);
+                        var IET = Number(eHr + eMin);
                         if (count != 0 && count <= 3) {
                             final[j].bookedStatus = 0;
                         }
                         else {
-                            var temp = final[j].slot.split('-')[0]
-                            var temp1=final[j].slot.split('-')[1]
-                            if (temp.includes(end) || temp1.includes(start)) {
-                                final[j].bookedStatus = 0;
-
-                            }
-                            else {
-                                final[j].bookedStatus = 1;
+                            for (var x = AST; x <= AET; x++) {
+                                if (x >= IST && x <= IET) {
+                                    var temp = final[j].slot.split('-')[0]
+                                    var temp1 = final[j].slot.split('-')[1]
+                                    if (IET == AST || IST == AET) {
+                                        final[j].bookedStatus = 0;
+                                    }
+                                    else {
+                                        final[j].bookedStatus = 1;
+                                    }
+                                }
                             }
                         }
                     }
-                    else {
-                        final[j].bookedStatus = 0;
-                    }
+
+
                 }
+                else {
+                    for (var j = 0; j < final.length; j++) {
+                        var start = bookedSlots[i].startTime.split(' ')[0];
+                        var end = bookedSlots[i].endTime.split(' ')[0];
+                        var bHr = (start.split(':')[0]);
+                        var bMin = (start.split(':')[1]);
+                        var AST = Number(bHr + bMin);
+                        var bHr1 = (end.split(':')[0]);
+                        var bMin1 = (end.split(':')[1]);
+                        var AET = Number(bHr1 + bMin1);
+                        if (bookedSlots[i].typeOfTreatment == 2) {
+                            AET = AET + 15;
+                        }
+                        var sHr = (final[j].slot.split('-')[0].split(':')[0]);
+                        var sMin = (final[j].slot.split('-')[0].split(':')[1]);
+                        var eHr = (final[j].slot.split('-')[1].split(':')[0])
+                        var eMin = (final[j].slot.split('-')[1].split(':')[1])
 
-            }
-            else {
-                for (var j = 0; j < final.length; j++) {
-                    var start = bookedSlots[i].startTime.split(' ')[0];
-                    var end = bookedSlots[i].endTime.split(' ')[0];
-                    if (final[j].slot.includes(start) || final[j].slot.includes(end)) {
-                        var temp = final[j].slot.split('-')[0]
-                        if (temp.includes(end)) {
-                            final[j].bookedStatus = 0;
+
+                        var IST = Number(sHr + sMin);
+                        var IET = Number(eHr + eMin);
+                        for (var x = AST; x <= AET; x++) {
+                            if (x >= IST && x <= IET) {
+                                var temp = final[j].slot.split('-')[0]
+                                var temp1 = final[j].slot.split('-')[1]
+                                if (IET == AST || IST == AET) {
+                                    final[j].bookedStatus = 0;
+                                }
+                                else {
+                                    final[j].bookedStatus = 1;
+                                }
+                            }
                         }
-                        else {
-                            final[j].bookedStatus = 1;
-                        }
-                    }
-                    else {
-                        final[j].bookedStatus = 0;
                     }
                 }
             }
         }
     }
-}
     if (err1) return Promise.reject(err1);
     if (lodash.isEmpty(final)) return reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(final);
@@ -1175,7 +1208,6 @@ var makeTimeIntervals = function (start_Time, end_Time, increment) {
 const pad = function (n) { return (n < 10) ? '0' + n.toString() : n; };
 
 const travelDistance = async (data) => {
-   console.log("inside")
     return new Promise((resolve, reject) => {
         const options = {
             method: 'POST',
@@ -1206,17 +1238,16 @@ const travelDistance = async (data) => {
             json: true //Parse the JSON string in the response
         };
         request(options, function (error, response, body) {
-            if (error){
-            console.log(error);
-             return reject(error);
+            if (error) {
+                return reject(error);
             }
             log.debug('Travel Distance response', { attach: response.body }); log.close();
             (async () => {
-                var value={
+                var value = {
                     duration: response.body.routes[0].duration,
-                    distance:response.body.routes[0].distanceMeters / 1000
-                }  
-               return resolve(value)
+                    distance: response.body.routes[0].distanceMeters / 1000
+                }
+                return resolve(value)
             })();
         });
     });
@@ -1242,5 +1273,5 @@ module.exports = {
     updateAssignService: updateAssignService,
     getAssignServiceDataByStaffIdAndDate: getAssignServiceDataByStaffIdAndDate,
     getSlotsForAssignService: getSlotsForAssignService,
-    travelDistance:travelDistance
+    travelDistance: travelDistance
 }
