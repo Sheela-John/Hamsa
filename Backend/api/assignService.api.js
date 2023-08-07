@@ -1015,10 +1015,18 @@ const getAssignedServicesofBranchById = async (serviceBranchId) => {
 const updateAssignService = async function (datatoupdate) {
     log.debug(component, 'Update Assinged Service fot Client', { 'attach': datatoupdate }); log.close();
     let assignServiceId = datatoupdate.assignServiceId;
+    delete datatoupdate.assignServiceId;
+    console.log(datatoupdate)
+    if(datatoupdate.slatitude)
+    {
     let [err, travelDistanceValue] = await handle(travelDistance(datatoupdate));
     datatoupdate.travelDistanceinKM = travelDistanceValue.distance;
     datatoupdate.travelDuration = travelDistanceValue.duration;
+    }
+    
+    console.log("assignServiceId",assignServiceId,datatoupdate)
     let [clientErr, clientData] = await handle(AssignService.findOneAndUpdate({ "_id": assignServiceId }, datatoupdate, { new: true, useFindAndModify: false }))
+    console.log("clientData",clientData)
     if (clientErr) return Promise.reject(clientErr);
     else return Promise.resolve(clientData);
 }
