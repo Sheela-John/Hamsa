@@ -21,6 +21,9 @@ const serviceRequestSchema = new mongoose.Schema({
    },
    assignServiceId:{
     type:String
+   },
+   reason:{
+    type:String
    }
 }, {
     collection: 'serviceRequest',
