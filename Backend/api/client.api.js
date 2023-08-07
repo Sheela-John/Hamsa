@@ -463,7 +463,6 @@ async function saveRecurringSession(data) {
     var slotArr = [];
     for (var i = 0; i < dateSlot.length; i++) {
         let temp = {
-
             "staffId": data.staffId,
             "date": dateSlot[i],
             "slotId": data.slotId,
@@ -489,7 +488,7 @@ function formattedDate(date) {
         month = '0' + month;
     if (day.length < 2)
         day = '0' + day;
-    return [year, month, day].join('-');
+    return [day, month, year].join('-');
 }
 async function enableDisableClient(id) {
     // clientApi.clientDetails(req, 'DELETE SPOC');
