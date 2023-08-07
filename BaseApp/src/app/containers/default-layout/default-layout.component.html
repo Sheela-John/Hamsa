@@ -8,9 +8,9 @@
             <div class="h-16 mt-4 w-full flex items-center">
                 <img src="assets/images/Logo.png" alt="#">
             </div>
-            <ul class="sidenav-nav mt-10">
+            <ul class="sidenav-nav">
                 <li *ngFor="let data of navData"
-                    class="sidenav-nav-item flex w-full justify-between text-gray-300 hover:text-gray-500 cursor-pointer items-center mb-6">
+                    class="sidenav-nav-item flex w-full justify-between text-gray-300 hover:text-gray-500 cursor-pointer items-center mb-3">
                     <div class="flex items-center">
                         <a class="sidenav-nav-link" [routerLink]="[data.url]" routerLinkActive="active"
                             [routerLinkActiveOptions]="{ exact: true }">
@@ -22,7 +22,7 @@
                     </div>
                 </li>
                 <li
-                    class="sidenav-nav-item flex w-full justify-between text-gray-300 hover:text-gray-500 cursor-pointer items-center mb-6">
+                    class="sidenav-nav-item flex w-full justify-between text-gray-300 hover:text-gray-500 cursor-pointer items-center mb-3">
                     <div class="flex items-center">
                         <a class="sidenav-nav-link" routerLink="/auth/login" routerLinkActive="active"
                             [routerLinkActiveOptions]="{ exact: true }">
