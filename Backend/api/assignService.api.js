@@ -1017,7 +1017,7 @@ const updateAssignService = async function (datatoupdate) {
     let assignServiceId = datatoupdate.assignServiceId;
     delete datatoupdate.assignServiceId;
     console.log(datatoupdate)
-    if(datatoupdate.slatitude)
+    if((datatoupdate.slatitude) || (datatoupdate.elatitude))
     {
     let [err, travelDistanceValue] = await handle(travelDistance(datatoupdate));
     datatoupdate.travelDistanceinKM = travelDistanceValue.distance;

@@ -269,14 +269,15 @@ const UpdateClient = async function (datatoupdate) {
     delete datatoupdate._id
     let [Clienterr, client] = await handle(Client.findOne({ "_id": clientId }))
   console.log("client",client)
+  let clientData;
   for(var z=0;z<client.packageId.length;z++)
   {
     if(client.packageId.includes(datatoupdate.packageId))
     {
-        let [err, clientData] = await handle(Client.findOneAndUpdate({ "_id": clientId }, datatoupdate, { new: true, useFindAndModify: false }))
+        clientData = await handle(Client.findOneAndUpdate({ "_id": clientId }, datatoupdate, { new: true, useFindAndModify: false }))
     }
     else{
-        let [err2, clientData] = await handle(Client.findOneAndUpdate({ _id: clientId,  }, { $push: { 'packageId':packageIdValue } }, { new: true, useFindAndModify: false }).lean());
+        clientData = await handle(Client.findOneAndUpdate({ _id: clientId,  }, { $push: { 'packageId':packageIdValue } }, { new: true, useFindAndModify: false }).lean());
     }
   }
   //   let [err, clientData] = await handle(Client.findOneAndUpdate({ "_id": clientId }, datatoupdate, { new: true, useFindAndModify: false }))
@@ -336,8 +337,8 @@ else
         let [err2, assignServiceData] = await handle(saveAssignData.save())
     }
 }
-    if (err) return Promise.reject(err);
-    else return Promise.resolve(clientData);
+  //  if (err) return Promise.reject(err);
+    return Promise.resolve(clientData);
 }
 
 const sendOTP = async function (data) {
