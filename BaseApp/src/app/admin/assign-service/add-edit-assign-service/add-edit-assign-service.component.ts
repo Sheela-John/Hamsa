@@ -111,21 +111,22 @@ export class AddEditAssignServiceComponent implements OnInit {
   public slotEndTime: any;
   public showAppointmentTable: boolean = false;
   assignSercieDataArr: any;
+  duration: any;
 
   constructor(private fb: FormBuilder, public StaffService: StaffService, public ClientService: ClientService, private route: ActivatedRoute, public ServiceService: ServiceService, public BranchService: BranchService, public AssignService: AssignService, public ServiceRequestService: ServiceRequestService, private FlashMessageService: FlashMessageService, private router: Router, private RoleService: RoleService) {
     this.route.params.subscribe((param) => {
       this.assignServiceId = param['assignServiceId'];
-      console.log(this.assignServiceId,"this.assignServiceId ",this.serviceRequestId,"this.serviceRequestId")
     })
   }
 
   ngOnInit(): void {
     this.initializeassignServiceForm();
     this.initializeassignServiceClientForm();
+    this.getAllBranch();
     this.getAllStaffs();
     this.getAllClient();
-    this.getAllServices()
-    this.getAllBranch();
+    this.getAllServices();
+
     if (this.startpickerOpened && this.ngxMaterialStartTimepicker)
       this.ngxMaterialStartTimepicker.close();
     if (this.endpickerOpened && this.ngxMaterialEndTimepicker)
@@ -232,7 +233,6 @@ export class AddEditAssignServiceComponent implements OnInit {
     this.AssignService.getAssignServiceDataByStaffIdAndDate(data).subscribe(res => {
       if (res.status) {
         this.assignServiceArray = res.data;
-        console.log(this.assignServiceArray, "this.assignServiceArray")
       }
 
     })
@@ -268,6 +268,10 @@ export class AddEditAssignServiceComponent implements OnInit {
   //onChangeClient
   onChangeClient(event) {
     var id = event[0]._id
+    this.getClientById(id)
+  }
+
+  getClientById(id) {
     this.ClientService.getClientById(id).subscribe(res => {
       if (res.status) {
         this.homeBranchAdress = res.data.homeBranchAddress
@@ -284,7 +288,6 @@ export class AddEditAssignServiceComponent implements OnInit {
 
   //ChooseHomeBranch
   ChooseHomeBranch(e) {
-    console.log(e)
     if (e == 0) {
       this.assignServiceClientForm.patchValue({
         branchId: this.homeBranchId,
@@ -361,6 +364,7 @@ export class AddEditAssignServiceComponent implements OnInit {
 
   //getAll Branch 
   getAllBranch() {
+    this.branchList = [];
     this.BranchService.getAllBranches().subscribe(res => {
       if (res.status) {
         this.branchData = res.data;
@@ -379,12 +383,17 @@ export class AddEditAssignServiceComponent implements OnInit {
   //onChange Branch by Id to patch branch address
   onChangegetBranchbyId(e) {
     var branchId = e.target.value
+    this.getBranchbyId(branchId)
+  }
+
+  getBranchbyId(branchId) {
     this.BranchService.getBranchbyId(branchId).subscribe(res => {
       if (res.status) {
         var branchAddress = res.data.branchAddress
         this.assignServiceClientForm.patchValue({
           branchAddress: branchAddress
         })
+
       }
     })
   }
@@ -404,6 +413,10 @@ export class AddEditAssignServiceComponent implements OnInit {
   //on change getotherBranchbyId
   getotherBranchbyId(e) {
     var branchId = e.target.value
+    this.getOtherBranchbyId(branchId)
+  }
+
+  getOtherBranchbyId(branchId) {
     this.BranchService.getBranchbyId(branchId).subscribe(res => {
       if (res.status) {
         var branchAddress = res.data.branchAddress
@@ -420,25 +433,25 @@ export class AddEditAssignServiceComponent implements OnInit {
     this.getStaffById(this.StaffId);
   }
 
-  getStaffById(id){
-  this.StaffService.getStaffById(id).subscribe(res => {
-    if (res.status) {
-      var staffRoleId = res.data.staffRole
-      this.RoleService.getRolebyId(staffRoleId).subscribe(res => {
-        if (res.status) {
-          var roleData = res.data
-          this.slotName = []
-          roleData.slots.forEach(element => {
-            this.slotName.push({
-              slotName: element.slotName,
-              _id: element._id
-            })
-          });
-        }
-      })
-    }
-  })
-}
+  getStaffById(id) {
+    this.StaffService.getStaffById(id).subscribe(res => {
+      if (res.status) {
+        var staffRoleId = res.data.staffRole
+        this.RoleService.getRolebyId(staffRoleId).subscribe(res => {
+          if (res.status) {
+            var roleData = res.data
+            this.slotName = []
+            roleData.slots.forEach(element => {
+              this.slotName.push({
+                slotName: element.slotName,
+                _id: element._id
+              })
+            });
+          }
+        })
+      }
+    })
+  }
 
   //Onchange Slot 
   Slot(event) {
@@ -449,21 +462,21 @@ export class AddEditAssignServiceComponent implements OnInit {
       staffId: this.StaffId,
       slotId: id
     }
+    this.getSlotByStaffIdAndSlotId(data)
+  }
+
+  getSlotByStaffIdAndSlotId(data) {
     this.AssignService.getSlotByStaffIdAndSlotId(data).subscribe(res => {
       if (res.status) {
         this.startTime = res.data.startTime
         this.endTime = res.data.endTime
-
       }
-
     })
   }
 
-
-
   //On select the duration
   dividingSlot(event) {
-    var duration = event.target.value
+    this.duration = event.target.value
     var formattedDates = this.formattedDate(this.assignServiceForm.value.date)
     var data = {
       staffId: this.assignServiceForm.value.staffId,
@@ -472,6 +485,10 @@ export class AddEditAssignServiceComponent implements OnInit {
       duration: this.assignServiceClientForm.value.duration,
       typeOfTreatment: this.assignServiceClientForm.value.typeOfTreatment
     }
+    this.getSlotsForAssignService(data);
+  }
+
+  getSlotsForAssignService(data) {
     this.AssignService.getSlotsForAssignService(data).subscribe(res => {
       if (res.status) {
         this.timeInterval = res.data
@@ -479,7 +496,6 @@ export class AddEditAssignServiceComponent implements OnInit {
     })
     this.isShowSlotTime = true
   }
-
 
 
   //slotSelection
@@ -516,19 +532,18 @@ export class AddEditAssignServiceComponent implements OnInit {
       startTime: this.slotStartTime,
       endTime: this.slotEndTime
     }
-   this.AssignService.createAssignServiceClient(data).subscribe(res =>{
-    if(res.status){
-      console.log(res.data,"uu")
-      this.FlashMessageService.successMessage("Assign service Client Created Successfully", 2);
-      this.router.navigateByUrl("admin/assignService")
-    }
-    else{
-      this.FlashMessageService.errorMessage("Assign service Client Created Failed", 2);
-    }
-   })   
+    this.AssignService.createAssignServiceClient(data).subscribe(res => {
+      if (res.status) {
+        this.FlashMessageService.successMessage("Assign service Client Created Successfully", 2);
+        this.router.navigateByUrl("admin/assignService")
+      }
+      else {
+        this.FlashMessageService.errorMessage("Assign service Client Created Failed", 2);
+      }
+    })
   }
 
-  
+
 
 
   //editAssignServiceClient by Id
@@ -544,45 +559,102 @@ export class AddEditAssignServiceComponent implements OnInit {
   //getAssignServiceById
 
   getAssignServiceById(id) {
-    // console.log(id,"hh")
-    // this.AssignService.getAssignServiceById(id).subscribe(res => {
-    //   if (res.status) {
-    //     this.assignSercieDataArr = res.data;
-    //     console.log(this.assignSercieDataArr,"this.assignSercieDataArr")
-    //     this.assignServiceForm.patchValue({
-    //       staffId: this.assignSercieDataArr.staffId,
-    //       date: this.formatDate(this.assignSercieDataArr.date),
-    //     })
-    //     if(this.assignSercieDataArr.staffId != ''){
-    //       this.getStaffById(this.assignSercieDataArr.staffId)
-    //     }
-    //     this.clientArr =[]
-    //     this.ClientService.getClientById(this.assignSercieDataArr.clientId).subscribe(res =>{
-    //       if(res.status){
-    //         console.log(res.data,"lll")
-    //         this.clientArr.push({
-    //           _id: res.data._id,
-    //           clientName: res.data.clientName
-    //         }
-    //         )
+    this.AssignService.getAssignServiceById(id).subscribe(res => {
+      if (res.status) {
+        this.assignSercieDataArr = res.data;
+        this.assignServiceForm.patchValue({
+          staffId: this.assignSercieDataArr.staffId,
+          date: this.formatDate(this.assignSercieDataArr.date),
+        })
+        if (this.assignSercieDataArr.staffId != '') {
+          this.getStaffById(this.assignSercieDataArr.staffId)
+        }
+        if (this.assignSercieDataArr.typeOfTreatment != '') {
+          this.changeOP(this.assignSercieDataArr.typeOfTreatment)
+        }
+        if (this.assignSercieDataArr.slot != '') {
+          this.AssignServiceDate = this.formatDate(this.assignSercieDataArr.date)
+          var datas = {
+            staffId: this.assignSercieDataArr.staffId,
+            slotId: this.assignSercieDataArr.slot
+          }
+          this.getSlotByStaffIdAndSlotId(datas)
+        }
 
-    //       }
-    //       this.assignServiceClientForm.patchValue({
-    //         clientId:this.clientArr 
-    //       })
-    //     })
-    //     this.assignServiceClientForm.patchValue({
-    //       duration:this.assignSercieDataArr.duration,
-    //       branchType:this.assignSercieDataArr.branchType,
-    //       branchId:this.assignSercieDataArr.branchId,
-    //       serviceId:this.assignSercieDataArr.serviceId,
-    //       slot:this.assignSercieDataArr.slot,
-    //       typeOfTreatment:this.assignSercieDataArr.typeOfTreatment
+        if (this.assignSercieDataArr.duration != '') {
+          var formattedDates = this.formattedDate(this.assignSercieDataArr.date)
+          var data = {
+            staffId: this.assignSercieDataArr.staffId,
+            date: formattedDates,
+            slotId: this.assignSercieDataArr.slot,
+            duration: this.assignSercieDataArr.duration,
+            typeOfTreatment: this.assignSercieDataArr.typeOfTreatment
+          }
+          this.getSlotsForAssignService(data);
+        }
+        this.clientArr = []
+        this.ClientService.getClientById(this.assignSercieDataArr.clientId).subscribe(res => {
+          if (res.status) {
+            this.clientArr.push({
+              _id: res.data._id,
+              clientName: res.data.clientName
+            }
+            )
+          }
+          this.assignServiceClientForm.patchValue({
+            clientId: this.clientArr
+          })
+        })
+        if (this.assignSercieDataArr.opType != '') {
+          let type = this.assignSercieDataArr.opType
+          if (type == 1) {
+            this.typeSelection = true;
+            this.getAllBranch();
+            this.assignServiceClientForm.patchValue({
+              otherBranchId: this.assignSercieDataArr.otherBranchId
+            })
+            this.getOtherBranchbyId(this.assignSercieDataArr.otherBranchId)
+          }
+          else {
+            this.typeSelection = false
+          }
+        }
+        if (this.assignSercieDataArr.branchType == 0) {
+          this.branchList = []
+          this.BranchService.getBranchbyId(this.assignSercieDataArr.branchId).subscribe(res => {
+            if (res.status) {
+              this.branchList.push({
+                _id: res.data._id,
+                branchName: res.data.branchName
+              });
 
-    //     })
+            }
+            this.assignServiceClientForm.patchValue({
+              branchId: this.assignSercieDataArr.branchId
+            })
+            this.getBranchbyId(this.assignSercieDataArr.branchId)
+          })
+        }
+        else {
+          this.getAllBranch();
+          this.assignServiceClientForm.patchValue({
+            branchId: this.assignSercieDataArr.branchId
+          })
+          this.getBranchbyId(this.assignSercieDataArr.branchId)
+        }
 
-    //   }
-    // })
+        this.assignServiceClientForm.patchValue({
+          duration: this.assignSercieDataArr.duration,
+          branchType: this.assignSercieDataArr.branchType,
+          // branchId: this.assignSercieDataArr.branchId,
+          serviceId: this.assignSercieDataArr.serviceId,
+          slot: this.assignSercieDataArr.slot,
+          typeOfTreatment: this.assignSercieDataArr.typeOfTreatment,
+          opType: this.assignSercieDataArr.opType,
+        })
+
+      }
+    })
   }
 
 
