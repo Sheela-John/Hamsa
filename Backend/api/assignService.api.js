@@ -1252,6 +1252,21 @@ const travelDistance = async (data) => {
         });
     });
 }
+async function getRoleDetailsByStaffIdAndSlotId(data){
+    let [staffErr, staffData] = await handle(Staff.findOne({ '_id': data.staffId }).lean());
+    let [err2, roleData] = await handle(Role.findOne({ _id: staffData.staffRole, "slots": { "$elemMatch": { "_id": (data.slotId) } } }).lean());
+    var slotDetails;
+    for(var i=0;i<roleData.slots.length;i++)
+    {
+        if((roleData.slots[i]._id.toString())==data.slotId)
+        {
+          slotDetails=roleData.slots[i]
+        }
+    }
+   
+    if (lodash.isEmpty(slotDetails)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+    return Promise.resolve(slotDetails);
+}
 module.exports = {
     assignServiceClient: assignServiceClient,
     assignServiceBranch: assignServiceBranch,
@@ -1273,5 +1288,6 @@ module.exports = {
     updateAssignService: updateAssignService,
     getAssignServiceDataByStaffIdAndDate: getAssignServiceDataByStaffIdAndDate,
     getSlotsForAssignService: getSlotsForAssignService,
-    travelDistance: travelDistance
+    travelDistance: travelDistance,
+    getRoleDetailsByStaffIdAndSlotId:getRoleDetailsByStaffIdAndSlotId
 }

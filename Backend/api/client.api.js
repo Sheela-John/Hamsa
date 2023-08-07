@@ -94,12 +94,6 @@ async function create(clientData) {
             function saveClient(cb) {
                 (async () => {
                     clientData.role = "PORTAL_CLIENT";
-                    clientData.packageId = Math.floor((Math.random() * 100000000000) + 1);
-                    let [Err, assignServiceData] = await handle(AssignService.find({ 'packageId': clientData.packageId }).lean());
-                    if(assignServiceData.length!=0)
-                    {
-                        clientData.packageId = Math.floor((Math.random() * 100000000000) + 1);
-                    }
                     var saveModel = new Client(clientData);
                     let [err, client] = await handle(saveModel.save())
                     for (var i = 0; i < client.addSession.length; i++) {
@@ -271,30 +265,71 @@ const UpdateClient = async function (datatoupdate) {
     log.debug(component, 'Updating a Client', { 'attach': datatoupdate }); log.close();
     let clientId = datatoupdate._id;
     delete datatoupdate._id
-    let [err, clientData] = await handle(Client.findOneAndUpdate({ "_id": clientId }, datatoupdate, { new: true, useFindAndModify: false }))
-    let [err1, assignData] = await handle(AssignService.deleteMany({ 'packageId': clientData.packageId }))
-    for (var i = 0; i < clientData.addSession.length; i++) {
+    let [Clienterr, client] = await handle(Client.findOne({ "_id": clientId }))
+  console.log("client",client)
+  for(var z=0;z<client.packageId.length;z++)
+  {
+    if(client.packageId.includes(datatoupdate.packageId))
+    {
+        let [err, clientData] = await handle(Client.findOneAndUpdate({ "_id": clientId }, datatoupdate, { new: true, useFindAndModify: false }))
+    }
+    else{
+        let [err2, clientData] = await handle(Client.findOneAndUpdate({ _id: clientId,  }, { $push: { 'packageId':packageIdValue } }, { new: true, useFindAndModify: false }).lean());
+    }
+  }
+  //   let [err, clientData] = await handle(Client.findOneAndUpdate({ "_id": clientId }, datatoupdate, { new: true, useFindAndModify: false }))
+    let [err2, assignData1] = await handle(AssignService.find({ 'packageId': datatoupdate.packageId }))
+    if(assignData1.length!=0)
+    {
+    let [err1, assignData] = await handle(AssignService.deleteMany({ 'packageId': datatoupdate.packageId }))
+    for (var i = 0; i < datatoupdate.addSession.length; i++) {
         var assign = {
 
-            "clientId": clientData._id,
-            "clientName": clientData.clientName,
-            "staffId": clientData.staffId,
-            "phone": clientData.phoneNumber,
-            "date": new Date(clientData.addSession[i].date),
+            "clientId": clientId,
+            "clientName": datatoupdate.clientName,
+            "staffId": datatoupdate.staffId,
+            "phone": datatoupdate.phoneNumber,
+            "date": new Date(datatoupdate.addSession[i].date),
             "status": 0,
-            "packageId": clientData.packageId,
-            "address": clientData.address,
-            "serviceId": clientData.serviceId,
-            "endTime": clientData.addSession[i].slotEndTime,
-            "startTime": clientData.addSession[i].slotStartTime,
-            "duration": clientData.addSession[i].duration,
-            "slot": clientData.addSession[i].slot,
-            "typeOfTreatment": clientData.typeOfTreatment
+            "packageId": datatoupdate.packageId,
+            "address": datatoupdate.address,
+            "serviceId": datatoupdate.serviceId,
+            "endTime": datatoupdate.addSession[i].slotEndTime,
+            "startTime": datatoupdate.addSession[i].slotStartTime,
+            "duration": datatoupdate.addSession[i].duration,
+            "slot": datatoupdate.addSession[i].slot,
+            "typeOfTreatment": datatoupdate.typeOfTreatment
         }
 
         var saveAssignData = new AssignService(assign);
         let [err2, assignServiceData] = await handle(saveAssignData.save())
     }
+}
+else
+{
+    for (var i = 0; i < datatoupdate.addSession.length; i++) {
+        var assign = {
+
+            "clientId": clientId,
+            "clientName": datatoupdate.clientName,
+            "staffId": datatoupdate.staffId,
+            "phone": datatoupdate.phoneNumber,
+            "date": new Date(datatoupdate.addSession[i].date),
+            "status": 0,
+            "packageId": datatoupdate.packageId,
+            "address": datatoupdate.address,
+            "serviceId": datatoupdate.serviceId,
+            "endTime": datatoupdate.addSession[i].slotEndTime,
+            "startTime": datatoupdate.addSession[i].slotStartTime,
+            "duration": datatoupdate.addSession[i].duration,
+            "slot": datatoupdate.addSession[i].slot,
+            "typeOfTreatment": datatoupdate.typeOfTreatment
+        }
+
+        var saveAssignData = new AssignService(assign);
+        let [err2, assignServiceData] = await handle(saveAssignData.save())
+    }
+}
     if (err) return Promise.reject(err);
     else return Promise.resolve(clientData);
 }
