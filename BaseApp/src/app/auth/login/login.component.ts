@@ -25,15 +25,11 @@ export class LoginComponent implements OnInit {
       this.routerData = params['link'];
       console.log("This.routerData", this.routerData)
     })
-    Parse.initialize(environment.PARSE_APP_ID, environment.PARSE_JS_KEY,);
-    (Parse as any).serverURL =   environment.PARSE_SERVER_URL
-
   }
 
   ngOnInit(): void {
     localStorage.clear();
     this.intializeLoginForm();
-    console.log(environment.PARSE_APP_ID,environment.PARSE_JS_KEY, environment.PARSE_SERVER_URL)
   }
 
   intializeLoginForm() {
@@ -92,7 +88,7 @@ this.authService.login(data).subscribe(res => {
 
   enterKeyPressed(event) {
     if (event.keyCode === 13) {
-      this.loginInBase4App();
+      //this.loginInBase4App();
     }
   }
 
@@ -100,24 +96,4 @@ this.authService.login(data).subscribe(res => {
     localStorage.setItem('role', "PORTAL_ADMIN");
     this.router.navigate(['/auth/forgetpassword']);
   }
-  //*********************************************** Base4App API Intergration********************************************************************************** *//
-  //loginInBase4App
- async loginInBase4App() {
-  this.isFormSubmitted = true;
-  var data = {};
-  if (this.loginForm.valid) {
-    console.log("tfsdygscj")
-    var self = this;
-    const username = this.loginForm.controls['username'].value;
-    const password = this.loginForm.controls['password'].value;
-   
-    
-  let user=  Parse.User.logIn(username, password,).then(() => {
-    
-        self.flashMessageService.successMessage("Successfully Authenticated");
-      this.router.navigate(['/admin/dashboard']);
-  });
-  console.log(user)
-  }
-}
 }

@@ -55,8 +55,6 @@ export class AddEditStaffComponent implements OnInit {
       this.routerData = param['id'];
       console.log(param, this.routerData)
     })
-    Parse.initialize(environment.PARSE_APP_ID, environment.PARSE_JS_KEY,);
-    (Parse as any).serverURL = environment.PARSE_SERVER_URL
   }
 
   ngOnInit(): void {
@@ -71,10 +69,7 @@ export class AddEditStaffComponent implements OnInit {
       this.showAddEdit = false;
     }
   }
-  // bsConfig:Partial<BsDatepickerConfig> = {
-  //   containerClass:'theme-red',
-  //   dateInputFormat:'DD MMM YYYY'
-  // }
+ 
 
   //Initialize Staff Form
   initializeStaffForm() {

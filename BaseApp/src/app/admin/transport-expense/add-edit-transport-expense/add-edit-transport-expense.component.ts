@@ -32,8 +32,6 @@ export class AddEditTransportExpenseComponent {
 
   constructor(private fb: FormBuilder, private router: Router, public TransportExpenseService : TransportExpenseService ,private route: ActivatedRoute,
     private flashMessageService: FlashMessageService) {
-    Parse.initialize(environment.PARSE_APP_ID, environment.PARSE_JS_KEY,);
-    (Parse as any).serverURL = environment.PARSE_SERVER_URL
     this.route.params.subscribe((param) => {
       this.travelExpenseId = param['id'];
     })

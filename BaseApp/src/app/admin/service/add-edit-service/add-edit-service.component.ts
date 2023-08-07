@@ -22,8 +22,6 @@ export class AddEditServiceComponent implements OnInit {
       this.routerData = param['id'];
       console.log(param, this.routerData)
     })
-    Parse.initialize(environment.PARSE_APP_ID, environment.PARSE_JS_KEY,);
-    (Parse as any).serverURL = environment.PARSE_SERVER_URL
   }
 
   ngOnInit(): void {

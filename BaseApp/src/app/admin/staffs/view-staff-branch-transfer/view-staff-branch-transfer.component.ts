@@ -14,7 +14,7 @@ import { BranchTransferService } from 'src/app/services/branchTransfer.service';
 })
 export class ViewStaffBranchTransferComponent implements OnInit {
   public routerData: any;
-  public showAddEdit: boolean=false;
+  public showAddEdit: boolean = false;
   public empid: any;
   public address: any;
   public staffName: any;
@@ -22,41 +22,39 @@ export class ViewStaffBranchTransferComponent implements OnInit {
   public Email: any;
   public Branch: any;
   public phone: any;
-  public branchId: any=[];
-  public BranchName: any=[];
-  public BranchDataArr: any=[];
-  public branchTranferId: any=[];
-  public branchTransferType: any=[];
+  public branchId: any = [];
+  public BranchName: any = [];
+  public BranchDataArr: any = [];
+  public branchTranferId: any = [];
+  public branchTransferType: any = [];
   public RoleArr: any;
-  public BranchTranferId: any=[];
+  public BranchTranferId: any = [];
   branchTranferData: string;
   branchTranferValue: number;
-  public branchtype: any=[];
-  public startDate: any=[];
-  public endDate: any=[];
-  public endTime: any=[];
-  public branchAddress: any=[];
-  public startTime: any=[];
-  public branch: any=[];
-  public Status: any=[];
-  public branchTransferArr: any=[];
-  public StaffId: any=[];
-  isShow: boolean=false;
-   public BranchAddress: any=[];
+  public branchtype: any = [];
+  public startDate: any = [];
+  public endDate: any = [];
+  public endTime: any = [];
+  public branchAddress: any = [];
+  public startTime: any = [];
+  public branch: any = [];
+  public Status: any = [];
+  public branchTransferArr: any = [];
+  public StaffId: any = [];
+  isShow: boolean = false;
+  public BranchAddress: any = [];
   public BranchNamedata: any;
   roleDatavalue: any;
   staffData: any;
-  branchTransferData: any=[];
+  branchTransferData: any = [];
 
 
 
-  constructor(private router: Router,public route: ActivatedRoute,public branchTransferService:BranchTransferService,public staffService:StaffService,public RoleService:RoleService,private flashMessageService:FlashMessageService ) { 
+  constructor(private router: Router, public route: ActivatedRoute, public branchTransferService: BranchTransferService, public staffService: StaffService, public RoleService: RoleService, private flashMessageService: FlashMessageService) {
     this.route.params.subscribe((param) => {
       this.routerData = param['id'];
       console.log(param, this.routerData)
     })
-    Parse.initialize(environment.PARSE_APP_ID, environment.PARSE_JS_KEY,);
-    (Parse as any).serverURL = environment.PARSE_SERVER_URL
   }
 
   ngOnInit(): void {
@@ -64,96 +62,103 @@ export class ViewStaffBranchTransferComponent implements OnInit {
     if (this.routerData != undefined) {
       this.getByStaffId(this.routerData)
       this.getAllBranchTransferDataForStaff(this.routerData)
-      this.getRoleById(this.routerData)  
-      
+      this.getRoleById(this.routerData)
+
       this.showAddEdit = true;
     } else {
       this.showAddEdit = false;
     }
-  
+
   }
 
   back() {
     this.router.navigateByUrl('admin/staffs')
   }
-  
-  editBranchTranfer(){
-    
+
+  editBranchTranfer() {
+
   }
-    //Base4App  staff by Id
-    getByStaffId(id)
-  {
-    console.log("id",id);
-    this.staffService.getStaffById(id).subscribe(res=>{
-      if(res.status)
-      {
-        this.staffData=res.data;
-       
-          this.empid = this.staffData.empId,
+  //Base4App  staff by Id
+  getByStaffId(id) {
+    console.log("id", id);
+    this.staffService.getStaffById(id).subscribe(res => {
+      if (res.status) {
+        this.staffData = res.data;
+
+        this.empid = this.staffData.empId,
           this.staffName = this.staffData.staffName,
           this.Email = this.staffData.email,
-          this.address= this.staffData.address,
-          this.phone= this.staffData.phone,
-          this.RoleArr=this.staffData.staffRoleName,
-          this.Branch=this.staffData.branchName     
+          this.address = this.staffData.address,
+          this.phone = this.staffData.phone,
+          this.RoleArr = this.staffData.staffRoleName,
+          this.Branch = this.staffData.branchName
       }
-      console.log("this.staffData",this.staffData)
+      console.log("this.staffData", this.staffData)
     })
   }
-    getRoleById(id) {
-      this.RoleService.getRolebyId(id).subscribe(res => {
-        if (res.status) {
-          this.roleDatavalue = res.data
-        //  this.roleForm.controls['role'].patchValue(this.roleDatavalue.role);
-          // this.roleForm.controls['startTime'].patchValue(this.roleDatavalue.startTime);
-          // this.roleForm.controls['endTime'].patchValue(this.roleDatavalue.endTime);
-        }
-      })
-    }
-    async getAllBranchTransferDataForStaff(id){
-      this.branchTransferService.getBranchTransferbyStaffId(id).subscribe(res=>{
-        if(res.status)
-          {
-            this.branchTransferData=res.data;
-            for(var i=0;i<this.branchTransferData.length;i++)
-            {
-              this.branchTransferData[i].Type = ( this.branchTransferData[i].branchTransferType == 0) ? 'Temporary' : 'Permanent';
+  getRoleById(id) {
+    this.RoleService.getRolebyId(id).subscribe(res => {
+      if (res.status) {
+        this.roleDatavalue = res.data;
+      }
+    })
+  }
+  async getAllBranchTransferDataForStaff(id) {
+    this.branchTransferService.getBranchTransferbyStaffId(id).subscribe(res => {
+      if (res.status) {
+        this.branchTransferData = res.data;
+        for (var i = 0; i < this.branchTransferData.length; i++) {
+          this.branchTransferData[i].Type = (this.branchTransferData[i].branchTransferType == 0) ? 'Temporary' : 'Permanent';
 
-            }
-            console.log("this.branchTransferData",this.branchTransferData)
-          }
-      })
-    
-    }
-    editBranchTransfer(id){
-      console.log(id)
-       this.router.navigateByUrl(`/admin/branch-Transfer/${this.routerData}/edit/` + id   );
+        }
+        // if (this.branchTransferData.endDate == null) {
+        //   console.log("end date", this.branchTransferData.endDate)
+        //   if (this.branchTransferData.startTime == null) {
+        //     console.log("start time", this.branchTransferData.startTime)
+        //     if (this.branchTransferData.endTime == null) {
+        //       console.log("end time", this.branchTransferData.endTime)
+        //     }
+        //   }
+        // }
+        // if (this.branchTransferData.startTime == null) {
+        //   console.log("start time", this.branchTransferData.startTime)
+        //   if (this.branchTransferData.endTime == null) {
+        //     console.log("end time", this.branchTransferData.endTime)
+        //   }
+        // }
+        console.log("this.branchTransferData", this.branchTransferData)
+      }
+    })
 
-    }
-    async deleteBranchTransfer(id){
-      console.log(id)
-      this.branchTransferService.deleteBranchTransferbyId(id).subscribe(res=>{
-        if(res.status)
-        {
-          this.flashMessageService.successMessage("Branch Transfer Deleted Successfully", 2);
-          window.location.reload()
-        }
-        else{
-          this.flashMessageService.errorMessage("Error in Branch Transfer Delete ", 2);
-        }
-      })
-      // this.branchTransferArr.forEach((value, index) => {
-      //   if (value == id) {
-      //     this.branchTransferArr.splice(index, 1);
-      //   }
-      //   console.log(" this.branchTransferArr.splice(index, 1)", this.branchTransferArr.splice(index, 1))
-      // });
-      // try{
-      //     //destroy the object
-      // //    let result = await player.destroy();
-      //     this.flashMessageService.successMessage("Branch Transfer Deleted Successfully", 2);
-      // }catch(error){
-      //   this.flashMessageService.successMessage("Branch Transfer Deleted Successfully", 2);
-      // }
-    }
+  }
+  editBranchTransfer(id) {
+    console.log(id)
+    this.router.navigateByUrl(`/admin/branch-Transfer/${this.routerData}/edit/` + id);
+
+  }
+  async deleteBranchTransfer(id) {
+    console.log(id)
+    this.branchTransferService.deleteBranchTransferbyId(id).subscribe(res => {
+      if (res.status) {
+        this.flashMessageService.successMessage("Branch Transfer Deleted Successfully", 2);
+        window.location.reload()
+      }
+      else {
+        this.flashMessageService.errorMessage("Error in Branch Transfer Delete ", 2);
+      }
+    })
+    // this.branchTransferArr.forEach((value, index) => {
+    //   if (value == id) {
+    //     this.branchTransferArr.splice(index, 1);
+    //   }
+    //   console.log(" this.branchTransferArr.splice(index, 1)", this.branchTransferArr.splice(index, 1))
+    // });
+    // try{
+    //     //destroy the object
+    // //    let result = await player.destroy();
+    //     this.flashMessageService.successMessage("Branch Transfer Deleted Successfully", 2);
+    // }catch(error){
+    //   this.flashMessageService.successMessage("Branch Transfer Deleted Successfully", 2);
+    // }
+  }
 }

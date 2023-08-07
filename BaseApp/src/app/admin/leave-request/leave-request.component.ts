@@ -18,8 +18,6 @@ export class LeaveRequestComponent implements OnInit {
 
 
   constructor(public LeaveRequestService : LeaveRequestService ) { 
-    Parse.initialize(environment.PARSE_APP_ID, environment.PARSE_JS_KEY,);
-    (Parse as any).serverURL = environment.PARSE_SERVER_URL
   }
 // public leaveDataArr:any=[];
   ngOnInit(): void {

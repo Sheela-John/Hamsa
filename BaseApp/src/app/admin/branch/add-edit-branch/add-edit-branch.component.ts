@@ -31,8 +31,6 @@ export class AddEditBranchComponent implements OnInit {
     this.route.params.subscribe((param) => {
       this.routerData = param['id'];
     })
-    Parse.initialize(environment.PARSE_APP_ID, environment.PARSE_JS_KEY,);
-    (Parse as any).serverURL = environment.PARSE_SERVER_URL
   }
 
   ngOnInit(): void {

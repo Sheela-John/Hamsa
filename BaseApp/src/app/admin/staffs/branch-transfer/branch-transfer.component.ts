@@ -61,9 +61,6 @@ export class BranchTransferComponent implements OnInit {
       this.routerData = param['branchTranferId'];
       this.minDate.setDate(this.minDate.getDate());
     })
-
-    Parse.initialize(environment.PARSE_APP_ID, environment.PARSE_JS_KEY,);
-    (Parse as any).serverURL = environment.PARSE_SERVER_URL
   }
 
   ngOnInit(): void {
@@ -277,6 +274,9 @@ export class BranchTransferComponent implements OnInit {
           this.flashMessageService.errorMessage("Error  in Creating Branch Transfer", 2);
         }
       })
+    }
+    else {
+      console.log("Error in creating branch")
     }
   }
 }

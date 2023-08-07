@@ -20,10 +20,6 @@ export class DefaultLayoutComponent implements OnInit {
     constructor(public router: Router) {
       this.role = localStorage.getItem('role');
       this.navData = new navItems().adminNavItems;
-      // if (this.role == 'PORTAL_ADMIN') {
-      //   this.navData = new navItems().adminNavItems;
-      //   console.log("navData:", this.navData);
-      // }
     }
     ngOnInit(): void {}
 

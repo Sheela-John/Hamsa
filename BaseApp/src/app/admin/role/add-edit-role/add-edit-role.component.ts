@@ -49,8 +49,6 @@ export class AddEditRoleComponent implements OnInit {
       this.showAddEdit = true;
     } else {
       this.showAddEdit = false;}
-    Parse.initialize(environment.PARSE_APP_ID, environment.PARSE_JS_KEY,);
-    (Parse as any).serverURL = environment.PARSE_SERVER_URL
   }
 
   //initializeRoleForm

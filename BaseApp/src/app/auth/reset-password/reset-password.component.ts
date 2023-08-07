@@ -27,7 +27,6 @@ export class ResetPasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.verifyToken(this.route.snapshot.params['token']);
     this.initializePasswordForm();
   }
 

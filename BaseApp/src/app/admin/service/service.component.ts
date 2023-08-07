@@ -23,8 +23,6 @@ export class ServiceComponent implements OnInit {
   public ServiceStaus: any = [];
   public ServiceStatus: any;
   constructor(private router: Router, public serviceService: ServiceService, public flashMessageService: FlashMessageService) {
-    Parse.initialize(environment.PARSE_APP_ID, environment.PARSE_JS_KEY,);
-    (Parse as any).serverURL = environment.PARSE_SERVER_URL
   }
 
   ngOnInit(): void {

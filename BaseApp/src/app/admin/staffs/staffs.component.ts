@@ -45,8 +45,6 @@ export class StaffsComponent implements OnInit {
   RoleArr: any=[];
 
   constructor(private router: Router, public staffService: StaffService, public flashMessageService: FlashMessageService) {
-    Parse.initialize(environment.PARSE_APP_ID, environment.PARSE_JS_KEY,);
-    (Parse as any).serverURL = environment.PARSE_SERVER_URL
   }
 
   ngOnInit(): void {
