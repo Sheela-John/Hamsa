@@ -34,7 +34,8 @@ onlineLink:{type:String},
     travelDuration: {type: String },
     rating: {  type: Number, default: 0},
     feedBack: { type: String},
-    paymentRefNum: {type: String }
+    paymentRefNum: {type: String },
+    reason:{type:String}
 }, {
     collection: 'assignService',
     versionKey: false,
