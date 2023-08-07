@@ -311,7 +311,7 @@ async function getStaffDataById(staffId) {
 /* Get All Staff Detail */
 async function getAllStaffDetails() {
     log.debug(component, 'Get All Staff Detail'); log.close();
-    let [err, staffData] = await handle(Staff.find().lean());
+    let [err, staffData] = await handle(Staff.find({role:"PORTAL_STAFF"}).lean());
     console.log(staffData)
     for(var i=0;i<staffData.length;i++)
     {
