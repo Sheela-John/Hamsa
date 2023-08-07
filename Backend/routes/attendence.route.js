@@ -22,6 +22,15 @@ router.post('/', async (req, res, next) => {
     else return res.status(200).json({ status: true, data: attendenceData });
 })
 
+  /* Update Attendence API */
+  .put('/:_id', async (req, res, next) => {
+    if (lodash.isEmpty(req.body)) return next(ERR.MANDATORY_FIELD_MISSING)
+    req.body._id = req.params._id;
+    let [err, branchData] = await handle(AttendenceAPI.UpdateAttendence(req.body));
+    if (err) return next(err);
+    else return res.status(200).json({ status: true, data: branchData, message: "Attendence Updated Successfully!" });
+})
+
 /* Get Attendence of Particluar Staff */
 router.get('/:id', async (req, res, next) => {
     let [err, attendenceData] = await handle(AttendenceAPI.getAttendenceofStaff(req.params.id));

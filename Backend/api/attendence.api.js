@@ -49,6 +49,16 @@ const entryAttendence = async (attendenceData) => {
     else return Promise.resolve(attendenceDataSaved)
 }
 
+// to update attendence
+const UpdateAttendence = async function (datatoupdate) {
+    log.debug(component, 'Updating a Branch', { 'attach': datatoupdate }); log.close();
+    let AttendenceId = datatoupdate._id;
+    delete datatoupdate._id
+    let [branchErr, branchData] = await handle(Attendence.findOneAndUpdate({ "_id": AttendenceId }, datatoupdate, { new: true, useFindAndModify: false }))
+    if (branchErr) return Promise.reject(branchErr);
+    else return Promise.resolve(branchData)
+}
+
 const getAttendenceofStaff = async (staffId) => {
     let [findStaffErr, staffData] = await handle(Attendence.find({ 'staffId': staffId }));
     if (findStaffErr) return Promise.reject(findStaffErr);
@@ -201,6 +211,7 @@ const getAttendenceofToday = async (data) => {
 
 module.exports = {
     entryAttendence: entryAttendence,
+    UpdateAttendence:UpdateAttendence,
     getAttendenceofStaff: getAttendenceofStaff,
     getAttendenceofStaffByDateRange: getAttendenceofStaffByDateRange,
     getAttendenceofToday: getAttendenceofToday
