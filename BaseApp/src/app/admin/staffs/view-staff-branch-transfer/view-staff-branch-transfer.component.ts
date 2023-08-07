@@ -111,21 +111,6 @@ export class ViewStaffBranchTransferComponent implements OnInit {
           this.branchTransferData[i].Type = (this.branchTransferData[i].branchTransferType == 0) ? 'Temporary' : 'Permanent';
 
         }
-        // if (this.branchTransferData.endDate == null) {
-        //   console.log("end date", this.branchTransferData.endDate)
-        //   if (this.branchTransferData.startTime == null) {
-        //     console.log("start time", this.branchTransferData.startTime)
-        //     if (this.branchTransferData.endTime == null) {
-        //       console.log("end time", this.branchTransferData.endTime)
-        //     }
-        //   }
-        // }
-        // if (this.branchTransferData.startTime == null) {
-        //   console.log("start time", this.branchTransferData.startTime)
-        //   if (this.branchTransferData.endTime == null) {
-        //     console.log("end time", this.branchTransferData.endTime)
-        //   }
-        // }
         console.log("this.branchTransferData", this.branchTransferData)
       }
     })
@@ -147,18 +132,5 @@ export class ViewStaffBranchTransferComponent implements OnInit {
         this.flashMessageService.errorMessage("Error in Branch Transfer Delete ", 2);
       }
     })
-    // this.branchTransferArr.forEach((value, index) => {
-    //   if (value == id) {
-    //     this.branchTransferArr.splice(index, 1);
-    //   }
-    //   console.log(" this.branchTransferArr.splice(index, 1)", this.branchTransferArr.splice(index, 1))
-    // });
-    // try{
-    //     //destroy the object
-    // //    let result = await player.destroy();
-    //     this.flashMessageService.successMessage("Branch Transfer Deleted Successfully", 2);
-    // }catch(error){
-    //   this.flashMessageService.successMessage("Branch Transfer Deleted Successfully", 2);
-    // }
   }
 }

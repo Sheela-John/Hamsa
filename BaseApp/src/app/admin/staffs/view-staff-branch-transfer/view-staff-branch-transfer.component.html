@@ -17,40 +17,100 @@
                             aria-hidden="true"></i>&nbsp;{{empid}}</div>
                 </div>
             </div>
-            <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3 ml-4">
-                <div class="md:grid-cols-1">
-                    <div class="font-semibold italic text-xl"><i class="fa fa-envelope"
+            <div class="row">
+                <div class="col-4">
+                    <div class="font-semibold italic text-xl p-1"><i class="fa fa-envelope"
                             aria-hidden="true"></i>&nbsp;&nbsp;{{Email}}</div>
-                    <div class="font-semibold italic text-xl"><i class="fa fa-phone"
+                    <div class="font-semibold italic text-xl p-1"><i class="fa fa-phone"
                             aria-hidden="true"></i>&nbsp;&nbsp;{{phone}}</div>
-                    <div class="font-semibold italic text-xl "><i class="fa fa-map-marker"
-                            aria-hidden="true"></i>&nbsp;&nbsp;{{address}}</div>
-                    <div class="font-semibold italic text-xl "><i class="fa fa-user-circle"
-                            aria-hidden="true"></i>&nbsp;&nbsp;{{RoleArr}} </div>
-                    <div class="font-semibold italic text-xl"><i class="fa fa-home"
+                </div>
+                <div class="col-4">
+                    <div class="font-semibold italic text-xl p-1"><i class="fa fa-home"
                             aria-hidden="true"></i>&nbsp;&nbsp;{{Branch}}</div>
+                    <div class="font-semibold italic text-xl p-1"><i class="fa fa-user-circle"
+                            aria-hidden="true"></i>&nbsp;&nbsp;{{RoleArr}} </div>
+                </div>
+                <div class="col-4">
+                    <div class="font-semibold italic text-xl p-1"><i class="fa fa-map-marker"
+                            aria-hidden="true"></i>&nbsp;&nbsp;{{address}}</div>
+
                 </div>
                 <!-- <div>
                     <img src="assets/images/user.jpg" width="143px" height="50px" />
                 </div> -->
             </div>
-
-            <ul class="mt-4 space-y-2" *ngFor="let branch of this.branchTransferData">
-                <li>
-                    <div class="block h-full rounded-lg border border-gray-700 subbox p-4 hover:border-pink-600">
-                        <div class="grid sm:grid-cols-1 md:grid-cols-6 md:gap-3 ml-4 " style="color:white">
-                            <div>{{branch.Type}}</div>
-                            <div>{{branch.branchName}}</div>
-                            <div>{{branch.startDate}} {{branch.startTime}}</div>
-                            <div>{{branch.endDate}}  {{branch.endTime}} </div>
-                            <div> <button  class="btn" (click)="editBranchTransfer(branch._id)" style="background-color: rgb(253 179 18)"><i
-                                class='fa fa-edit fa-xs'></i></button></div>
-                                <div> <button  class="btn" (click)="deleteBranchTransfer(branch._id)" style="background-color: rgb(253, 45, 18)"><i
-                                    class='fa fa-trash fa-xs'></i></button></div>
-                        </div>
+            <div class="block h-full rounded-lg border border-gray-700 subbox p-2 mt-2" style="background-color: #2dd4bf">
+                <div class="row p-2 font-bold" style="color:black; font-size: large;">
+                    <div class="col-2">
+                        Branch type
                     </div>
-                </li>
-            </ul>
+                    <div class="col-2">
+                        Branch Name
+                    </div>
+                    <div class="col-2">
+                        Start Date
+                    </div>
+                    <div class="col-2">
+                        End Date
+                    </div>
+                    <div class="col-1">
+                        Start Time
+                    </div>
+                    <div class="col-1">
+                        End Time
+                    </div>
+                    <div class="col-2">
+                        Action
+                    </div>
+                </div>
+
+                <ul class="mt-4 space-y-2" *ngFor="let branch of this.branchTransferData">
+                    <li>
+                        <div class="block h-full rounded-lg border border-gray-700 subbox p-4 hover:border-pink-600">
+                            <div class="row" style="color:white">
+                                <div class="col-2">
+                                    <div>{{branch.Type}}</div>
+                                </div>
+                                <div class="col-2">
+                                    <div>{{branch.branchName}}</div>
+                                </div>
+                                <div class="col-2">
+                                    <div>{{branch.startDate}}</div>
+                                </div>
+                                <div class="col-2" *ngIf="branch.endDate">
+                                    <div> {{branch.endDate}} </div>
+                                </div>
+                                <div class="col-2" *ngIf="!branch.endDate">
+                                    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{branch.endDate ? branch.endDate : "-" }} </div>
+                                </div>
+                                <div class="col-1" *ngIf="branch.startTime">
+                                    <div> {{branch.startTime}}</div>
+                                </div>
+                                <div class="col-1" *ngIf="!branch.startTime">
+                                    <div>&nbsp;&nbsp; {{branch.startTime == null? null : "-" }} </div>
+                                </div>
+                                <div class="col-1" *ngIf="branch.endTime">
+                                    <div> {{branch.endTime}} </div>
+                                </div>
+                                <div class="col-1" *ngIf="!branch.endTime">
+                                    <div> &nbsp;&nbsp;{{branch.endTime == null? null : "-"}} </div>
+                                </div>
+                                <div class="col-1">
+                                    <div> <button class="btn" (click)="editBranchTransfer(branch._id)"
+                                            style="background-color: rgb(253 179 18)"><i
+                                                class='fa fa-edit fa-xs'></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-1">
+                                    <div> <button class="btn" (click)="deleteBranchTransfer(branch._id)"
+                                            style="background-color: rgb(253, 45, 18)"><i
+                                                class='fa fa-trash fa-xs'></i></button></div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
         </article>
     </section>
     <app-flash-message></app-flash-message>
