@@ -6,7 +6,7 @@ import { AssignDataService } from '../api/assign-data.service';
 })
 
 export class AssignService {
-    constructor(private AssignDataService:AssignDataService) { }
+    constructor(private AssignDataService: AssignDataService) { }
 
     //save Client
     public createAssignServiceClient(data) {
@@ -37,17 +37,23 @@ export class AssignService {
     public getAllAssignServiceBranchbyId(id) {
         return this.AssignDataService.getAllAssignServiceBranchbyId(id);
     }
- //getAll Assign Service by Id
- public getAssignServiceById(id) {
-    return this.AssignDataService.getAssignServiceById(id);
-}
+
+    //getAll Assign Service by Id
+    public getAssignServiceById(id) {
+        return this.AssignDataService.getAssignServiceById(id);
+    }
 
     //Get All Assign Service
     public getAllAssignService() {
         return this.AssignDataService.getAllAssignService();
     }
-    public getAssignServiceDataByStaffIdAndDate(data)
-    {
+    
+    public getAssignServiceDataByStaffIdAndDate(data) {
         return this.AssignDataService.getAssignServiceDataByStaffIdAndDate(data);
+    }
+
+    //get Slot by staffId and slotId
+    public getSlotbystaffIdandslotId(Data) {
+        return this.AssignDataService.getSlotbystaffIdandslotId(Data);
     }
 }

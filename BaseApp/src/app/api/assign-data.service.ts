@@ -28,7 +28,7 @@ export class AssignDataService {
 
     //getAll Client by Id 
     public getAllAssignServiceClientbyId(id): Observable<any> {
-        return this.httpClient.get('assignService/'+id).pipe(tap(res => {
+        return this.httpClient.get('assignService/' + id).pipe(tap(res => {
             return res;
         }), catchError(error => throwError(error)));
     }
@@ -49,25 +49,32 @@ export class AssignDataService {
 
     //getAll Branch by Id 
     public getAllAssignServiceBranchbyId(id): Observable<any> {
-        return this.httpClient.get('assignService/ofBranch/'+id).pipe(tap(res => {
+        return this.httpClient.get('assignService/ofBranch/' + id).pipe(tap(res => {
             return res;
         }), catchError(error => throwError(error)));
     }
- //getAll AssignService by Id 
- public getAssignServiceById(id): Observable<any> {
-    return this.httpClient.get('assignService/'+id).pipe(tap(res => {
-        return res;
-    }), catchError(error => throwError(error)));
-}
+    //getAll AssignService by Id 
+    public getAssignServiceById(id): Observable<any> {
+        return this.httpClient.get('assignService/' + id).pipe(tap(res => {
+            return res;
+        }), catchError(error => throwError(error)));
+    }
     //Get All Assign Service
     public getAllAssignService(): Observable<any> {
         return this.httpClient.get('assignService/allAssignedServices').pipe(tap(res => {
             return res;
         }), catchError(error => throwError(error)));
     }
-      //Get All Assign Service
-      public getAssignServiceDataByStaffIdAndDate(data): Observable<any> {
-        return this.httpClient.post('assignService/getAssignServiceDataByStaffIdAndDate',data).pipe(tap(res => {
+    //Get All Assign Service
+    public getAssignServiceDataByStaffIdAndDate(data): Observable<any> {
+        return this.httpClient.post('assignService/getAssignServiceDataByStaffIdAndDate', data).pipe(tap(res => {
+            return res;
+        }), catchError(error => throwError(error)));
+    }
+
+    //Enable or Disabl Role
+    public getSlotbystaffIdandslotId(Data): Observable<any> {
+        return this.httpClient.post('assignService/getRoleDetailsByStaffIdAndSlotId',Data).pipe(tap(res => {
             return res;
         }), catchError(error => throwError(error)));
     }
