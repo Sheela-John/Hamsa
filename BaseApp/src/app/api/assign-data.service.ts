@@ -72,9 +72,16 @@ export class AssignDataService {
         }), catchError(error => throwError(error)));
     }
 
-    //Enable or Disabl Role
-    public getSlotbystaffIdandslotId(Data): Observable<any> {
+    //getSlotByStaffIdAndSlotId
+    public getSlotByStaffIdAndSlotId(Data): Observable<any> {
         return this.httpClient.post('assignService/getRoleDetailsByStaffIdAndSlotId',Data).pipe(tap(res => {
+            return res;
+        }), catchError(error => throwError(error)));
+    }
+
+     //getSlotsForAssignService
+     public getSlotsForAssignService(Data): Observable<any> {
+        return this.httpClient.post('assignService/getSlotsForAssignService',Data).pipe(tap(res => {
             return res;
         }), catchError(error => throwError(error)));
     }

@@ -15,7 +15,6 @@ export class ClientDataService {
     //Get All Clients
     public getAllClients(): Observable<any> {
         return this.httpClient.get('client/get/allClient').pipe(tap(res => {
-            console.log("client",res)
             return res;
         }), catchError(error => throwError(error)));
     }

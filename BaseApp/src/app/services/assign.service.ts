@@ -53,7 +53,12 @@ export class AssignService {
     }
 
     //get Slot by staffId and slotId
-    public getSlotbystaffIdandslotId(Data) {
-        return this.AssignDataService.getSlotbystaffIdandslotId(Data);
+    public getSlotByStaffIdAndSlotId(Data) {
+        return this.AssignDataService.getSlotByStaffIdAndSlotId(Data);
+    }
+
+    //get Slots For AssignService
+    public getSlotsForAssignService(Data) {
+        return this.AssignDataService.getSlotsForAssignService(Data);
     }
 }
