@@ -1,4 +1,4 @@
-<div class="main bg-white p-6 rounded-lg shadow-lg">
+<div class="main bg-white p-6 rounded-lg ">
     <div class="card">
         <div class="card-header">
             <h2 class="card-header heading text-2xl font-bold">Branch</h2>
@@ -11,9 +11,10 @@
             <form novalidate="" [formGroup]="branchForm">
                 <div class="row">
                     <div class="col-6">
-                        <label for="name" class="block mb-2 font-bold text-gray-600 ">Branch Name<span class="required">*</span></label>
+                        <label for="name" class="block mb-2 font-bold text-gray-600 ">Branch Name<span
+                                class="required">*</span></label>
                         <input type="text" id="name" name="name" placeholder="Enter Branch Name"
-                            class="border border-gray-300 shadow p-2 w-full rounded" formControlName="branchName">
+                            class="border border-gray-300  p-2 w-full rounded" formControlName="branchName">
                         <div class="error-msg-area">
                             <div *ngIf="branchForm.controls['branchName'].errors && (!branchForm.controls['branchName'].pristine|| isbranchFormSubmitted)"
                                 class="error-msg">
@@ -24,9 +25,10 @@
                         </div>
                     </div>
                     <div class="col-6">
-                        <label for="address" class="block mb-2 font-bold text-gray-600 ">Address<span class="required">*</span></label>
-                        <textarea class="border border-gray-300 shadow p-2 w-full rounded" id="inputPhysicalStreet"
-                            rows="3" ngx-google-places-autocomplete [options]='options' formControlName="branchAddress"
+                        <label for="address" class="block mb-2 font-bold text-gray-600 ">Address<span
+                                class="required">*</span></label>
+                        <textarea class="border border-gray-300  p-2 w-full rounded" id="inputPhysicalStreet" rows="3"
+                            ngx-google-places-autocomplete [options]='options' formControlName="branchAddress"
                             name="branchAddress" #placesRef="ngx-places" (onAddressChange)="handleAddressChange($event)"
                             autocomplete="false"></textarea>
                         <div class="error-msg-area">
@@ -39,12 +41,12 @@
                         </div>
                     </div>
                 </div>
-        <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg" *ngIf="!showAddEdit"
-            (click)="saveBranch()">Submit</button>
-        <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg" *ngIf="showAddEdit"
-            (click)="updateBranch()">Update</button>
-        </form>
-</div>
-</section>
+                <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg" *ngIf="!showAddEdit"
+                    (click)="saveBranch()">Submit</button>
+                <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg" *ngIf="showAddEdit"
+                    (click)="updateBranch()">Update</button>
+            </form>
+        </div>
+    </section>
 </div>
 <app-flash-message></app-flash-message>

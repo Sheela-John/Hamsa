@@ -7,71 +7,7 @@
       </button>
     </div>
   </div>
-  <!-- <section class="flex mt-2">
-        <div class="container">
-            <section class="grid grid-cols-2 gap-4">
-            <article class="rounded-m border border-gray-100 box p-2  h-fit" style="background-color: #2DD4BF;"
-                *ngFor="let role of roleList;">
-                <div class="relative block overflow-hidden rounded-lg border headbox border-gray-100 sm:p-6 lg:p-4">
-                    <span
-                        class="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"></span>
 
-                    <div class="row ">
-                        <div class="col-9">
-                            <div class="font-bold italic text-xl text-left">Role Name :&nbsp;{{role.name}}</div>
-                        </div>
-                        <div class="col-3">
-                            <div class="row">
-                                <div class="col-6">
-                                    <button class="btn float-right" (click)="editrole(role._id)"
-                                        style="background-color: rgb(253 179 18)"><i
-                                            class='fa fa-edit fa-xs'></i></button>&nbsp;&nbsp;
-                                </div>
-                                <div class="col-6">
-                                    <buttonc style="background-color: green;"
-                                        (click)="enableDisableRole(role._id)" *ngIf="role.status == 0"><i
-                                            class="fa fa-unlock" aria-hidden="true"></i></button>
-                                    <button class="btn" style="background-color: red;" (click)="enableDisableRole
-                                            (role._id)" *ngIf="role.status == 2"><i class="fa fa-lock"
-                                            aria-hidden="true"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <ul class=" space-y-2">
-                    <div class="block h-full rounded-lg border border-gray-700 subbox p-4 hover:border-pink-600"
-                        style="background-color: #163339;">
-                        <div class="row" style="color:white ">
-                            <div class="col-4">
-                                <div>Slot Name</div>&nbsp;&nbsp;
-                            </div>
-                            <div class="col-4">
-                                <div>Start Time</div>&nbsp;&nbsp;
-                            </div>
-                            <div class="col-4">
-                                <div>End Time</div>&nbsp;&nbsp;
-                            </div>
-                        </div>
-                        <li *ngFor="let addRole of role.slots ;">
-                            <div class="row" style="color:white">
-                                <div class="col-4">
-                                    <div>{{addRole.slotName}}</div>&nbsp;&nbsp;
-                                </div>
-                                <div class="col-4">
-                                    <div>{{addRole.startTime}}</div>&nbsp;&nbsp;
-                                </div>
-                                <div class="col-4">
-                                    <div>{{addRole.endTime}}</div>&nbsp;&nbsp;
-                                </div>
-                            </div>
-                        </li>
-                    </div>
-                </ul>
-            </article>
-        </section>
-        </div>
-    </section> -->
 
   <section>
     <div class="container">
@@ -166,72 +102,25 @@
                     </ul>
                   </div>
              
-                <!-- <article class="rounded-m border border-gray-100 box p-2  h-fit" style="background-color: #2DD4BF;"
-                        *ngFor="let role of roleList;">
-                        <div class="relative block overflow-hidden rounded-lg border headbox border-gray-100 sm:p-6 lg:p-4">
-                            <span
-                                class="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"></span>
-        
-                            <div class="row ">
-                                <div class="col-9">
-                                    <div class="font-bold italic text-xl text-left">Role Name :&nbsp;{{role.name}}</div>
-                                </div>
-                                <div class="col-3">
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <button class="btn float-right" (click)="editrole(role._id)"
-                                                style="background-color: rgb(253 179 18)"><i
-                                                    class='fa fa-edit fa-xs'></i></button>&nbsp;&nbsp;
-                                        </div>
-                                        <div class="col-6">
-                                            <button class="btn" style="background-color: green;"
-                                                (click)="enableDisableRole(role._id)" *ngIf="role.status == 0"><i
-                                                    class="fa fa-unlock" aria-hidden="true"></i></button>
-                                            <button class="btn" style="background-color: red;" (click)="enableDisableRole
-                                                    (role._id)" *ngIf="role.status == 2"><i class="fa fa-lock"
-                                                    aria-hidden="true"></i></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <ul class=" space-y-2">
-                            <div class="block h-full rounded-lg border border-gray-700 subbox p-4 hover:border-pink-600"
-                                style="background-color: #163339;">
-                                <div class="row" style="color:white ">
-                                    <div class="col-4">
-                                        <div>Slot Name</div>&nbsp;&nbsp;
-                                    </div>
-                                    <div class="col-4">
-                                        <div>Start Time</div>&nbsp;&nbsp;
-                                    </div>
-                                    <div class="col-4">
-                                        <div>End Time</div>&nbsp;&nbsp;
-                                    </div>
-                                </div>
-                                <li *ngFor="let addRole of role.slots ;">
-                                    <div class="row" style="color:white">
-                                        <div class="col-4">
-                                            <div>{{addRole.slotName}}</div>&nbsp;&nbsp;
-                                        </div>
-                                        <div class="col-4">
-                                            <div>{{addRole.startTime}}</div>&nbsp;&nbsp;
-                                        </div>
-                                        <div class="col-4">
-                                            <div>{{addRole.endTime}}</div>&nbsp;&nbsp;
-                                        </div>
-                                    </div>
-                                </li>
-                            </div>
-                        </ul>
-                    </article> -->
+             
               </div>
               <!-- <span>
                         <a href="#">Read more</a>
                     </span> -->
             </div>
           </div>
-          <!-- <div class="card">
+         
+        </div>
+      </section>
+    </div>
+  </section>
+</div>
+<app-flash-message></app-flash-message>
+
+
+
+
+ <!-- <div class="card">
               <div class="card__img">
                   <a href="#">
                       <img class="img-fluid" src="https://picsum.photos/501/250/?random" alt="Image 1">
@@ -336,9 +225,6 @@
                   </span>
                   </div>
               </div> -->
-        </div>
-      </section>
-    </div>
-  </section>
-</div>
-<app-flash-message></app-flash-message>
+
+
+              

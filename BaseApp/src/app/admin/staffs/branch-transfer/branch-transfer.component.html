@@ -1,4 +1,4 @@
-<div class="main bg-white p-6 rounded-lg shadow-lg">
+<div class="main bg-white p-6 rounded-lg ">
     <div class="card">
         <div class="card-header">
             <h2 class="card-header heading text-2xl font-bold">Branch Transfer</h2>
@@ -133,7 +133,7 @@
                 <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3 " *ngIf="isShowTime && ishidden " >
                     <div>
                         <label for="twitter" class="block mb-2 font-bold text-gray-600">Start Time<span class="required">*</span></label>
-                        <input class="border border-gray-300 shadow p-2 w-full rounded " type="text"
+                        <input class="border border-gray-300  p-2 w-full rounded " type="text"
                             placeholder="Select Start Time" formControlName="startTime" name="startTime"
                             [ngxTimepicker]="startrange"  [format]="24">
                         <ngx-material-timepicker #startrange (opened)="startpickerOpened = true;"
@@ -148,7 +148,7 @@
                     </div>
                     <div >
                         <label for="name" class="block mb-2 font-bold text-gray-600">End Time<span class="required">*</span></label>
-                        <input class="border border-gray-300 shadow p-2 w-full rounded " type="text"
+                        <input class="border border-gray-300  p-2 w-full rounded " type="text"
                             placeholder="Select End Time" formControlName="endTime" name="endTime"
                             [ngxTimepicker]="Endrange" [format]="24" >
                         <ngx-material-timepicker #Endrange (opened)="endpickerOpened = true;" [defaultTime]="'18:00 pm'"
@@ -167,7 +167,7 @@
                     <div>
                         <label for="branchId" class="block mb-2 font-bold text-gray-600">Branch
                             Name<span class="required">*</span></label>
-                        <select class="border border-gray-300 shadow p-2 w-full rounded"
+                        <select class="border border-gray-300  p-2 w-full rounded"
                             formControlName="branchId" (change)="getBranchbyId($event)">
                             <option value="">--select--</option>+
 
@@ -188,7 +188,7 @@
                     <div>
                         <label for="address" class="block mb-2 font-bold text-gray-600">Branch
                             Address<span class="required">*</span></label>
-                        <textarea class="border border-gray-300 shadow p-2 w-full rounded" id="branchAddress"
+                        <textarea class="border border-gray-300  p-2 w-full rounded" id="branchAddress"
                             rows="3" ngx-google-places-autocomplete [options]='options'
                             formControlName="branchAddress" name="branchAddress" #placesRef="ngx-places"
                             (onAddressChange)="handleAddressChange($event)" autocomplete="false"></textarea>

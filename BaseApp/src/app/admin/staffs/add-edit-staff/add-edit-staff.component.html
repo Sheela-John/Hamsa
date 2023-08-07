@@ -61,13 +61,21 @@
                         <label for="email" class="block mb-2 font-bold text-gray-600">Email
                             <span class="required">*</span>
                         </label>
-                        <input class="border border-gray-300  p-2 w-full rounded" type="text" placeholder="Enter Email"
-                            formControlName="email" name="email">
+                        <input class="border border-gray-300  p-2 w-full rounded" type="email" placeholder="Enter Email"
+                            formControlName="email" name="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$">
                         <div class="error-msg-area">
                             <div *ngIf="staffForm.controls['email'].errors && (!staffForm.controls['email'].pristine|| isStaffFormSubmitted)"
                                 class="error-msg">
                                 <div [hidden]="!staffForm.controls['email'].errors.required">Please Enter Email
                                 </div>
+                            </div>
+                        </div>
+                        <div class="error-msg-area">
+                            <div *ngIf="staffForm.controls['email'].errors && staffForm.controls['email'].touched"
+                                class="error-msg">
+                                <div *ngIf="staffForm.controls['email'].errors.pattern">Please Enter Valid Email Address
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -78,7 +86,7 @@
                         <label for="name" class="block mb-2 font-bold text-gray-600 ">Address
                             <span class="required">*</span>
                         </label>
-                        <textarea class="border border-gray-300  p-2 w-full rounded" id="name" rows="5" cols="70"
+                        <textarea class="border border-gray-300  p-2 w-full rounded" id="name" rows="5" cols="80"
                             placeholder="Enter a location" ngx-google-places-autocomplete [options]='options'
                             formControlName="address" name="address" #placesRef="ngx-places"
                             (onAddressChange)="handleAddressChange($event)" autocomplete="false"></textarea>
@@ -95,13 +103,23 @@
                         <label for="phone" class="block mb-2 font-bold text-gray-600">Phone
                             <span class="required">*</span>
                         </label>
-                        <input class="border border-gray-300  p-2 w-full rounded" type="text"
-                            placeholder="Enter Phone Number" formControlName="phone" name="phone">
+
+                        <input class="border border-gray-300 p-2 w-full rounded" type="text" pattern="[0-9]{10}"
+                            maxlength="10" placeholder="Enter Phone Number (10 digits)" formControlName="phone"
+                            name="phone" required>
                         <div class="error-msg-area">
                             <div *ngIf="staffForm.controls['phone'].errors && (!staffForm.controls['phone'].pristine|| isStaffFormSubmitted)"
                                 class="error-msg">
                                 <div [hidden]="!staffForm.controls['phone'].errors.required">Please Enter Phone Number
                                 </div>
+                            </div>
+                        </div>
+                        <div class="error-msg-area">
+                            <div *ngIf="staffForm.controls['phone'].errors && staffForm.controls['phone'].touched"
+                                class="error-msg">
+                                <div *ngIf="staffForm.controls['phone'].errors.pattern">Please Enter Valid Phone Number
+                                </div>
+
                             </div>
                         </div>
                         <div>
