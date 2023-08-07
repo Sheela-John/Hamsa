@@ -111,7 +111,9 @@ async function create(clientData) {
                             "startTime": client.addSession[i].slotStartTime,
                             "duration": client.addSession[i].duration,
                             "slot": client.addSession[i].slot,
-                            "typeOfTreatment": client.typeOfTreatment
+                            "typeOfTreatment": client.typeOfTreatment,
+                            "latitude":client.clientAddressLatitude,
+                            "longitude":client. clientAddressLogitude
                         }
                         var saveAssignData = new AssignService(assignData);
                         let [err1, assignServiceData] = await handle(saveAssignData.save())
@@ -298,7 +300,9 @@ const UpdateClient = async function (datatoupdate) {
             "startTime": datatoupdate.addSession[i].slotStartTime,
             "duration": datatoupdate.addSession[i].duration,
             "slot": datatoupdate.addSession[i].slot,
-            "typeOfTreatment": datatoupdate.typeOfTreatment
+            "typeOfTreatment": datatoupdate.typeOfTreatment,
+            "latitude":datatoupdate.clientAddressLatitude,
+            "longitude":datatoupdate. clientAddressLogitude
         }
 
         var saveAssignData = new AssignService(assign);
@@ -323,7 +327,9 @@ else
             "startTime": datatoupdate.addSession[i].slotStartTime,
             "duration": datatoupdate.addSession[i].duration,
             "slot": datatoupdate.addSession[i].slot,
-            "typeOfTreatment": datatoupdate.typeOfTreatment
+            "typeOfTreatment": datatoupdate.typeOfTreatment,
+            "latitude":datatoupdate.clientAddressLatitude,
+            "longitude":datatoupdate. clientAddressLogitude
         }
 
         var saveAssignData = new AssignService(assign);

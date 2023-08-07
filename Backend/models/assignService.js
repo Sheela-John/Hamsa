@@ -25,7 +25,7 @@ const assignServiceSchema = new mongoose.Schema({
    staffId:{
     type:String
    },
-   lattitude:{
+   latitude:{
     type:String
    },
    longitude:{
@@ -91,6 +91,9 @@ const assignServiceSchema = new mongoose.Schema({
     default:0
    },
    feedBack:{
+    type:String
+   },
+   paymentRefNum:{
     type:String
    }
 }, {
