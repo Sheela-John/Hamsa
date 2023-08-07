@@ -168,7 +168,7 @@ async function checkForExistingUser(loginCred) {
             $match: {
                 $and: [{
                     $or: [
-                        { 'email': loginCred.email }]
+                        { 'empId': loginCred.empId }]
                     // { 'phone': loginCred.phone }]
                 }]
             }
