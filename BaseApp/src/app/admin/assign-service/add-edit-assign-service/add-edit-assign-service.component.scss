@@ -13,9 +13,11 @@
     border-radius: 3px 3px 0px 0px;
     box-shadow: 0 0.5rem 0.4rem #00000080;
 }
+
 ::ng-deep .theme-green .bs-datepicker-head {
     background-color: #2dd4bf !important;
 }
+
 .panels {
     background: #fff;
     box-shadow: 0 1rem 1rem #00000080;
@@ -52,15 +54,42 @@
 }
 
 #one:checked~.panels #one-panel,
-#two:checked~.panels #two-panel
- {
+#two:checked~.panels #two-panel {
     display: block;
 }
 
 #one:checked~.tabs #one-tab,
-#two:checked~.tabs #two-tab
-{
+#two:checked~.tabs #two-tab {
     background: #fff;
     color: #000;
     border-top: 3px solid rgb(45 212 191);
+}
+
+.btn_show {
+    margin-top: 30px;
+}
+
+::ng-deep .multiselect-dropdown .dropdown-btn {
+    display: inline-block;
+    border: 1px solid #dee2e6 !important;
+    width: 100%;
+    padding: 8px 11px !important;
+    margin-bottom: 0;
+    font-weight: 400;
+    line-height: 1.52857143;
+    text-align: left;
+    vertical-align: middle;
+    cursor: pointer;
+    background-image: none;
+    border-radius: 4px;
+}
+
+.disabled {
+    pointer-events: none;
+    background-color:#c8c9ca42;
+}
+
+.badge-danger {
+    color: #fff;
+    background-color: #2dd4bf;
 }

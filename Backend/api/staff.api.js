@@ -315,6 +315,7 @@ async function getAllStaffDetails() {
     console.log(staffData)
     for(var i=0;i<staffData.length;i++)
     {
+        console.log(i)
         if(staffData[i].role!='PORTAL_ADMIN')
         {
         let [err, branchData] = await handle(Branch.findOne({_id:staffData[i].branchId}).lean());

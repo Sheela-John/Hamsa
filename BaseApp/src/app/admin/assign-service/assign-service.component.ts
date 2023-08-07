@@ -82,6 +82,9 @@ export class AssignServiceComponent implements OnInit {
         });
         this.dtTrigger.next(null);
       }
+      else{
+        this.assignServiceList =[]
+      }
     })
   }
 
@@ -105,7 +108,6 @@ export class AssignServiceComponent implements OnInit {
  
 
   edit(id) {
-console.log(id)
     this.router.navigateByUrl('admin/assignService/'+id+'/addEditAssignService')
   }
 

@@ -79,7 +79,7 @@ const assignServiceClient = async (assignServiceData) => {
             var settingsData = settingsDataFind[settingsDataFind.length - 1]
             assignServiceData['settingsId'] = settingsData._id;
             assignServiceData['staffName'] = staffNameData.staffName;
-            let [findClientErr, findClientData] = await handle(Client.findOne({ 'clientName': assignServiceData.clientName }));
+            let [findClientErr, findClientData] = await handle(Client.findOne({ '_id': assignServiceData.clientId }));
             assignServiceData['clientId'] = findClientData._id;
             if (findClientErr) return Promise.reject(findClientErr);
             if (findClientData == undefined) {
@@ -355,6 +355,7 @@ const getAssignedServicesbyStaff = async (data) => {
 async function getAllAssignedServices() {
     log.debug(component, 'Get All Assign Service Detail'); log.close();
     let [err, assignServiceData] = await handle(AssignService.find().lean());
+    console.log("assignServiceData",assignServiceData)
     for (var i = 0; i < assignServiceData.length; i++) {
         let [err, clientData] = await handle(Client.findOne({ _id: assignServiceData[i].clientId }).lean());
         let [err1, staffData] = await handle(Staff.findOne({ _id: assignServiceData[i].staffId }).lean());
