@@ -8,35 +8,23 @@ import { ClientDataService } from "../api/client-data.service";
 export class ClientService {
     constructor(private clientDataService: ClientDataService) { }
 
+    //Create Session
+    public createSession(data) {
+        return this.clientDataService.createSession(data);
+    }
+
+    //Create Client
+    public createClient(data) {
+        return this.clientDataService.createClient(data);
+    }
+
+    //Get Client By Id
+    public getClientById(id) {
+        return this.clientDataService.getClientbyId(id);
+    }
+
     //Get All Clients
     public getAllClients() {
         return this.clientDataService.getAllClients();
     }
-    public getClientById(id)
-    {
-       return this.clientDataService.getClientbyId(id);
-    }
-    public ebableDisableClient(id)
-    {
-        return this.clientDataService.enableDisableClient(id);
-    }
-    // //Create Branch
-    // public createBranch(data) {
-    //     return this.branchDataService.createBranch(data);
-    // }
-
-    // //Get Branch By Id
-    // public getBranchbyId(branchId) {
-    //     return this.branchDataService.getBranchbyId(branchId);
-    // }
-
-    // //Update Branch By Id
-    // public updateBranchById(updateBranchDataId) {
-    //     return this.branchDataService.updateBranchById(updateBranchDataId);
-    // }
-
-    // //Enable or Disable Service
-    // public enableDisableBranch(id) {
-    //     return this.branchDataService.enableDisableBranch(id);
-    // }
 }

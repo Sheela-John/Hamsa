@@ -6,10 +6,6 @@ const branchSchema = new mongoose.Schema({
     latitude: { type: Number },
     longitude: { type: Number },
     status: { type: Number, default: 0 }, /* 0 - Active ,  1 - Deleted , 2 - Disabled */
-    isDeleted:{
-        type:Number,
-        default:0
-    }
 }, {
     collection: 'branch',
     versionKey: false,

@@ -16,7 +16,6 @@
                 <th class="p-3 text-left">Email</th>
                 <th class="p-3 text-left">Address</th>
                 <th class="p-3 text-left">NoOfSession</th>
-                <!-- <th class="p-3 text-left">WeeklySession</th> -->
                 <th class="p-3 text-left">Amount</th>
                 <th class="p-3 text-left" width="110px">Actions</th>
             </tr>
@@ -33,10 +32,10 @@
                 <td
                 class="border-grey-light border hover:bg-gray-100 p-3 text-red-400 hover:text-red-600 hover:font-medium cursor-pointer">
                 <button class="btn" (click)="editClient(client._id,client.packageId)"><i class='fa fa-edit'></i></button>&nbsp;&nbsp;
-                <button class="btn" style="background-color: green;" (click)="enableDisableClient(client._id)"
+                <!-- <button class="btn" style="background-color: green;" (click)="enableDisableClient(client._id)"
                 *ngIf="client.status == 0"><i class="fa fa-unlock" aria-hidden="true"></i></button>
                 <button class="btn" style="background-color: red;" (click)="enableDisableClient(client._id)"
-                *ngIf="client.status == 2"><i class="fa fa-lock" aria-hidden="true"></i></button>
+                *ngIf="client.status == 2"><i class="fa fa-lock" aria-hidden="true"></i></button> -->
             </td>
             </tr>
         </tbody>

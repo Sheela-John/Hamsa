@@ -74,14 +74,14 @@ export class AssignDataService {
 
     //getSlotByStaffIdAndSlotId
     public getSlotByStaffIdAndSlotId(Data): Observable<any> {
-        return this.httpClient.post('assignService/getRoleDetailsByStaffIdAndSlotId',Data).pipe(tap(res => {
+        return this.httpClient.post('assignService/getRoleDetailsByStaffIdAndSlotId', Data).pipe(tap(res => {
             return res;
         }), catchError(error => throwError(error)));
     }
 
-     //getSlotsForAssignService
-     public getSlotsForAssignService(Data): Observable<any> {
-        return this.httpClient.post('assignService/getSlotsForAssignService',Data).pipe(tap(res => {
+    //getSlotsForAssignService
+    public getSlotsForAssignService(Data): Observable<any> {
+        return this.httpClient.post('assignService/getSlotsForAssignService', Data).pipe(tap(res => {
             return res;
         }), catchError(error => throwError(error)));
     }
