@@ -268,18 +268,18 @@ const UpdateClient = async function (datatoupdate) {
     let clientId = datatoupdate._id;
     delete datatoupdate._id
     let [Clienterr, client] = await handle(Client.findOne({ "_id": clientId }))
-  console.log("client",client)
   let clientData;
-  for(var z=0;z<client.packageId.length;z++)
-  {
+ 
     if(client.packageId.includes(datatoupdate.packageId))
     {
         clientData = await handle(Client.findOneAndUpdate({ "_id": clientId }, datatoupdate, { new: true, useFindAndModify: false }))
     }
-    else{
-        clientData = await handle(Client.findOneAndUpdate({ _id: clientId,  }, { $push: { 'packageId':packageIdValue } }, { new: true, useFindAndModify: false }).lean());
-    }
-  }
+else{
+      
+        clientData = await handle(Client.findOneAndUpdate({ _id: clientId,  },{ $push: { packageId: { $each:[datatoupdate.packageId], $sort: -1 } } }, { new: true, useFindAndModify: false }).lean());
+      
+}
+  
   //   let [err, clientData] = await handle(Client.findOneAndUpdate({ "_id": clientId }, datatoupdate, { new: true, useFindAndModify: false }))
     let [err2, assignData1] = await handle(AssignService.find({ 'packageId': datatoupdate.packageId }))
     if(assignData1.length!=0)
@@ -312,6 +312,7 @@ const UpdateClient = async function (datatoupdate) {
 }
 else
 {
+    console.log("clientData",clientData)
     for (var i = 0; i < datatoupdate.addSession.length; i++) {
         var assign = {
 
@@ -337,7 +338,7 @@ else
         let [err2, assignServiceData] = await handle(saveAssignData.save())
     }
 }
-  //  if (err) return Promise.reject(err);
+
     return Promise.resolve(clientData);
 }
 
