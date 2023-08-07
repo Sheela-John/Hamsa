@@ -21,5 +21,6 @@ db.BranchTransfer = require('./branchTransfer');
 db.ServiceRequest=require('./serviceRequest');
 db.RolePosition = require('./rolePosition');
 db.BranchTransfer = require('./branchTransfer');
+db.QRcodeImage = require('./QRcodeImage')
 
 module.exports = db;

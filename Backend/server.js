@@ -50,6 +50,7 @@ app.use('/travelAllowance', require('./routes/travelAllowance.route'));
 app.use('/attendence', require('./routes/attendence.route'));
 app.use('/client', require('./routes/client.route'));
 app.use('/branchTransfer', require('./routes/branchTransfer.route'));
+app.use('/QRcodeImage', require('./routes/QRcode.route'))
 
 app.use(errorHandler);
 
