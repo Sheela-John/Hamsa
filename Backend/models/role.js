@@ -4,6 +4,7 @@ const slotSchema = new mongoose.Schema({
     slotName: { type: String },
     startTime: { type: String },
     endTime: { type: String },
+    isDeleted:{ type: Number, default: 0}  /* 0 - Active ,  1 - Deleted  */
 })
 
 const roleSchema = new mongoose.Schema({

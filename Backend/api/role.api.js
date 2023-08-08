@@ -43,10 +43,10 @@ const handle = (promise) => {
 /* Create Role */
 async function create(roleData) {
     log.debug(component, 'Creating a Role', { 'attach': roleData }); log.close();
-    console.log("roleData",roleData)
+    console.log("roleData", roleData)
     var saveModel = new Role(roleData);
     let [err, roleDataSaved] = await handle(saveModel.save())
-    console.log(err,"fsdfgdg",roleDataSaved)
+    console.log(err, "fsdfgdg", roleDataSaved)
     if (err) return Promise.reject(err);
     else return Promise.resolve(roleDataSaved)
 }
@@ -82,7 +82,7 @@ async function getAllRoleDetails() {
 
 /* Enable / Disable Role By Role Id */
 const enableDisableRole = async (roleId) => {
-    log.debug(component, 'Enable and Disable functionality');
+    log.debug(component, 'Enable and Disable functionality' );
     log.close();
     let [enableDisableErr, enableDisableData] = await handle(Role.findOne({ "_id": roleId }));
     if (enableDisableErr) return Promise.reject(enableDisableErr);
@@ -93,10 +93,31 @@ const enableDisableRole = async (roleId) => {
     else return Promise.resolve(enableDisableValue);
 }
 
+
+async function deleteSlot(data) {
+
+    log.debug(component, 'delete slot');
+    log.close();
+    let [err, roleData] = await handle(Role.findOne({ "_id": data.id }));
+    if (err) return Promise.reject(err);
+    console.log("roleData.length", roleData.slots.length)
+    console.log("roleData",roleData)
+    for (var i = 0; i < roleData.slots.length; i++) {
+        if (roleData.slots[i].id == data.slotId) {
+            console.log("data.slotId", data.slotId)
+            console.log("roleData.slots[i].id", roleData.slots[i].id)
+            let [error, slotData] = await handle(Role.findOneAndUpdate({ "_id": data.id, "slots": { "$elemMatch": { "_id": (data.slotId) } } }, { $set: { 'slots.$.isDeleted': 1 } }, { new: true, useFindAndModify: false }).lean());
+            if (error) return Promise.reject(error);
+            return Promise.resolve(slotData);
+        }
+    }
+}
+
 module.exports = {
     create: create,
     UpdateRole: UpdateRole,
     getRoleDataById: getRoleDataById,
     getAllRoleDetails: getAllRoleDetails,
-    enableDisableRole: enableDisableRole
+    enableDisableRole: enableDisableRole,
+    deleteSlot: deleteSlot
 }

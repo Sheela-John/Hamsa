@@ -70,4 +70,20 @@ router.post('/', async (req, res, next) => {
         else return res.status(200).json({ status: true, "data": enableDisableData });
     })
 
+    .delete('/deleteSlot/:_id', async (req, res, next) => {
+        log.debug(COMPONENT, 'Delete slot '); log.close();
+        req.body.id=req.params._id
+        let [err, mentorData] = await handle(RoleAPI.deleteSlot(req.body));
+        if (err) {
+            log.error(COMPONENT, 'Change slot status error', { attach: err });
+            log.close();
+            return res.json({ status: false, err: Object.assign(ERR.UNKNOWN, { message: err.message }) });
+        }
+        else {
+            log.debug(COMPONENT, 'Changing slot Status');
+            log.close();
+            return res.json({ "status": true, data: mentorData, "message": "slot Status Changed!" })
+        }
+    });
+
 module.exports = router;
