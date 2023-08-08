@@ -12,17 +12,18 @@
           <div class="container">
             <div class="row">
               <div class="col-lg-6">
-                <label for="name" class="block mb-2 font-bold text-gray-600 ">Travel Expense
-                  Mode  <span
-                  class="required">*</span>
+                <label for="name" class="block mb-2 font-bold text-gray-600">Travel Expense Mode
+                  <span class="required">*</span>
                 </label>
                 <input type="text" id="name" name="name" placeholder="Travel Expense Mode"
-                  class="border border-gray-300  p-3 w-full rounded mb-" formControlName="travelExpenseMode">
+                  class="border border-gray-300 p-3 w-full rounded mb-" formControlName="travelExpenseMode">
                 <div class="error-msg-area">
-                  <div *ngIf="travelExpenseForm.controls['travelExpenseMode'].errors && 
-                                        (!travelExpenseForm.controls['travelExpenseMode'].pristine || 
-                                        isTravelExpenseFormSubmitted)" class="error-msg">
-                    <div [hidden]="!travelExpenseForm.controls['travelExpenseMode'].errors.required">
+                  <div *ngIf="
+                      travelExpenseForm.controls['travelExpenseMode'].errors &&
+                      (!travelExpenseForm.controls['travelExpenseMode'].pristine ||
+                        isTravelExpenseFormSubmitted)
+                    " class="error-msg">
+                    <div [hidden]="!travelExpenseForm.controls['travelExpenseMode'].errors['required']">
                       Please Enter Travel Expense Mode
                     </div>
                   </div>
@@ -30,8 +31,7 @@
               </div>
               <div class="col-lg-6">
                 <label for="costType" class="block mb-2 font-bold text-gray-600">Cost Type
-                  <span
-                  class="required">*</span> 
+                  <span class="required">*</span>
                 </label>
                 <div class="flex items-center mr-4">
                   <input id="per-km" type="radio" value="0" name="costType" formControlName="costType"
@@ -46,96 +46,115 @@
                     class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">By Distance</label>
                 </div>
                 <div class="error-msg-area">
-                  <div *ngIf="travelExpenseForm.controls['costType'].errors &&
-                    (!travelExpenseForm.controls['costType'].pristine || isTravelExpenseFormSubmitted)"
-                    class="error-msg">
-                    <div [hidden]="!travelExpenseForm.controls['costType'].errors.required">
+                  <div *ngIf="
+                      travelExpenseForm.controls['costType'].errors &&
+                      (!travelExpenseForm.controls['costType'].pristine || isTravelExpenseFormSubmitted)
+                    " class="error-msg">
+                    <div [hidden]="!travelExpenseForm.controls['costType'].errors['required']">
                       Please Enter Cost Type
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-        <div *ngIf="hideAddCostHeader" style="display: flex;gap: 877px;">
-          <h1 class="font-bold text-teal-400 mb-2" style="font-size: x-large;">Add Cost</h1>
-          <button class="block  bg-teal-400 text-white font-bold p-2 rounded-lg" *ngIf="hideAddCost"
-            (click)="addCost()">Add Cost</button>
-        </div>
-        <ng-container formArrayName="addCost"
-          *ngFor="let cost of travelExpenseForm.get('addCost')['controls']; let i = index;">
-          <ng-container [formGroupName]="i" class="mt-3">
-            <div class="grid sm:grid-cols-1 md:grid-cols-4 md:gap-3">
-              <div>
-                <label for="from{{i}}" class="block mb-2 font-bold text-gray-600">From(km)
-                  <span
-                  class="required">*</span>
-                </label>
-                <input type="number" id="from{{i}}" name="from{{i}}" placeholder="From"
-                  class="border border-gray-300  p-2 w-full rounded" formControlName="from">
-                <div class="error-msg-area">
-                  <div
-                    *ngIf="travelExpenseForm.controls['addCost']['controls'][i]['controls'].from?.errors && (!travelExpenseForm.controls['addCost']['controls'][i]['controls'].from?.pristine || isTravelExpenseFormSubmitted)"
-                    class="error-msg">
-                    <div
-                      [hidden]="!travelExpenseForm.controls['addCost']['controls'][i]['controls'].from?.errors.required">
-                      Please Enter From
-                    </div>
-                  </div>
+              <div *ngIf="hideAddCostHeader" class="row mt-3">
+                <div class="col-10">
+                  <h1 class="font-bold text-teal-400 mb-2" style="font-size: x-large;">Add Cost</h1>
+                </div>
+                <div class="col-2">
+                  <button class="block  bg-teal-400 text-white font-bold p-2 rounded-lg" *ngIf="hideAddCost"
+                    (click)="addCost()">Add Cost</button>
                 </div>
               </div>
-              <div>
-                <label for="to{{i}}" class="block mb-2 font-bold text-gray-600">To(km)
-                  <span
-                  class="required">*</span>
-                </label>
-                <input type="number" id="to{{i}}" name="to{{i}}" placeholder="To"
-                  class="border border-gray-300  p-2 w-full rounded" formControlName="to">
-                <div class="error-msg-area">
-                  <div
-                    *ngIf="travelExpenseForm.controls['addCost']['controls'][i]['controls'].to?.errors && (!travelExpenseForm.controls['addCost']['controls'][i]['controls'].to?.pristine || isTravelExpenseFormSubmitted)"
-                    class="error-msg">
-                    <div
-                      [hidden]="!travelExpenseForm.controls['addCost']['controls'][i]['controls'].to?.errors.required">
-                      Please Enter To
+              <ng-container formArrayName="addCost"
+                *ngFor="let cost of travelExpenseForm.get('addCost')['controls']; let i = index;">
+                <ng-container [formGroupName]="i" class="mt-3">
+                  <div class="grid sm:grid-cols-1 md:grid-cols-4 md:gap-3">
+                    <div>
+                      <label for="from{{i}}" class="block mb-2 font-bold text-gray-600">From(km)
+                        <span class="required">*</span>
+                      </label>
+                      <input type="number" id="from{{i}}" name="from{{i}}" placeholder="From"
+                        class="border border-gray-300  p-2 w-full rounded" formControlName="from">
+                      <div class="error-msg-area">
+                        <div
+                          *ngIf="travelExpenseForm.controls['addCost']['controls'][i]['controls'].from?.errors && (!travelExpenseForm.controls['addCost']['controls'][i]['controls'].from?.pristine || isTravelExpenseFormSubmitted)"
+                          class="error-msg">
+                          <div
+                            [hidden]="!travelExpenseForm.controls['addCost']['controls'][i]['controls'].from?.errors.required">
+                            Please Enter From
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <label for="to{{i}}" class="block mb-2 font-bold text-gray-600">To(km)
+                        <span class="required">*</span>
+                      </label>
+                      <input type="number" id="to{{i}}" name="to{{i}}" placeholder="To"
+                        class="border border-gray-300  p-2 w-full rounded" formControlName="to">
+                      <div class="error-msg-area">
+                        <div
+                          *ngIf="travelExpenseForm.controls['addCost']['controls'][i]['controls'].to?.errors && (!travelExpenseForm.controls['addCost']['controls'][i]['controls'].to?.pristine || isTravelExpenseFormSubmitted)"
+                          class="error-msg">
+                          <div
+                            [hidden]="!travelExpenseForm.controls['addCost']['controls'][i]['controls'].to?.errors.required">
+                            Please Enter To
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <label for="cost{{i}}" class="block mb-2 font-bold text-gray-600">Cost
+                        <span class="required">*</span>
+                      </label>
+                      <input type="number" id="cost{{i}}" name="cost{{i}}" placeholder="Cost"
+                        class="border border-gray-300  p-2 w-full rounded" formControlName="cost">
+                      <div class="error-msg-area">
+                        <div
+                          *ngIf="travelExpenseForm.controls['addCost']['controls'][i]['controls'].cost?.errors && (!travelExpenseForm.controls['addCost']['controls'][i]['controls'].cost?.pristine || isTravelExpenseFormSubmitted)"
+                          class="error-msg">
+                          <div
+                            [hidden]="!travelExpenseForm.controls['addCost']['controls'][i]['controls'].cost?.errors.required">
+                            Please Enter Cost
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div *ngIf="!showdelete">
+                      <button class="card-header btn_delete ml-4 mt-4" style="background-color:red;"
+                        (click)="RemoveSlot(i)">
+                        <i class="fa fa-trash"></i>
+                      </button>
                     </div>
                   </div>
-                </div>
-              </div>
-              <div>
-                <label for="cost{{i}}" class="block mb-2 font-bold text-gray-600">Cost
-                  <span
-                  class="required">*</span> 
+                </ng-container>
+              </ng-container>
+              <div *ngIf="travelExpenseForm.controls['costType'].value === '0'">
+                <label for="newPerKmCost" class="block mb-2 font-bold text-gray-600"> Cost
+                  <span class="required">*</span>
                 </label>
-                <input type="number" id="cost{{i}}" name="cost{{i}}" placeholder="Cost"
-                  class="border border-gray-300  p-2 w-full rounded" formControlName="cost">
+                <input type="number" id="newPerKmCost" name="newPerKmCost" placeholder="Per Km Cost"
+                  class="border border-gray-300 p-2 w-full rounded" formControlName="newPerKmCost">
                 <div class="error-msg-area">
-                  <div
-                    *ngIf="travelExpenseForm.controls['addCost']['controls'][i]['controls'].cost?.errors && (!travelExpenseForm.controls['addCost']['controls'][i]['controls'].cost?.pristine || isTravelExpenseFormSubmitted)"
-                    class="error-msg">
-                    <div
-                      [hidden]="!travelExpenseForm.controls['addCost']['controls'][i]['controls'].cost?.errors.required">
+                  <div *ngIf="
+                      travelExpenseForm.controls['newPerKmCost'].errors &&
+                      (!travelExpenseForm.controls['newPerKmCost'].pristine || isTravelExpenseFormSubmitted)
+                    " class="error-msg">
+                    <div [hidden]="!travelExpenseForm.controls['newPerKmCost'].errors['required']">
                       Please Enter Cost
                     </div>
                   </div>
                 </div>
-              </div>
-              <div>
-                <button class="card-header btn_delete ml-4 mt-4" style="background-color:red;" (click)="RemoveSlot(i)">
-                  <i class="fa fa-trash"></i>
-                </button>
+
               </div>
             </div>
-          </ng-container>
-        </ng-container>
-        <br><br>
+          </div>
+        </div>
         <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg mt-5" *ngIf="!showAddEdit"
           (click)=" addtravelExpense()">Submit</button>
 
         <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg mt-5" *ngIf="showAddEdit"
           (click)="updatetravelExpenseById()">Update</button>
-        <br><br>
       </form>
     </div>
   </section>

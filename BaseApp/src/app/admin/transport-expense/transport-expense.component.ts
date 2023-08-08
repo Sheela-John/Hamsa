@@ -1,3 +1,5 @@
+
+
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { FlashMessageService } from 'src/app/shared/flash-message/flash-message.service';
@@ -50,7 +52,6 @@ export class TransportExpenseComponent {
     this.TransportExpenseService.getAlltravelExpense().subscribe(res => {
       if (res.status) {
         this.travelExpenseArr = res.data;
-        this.dtTrigger.next(null);
         console.log(this.travelExpenseArr, "this.travelExpenseArr ")
       }
     })

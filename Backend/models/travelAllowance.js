@@ -1,14 +1,15 @@
 const mongoose = require('mongoose');
 
 const distanceSchema = new mongoose.Schema({
-      from:{type:String},
-      to:{type:String},
-      cost:{type:String}
+      from:{type:Number},
+      to:{type:Number},
+      cost:{type:Number}
 })
 
 const travelAllowanceSchema = new mongoose.Schema({
     costType:{ type:Number,default: 0 }, //0- per km, 1- by distance
     travelExpenseMode:{type:String },
+    newPerKmCost:{type:Number},
     distance:{ type: [distanceSchema] }
 }, {
     collection: 'travelAllowance',

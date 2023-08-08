@@ -34,7 +34,7 @@
                     </div>
                     <div class="col-1"></div>
                   </div>
-                  <ul>
+                  <ul *ngIf="travelExpense.costType == 1">
                     <div style="background-color: #163339; padding: 15px;">
                       <div class="row" style="color: white;">
                         <div class="col-4">
@@ -66,6 +66,16 @@
                           </div>
                         </div>
                       </li>
+                    </div>
+                  </ul>
+                  <ul *ngIf="travelExpense.costType == 0">
+                    <div style="background-color: #163339; padding: 15px;">
+                      <div class="row" style="color: white;">
+                        <div class="col-4">
+                          <div>cost: {{ travelExpense.newPerKmCost }}</div>
+                          &nbsp;&nbsp;
+                        </div>
+                      </div>
                     </div>
                   </ul>
                 </div>
