@@ -79,7 +79,9 @@ const assignServiceClient = async (assignServiceData) => {
             assignServiceData['staffName'] = staffNameData.staffName;
             let [findClientErr, findClientData] = await handle(Client.findOne({ '_id': assignServiceData.clientId }));
             console.log("findClientData", findClientData)
-            assignServiceData['clientId'] = findClientData._id;
+           // assignServiceData['clientId'] = findClientData._id;
+           assignServiceData['latitude'] =findClientData.clientAddressLatitude;
+           assignServiceData['longitude']=findClientData.clientAddressLongitude;
             if (findClientErr) return Promise.reject(findClientErr);
             const options = {
                 provider: 'google',
@@ -1038,21 +1040,16 @@ const updateAssignService = async function (datatoupdate) {
 
 
 async function getAssignServiceDataByStaffIdAndDate(data) {
-    console.log("data", data)
-    console.log("staff", data.staffId)
     log.debug(component, 'Getting AssignService Data by StaffId And Date');
     log.close();
     let someDate = new Date(data.date);
     let copiedAppointmentDate = new Date(someDate.getTime());
-    console.log("copiedAppointmentDate", copiedAppointmentDate)
     let [Err, assignServiceData] = await handle(AssignService.find({ 'staffId': data.staffId, date: someDate }).lean());
-    console.log("assignServiceData", assignServiceData)
     if (assignServiceData.length != 0) {
         for (var i = 0; i < assignServiceData.length; i++) {
             let [err, clientData] = await handle(Client.findOne({ _id: assignServiceData[i].clientId }).lean());
             let [err1, staffData] = await handle(Staff.findOne({ _id: assignServiceData[i].staffId }).lean());
             let [err2, serviceData] = await handle(Service.findOne({ _id: assignServiceData[i].serviceId }).lean());
-            console.log("fsdsfs", clientData, assignServiceData[i].clientId)
             assignServiceData[i].clientName = clientData.clientName;
             assignServiceData[i].staffName = staffData.staffName;
             assignServiceData[i].serviceName = serviceData.serviceName;
@@ -1308,6 +1305,16 @@ function slotCheck(start)
     var AST = Number(bHr + bMin);
     return AST
 }
+async function assignServiceForClientByPhone(data)
+{
+    let [clientErr, clientData] = await handle(Client.findOne({ 'phoneNumber': data.phoneNumber }).lean());
+    if(clientErr) return Promise.reject(clientErr);
+    if (lodash.isEmpty(clientData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+    let [Err, assignServiceData] = await handle(AssignService.find({ 'clientId': clientData._id }).lean());
+    if(Err) return Promise.reject(Err);
+    if (lodash.isEmpty(assignServiceData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+    return Promise.resolve(assignServiceData);
+}
 module.exports = {
     assignServiceClient: assignServiceClient,
     assignServiceBranch: assignServiceBranch,
@@ -1330,5 +1337,6 @@ module.exports = {
     getAssignServiceDataByStaffIdAndDate: getAssignServiceDataByStaffIdAndDate,
     getSlotsForAssignService: getSlotsForAssignService,
     travelDistance: travelDistance,
-    getRoleDetailsByStaffIdAndSlotId: getRoleDetailsByStaffIdAndSlotId
+    getRoleDetailsByStaffIdAndSlotId: getRoleDetailsByStaffIdAndSlotId,
+    assignServiceForClientByPhone:assignServiceForClientByPhone
 }

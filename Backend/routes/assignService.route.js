@@ -175,5 +175,10 @@ router.post('/getRoleDetailsByStaffIdAndSlotId', async (req, res, next) => {
     if (err) return next(err);
     else return res.status(200).json({ status: true, data: assignServiceData });
 })
+router.post('/assignServiceForClientByPhone', async (req, res, next) => {
+    let [err, assignServiceData] = await handle(AssignServiceAPI.assignServiceForClientByPhone(req.body));
+    if (err) return next(err);
+    else return res.status(200).json({ status: true, data: assignServiceData });
+})
 
 module.exports = router;
