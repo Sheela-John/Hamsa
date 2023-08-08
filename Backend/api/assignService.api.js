@@ -355,7 +355,7 @@ const getAssignedServicesbyStaff = async (data) => {
 async function getAllAssignedServices() {
     log.debug(component, 'Get All Assign Service Detail'); log.close();
     let [err, assignServiceData] = await handle(AssignService.find().lean());
-    console.log("assignServiceData",assignServiceData)
+    console.log("assignServiceData", assignServiceData)
     for (var i = 0; i < assignServiceData.length; i++) {
         let [err, clientData] = await handle(Client.findOne({ _id: assignServiceData[i].clientId }).lean());
         let [err1, staffData] = await handle(Staff.findOne({ _id: assignServiceData[i].staffId }).lean());
@@ -1026,7 +1026,7 @@ const updateAssignService = async function (datatoupdate) {
     // }
     console.log("assignServiceId",assignServiceId,datatoupdate)
     let [clientErr, clientData] = await handle(AssignService.findOneAndUpdate({ "_id": assignServiceId }, datatoupdate, { new: true, useFindAndModify: false }))
-    console.log("clientData",clientData)
+    console.log("clientData", clientData)
     if (clientErr) return Promise.reject(clientErr);
     else return Promise.resolve(clientData);
 }
@@ -1039,17 +1039,19 @@ async function getAssignServiceDataByStaffIdAndDate(data) {
     let someDate = new Date(data.date);
     let copiedAppointmentDate = new Date(someDate.getTime());
     let [Err, assignServiceData] = await handle(AssignService.find({ 'staffId': data.staffId, date: copiedAppointmentDate }).lean());
+    console.log("assignServiceData", assignServiceData)
     if (assignServiceData.length != 0) {
         for (var i = 0; i < assignServiceData.length; i++) {
             let [err, clientData] = await handle(Client.findOne({ _id: assignServiceData[i].clientId }).lean());
             let [err1, staffData] = await handle(Staff.findOne({ _id: assignServiceData[i].staffId }).lean());
             let [err2, serviceData] = await handle(Service.findOne({ _id: assignServiceData[i].serviceId }).lean());
+            console.log("fsdsfs", clientData, assignServiceData[i].clientId)
             assignServiceData[i].clientName = clientData.clientName;
             assignServiceData[i].staffName = staffData.staffName;
             assignServiceData[i].serviceName = serviceData.serviceName;
         }
     }
-    console.log(assignServiceData,"assignServiceData")
+    console.log(assignServiceData, "assignServiceData")
     if (Err) return Promise.reject(Err);
     if (lodash.isEmpty(assignServiceData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(assignServiceData);
@@ -1087,7 +1089,7 @@ console.log("bookedSlots",bookedSlots)
         }
     }
     var count = 0;
-    console.log(bookedSlots)
+    console.log("bookedSlots", bookedSlots)
     if (bookedSlots) {
         for (var i = 0; i < bookedSlots.length; i++) {
             if (typeOfTreamentArray.includes(bookedSlots[i].typeOfTreatment)) {
@@ -1095,44 +1097,65 @@ console.log("bookedSlots",bookedSlots)
             }
         }
     }
+    console.log("count", count)
     if (bookedSlots) {
         for (var i = 0; i < bookedSlots.length; i++) {
             if (bookedSlots[i].date == new Date(data.date)) {
-                if (typeOfTreamentArray.includes(data.typeOfTreatment)) {
+                console.log("date", bookedSlots[i].typeOfTreatment)
+                let typeOfTreament = typeOfTreamentArray.filter(a => (a == data.typeOfTreatment))
+                let bookedTreatment = typeOfTreamentArray.filter(a => (a == bookedSlots[i].typeOfTreatment))
+                console.log(bookedTreatment);
+                if (typeOfTreament.length != 0) {
+                    console.log("data.typeOfTreatment", data.typeOfTreatment)
                     for (var j = 0; j < final.length; j++) {
                         var start = bookedSlots[i].startTime.split(' ')[0];
                         var end = bookedSlots[i].endTime.split(' ')[0];
                         var bHr = (start.split(':')[0]);
                         var bMin = (start.split(':')[1]);
-
                         var AST = Number(bHr + bMin);
                         var bHr1 = (end.split(':')[0]);
                         var bMin1 = (end.split(':')[1]);
-
                         var AET = Number(bHr1 + bMin1);
                         if (bookedSlots[i].typeOfTreatment == 0) {
-                            console.log("dsadnak")
                             AET = AET + 15;
                         }
                         var sHr = (final[j].slot.split('-')[0].split(':')[0]);
                         var sMin = (final[j].slot.split('-')[0].split(':')[1]);
                         var eHr = (final[j].slot.split('-')[1].split(':')[0])
                         var eMin = (final[j].slot.split('-')[1].split(':')[1])
-
-
                         var IST = Number(sHr + sMin);
                         var IET = Number(eHr + eMin);
-                        if (count != 0 && count <= 3) {
-                            final[j].bookedStatus = 0;
+                        if (bookedTreatment.length != 0) {
+                            console.log(bookedSlots[i].startTime, bookedSlots[i].endTime)
+                            var slot = bookedSlots[i].startTime + '-' + bookedSlots[i].endTime;
+                            if (count != 0 && count < 3 && final[j].slot == slot) {
+                                console.log(true);
+                                final[j].bookedStatus = 0;
+                            }
+                            else{
+                                console.log(false)
+                              
+                                    for (var x = AST; x <= AET; x++) {
+                                        if (x >= IST && x <= IET) {
+                                            var temp = final[j].slot.split('-')[0]
+                                            var temp1 = final[j].slot.split('-')[1]
+                                            if (IET == AST || IST == AET) {
+                                                final[j].bookedStatus = 0;
+                                            }
+                                            else {
+                                                final[j].bookedStatus = 1;
+                                            }
+                                        }
+                                    }
+                                }
+                            
                         }
                         else {
                             for (var x = AST; x <= AET; x++) {
                                 if (x >= IST && x <= IET) {
                                     var temp = final[j].slot.split('-')[0]
                                     var temp1 = final[j].slot.split('-')[1]
-                                   
                                     if (IET == AST || IST == AET) {
-                                        console.log("IET",IET,AST,IST,AET)
                                         final[j].bookedStatus = 0;
                                     }
                                     else {
@@ -1142,8 +1165,6 @@ console.log("bookedSlots",bookedSlots)
                             }
                         }
                     }
-
-
                 }
                 else {
                     for (var j = 0; j < final.length; j++) {
@@ -1158,40 +1179,33 @@ console.log("bookedSlots",bookedSlots)
                         if (bookedSlots[i].typeOfTreatment == 0) {
                             AET = AET + 15;
                         }
-                        console.log("AET",AET)
                         var sHr = (final[j].slot.split('-')[0].split(':')[0]);
                         var sMin = (final[j].slot.split('-')[0].split(':')[1]);
                         var eHr = (final[j].slot.split('-')[1].split(':')[0])
                         var eMin = (final[j].slot.split('-')[1].split(':')[1])
-
-
                         var IST = Number(sHr + sMin);
                         var IET = Number(eHr + eMin);
                         for (var x = AST; x <= AET; x++) {
                             if (x >= IST && x <= IET) {
-                              
-                              
                                 if (IET == AST || IST == AET) {
-                                    console.log("IET", final[j].slot)
                                     final[j].bookedStatus = 0;
-                                    console.log(" final[j].bookedStatus", final[j].bookedStatus)
                                 }
                                 else {
                                     final[j].bookedStatus = 1;
                                 }
                             }
                         }
-                        console.log("final",final[j])
                     }
                 }
             }
         }
     }
-    
+
     if (err1) return Promise.reject(err1);
     if (lodash.isEmpty(final)) return reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(final);
 }
+
 var makeTimeIntervals = function (start_Time, end_Time, increment) {
     var startTime = start_Time.toString().split(':');
     var endTime = end_Time.toString().split(':');
@@ -1227,7 +1241,7 @@ var makeTimeIntervals = function (start_Time, end_Time, increment) {
 const pad = function (n) { return (n < 10) ? '0' + n.toString() : n; };
 
 const travelDistance = async (data) => {
-    let [err,branchData]=await handle(Branch.findOne({"_id":data.branchId}))
+    let [err, branchData] = await handle(Branch.findOne({ "_id": data.branchId }))
     return new Promise((resolve, reject) => {
         const options = {
             method: 'POST',
@@ -1267,24 +1281,22 @@ const travelDistance = async (data) => {
                     duration: response.body.routes[0].duration,
                     distance: response.body.routes[0].distanceMeters / 1000
                 }
-                console.log("value",value)
+                console.log("value", value)
                 return resolve(value)
             })();
         });
     });
 }
-async function getRoleDetailsByStaffIdAndSlotId(data){
+async function getRoleDetailsByStaffIdAndSlotId(data) {
     let [staffErr, staffData] = await handle(Staff.findOne({ '_id': data.staffId }).lean());
     let [err2, roleData] = await handle(Role.findOne({ _id: staffData.staffRole, "slots": { "$elemMatch": { "_id": (data.slotId) } } }).lean());
     var slotDetails;
-    for(var i=0;i<roleData.slots.length;i++)
-    {
-        if((roleData.slots[i]._id.toString())==data.slotId)
-        {
-          slotDetails=roleData.slots[i]
+    for (var i = 0; i < roleData.slots.length; i++) {
+        if ((roleData.slots[i]._id.toString()) == data.slotId) {
+            slotDetails = roleData.slots[i]
         }
     }
-   
+
     if (lodash.isEmpty(slotDetails)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(slotDetails);
 }
@@ -1310,5 +1322,5 @@ module.exports = {
     getAssignServiceDataByStaffIdAndDate: getAssignServiceDataByStaffIdAndDate,
     getSlotsForAssignService: getSlotsForAssignService,
     travelDistance: travelDistance,
-    getRoleDetailsByStaffIdAndSlotId:getRoleDetailsByStaffIdAndSlotId
+    getRoleDetailsByStaffIdAndSlotId: getRoleDetailsByStaffIdAndSlotId
 }
