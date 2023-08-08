@@ -61,4 +61,9 @@ export class AssignService {
     public getSlotsForAssignService(Data) {
         return this.AssignDataService.getSlotsForAssignService(Data);
     }
+
+    //update Assign Service
+    public updateAssignService(data,id){
+        return this.AssignDataService.updateAssignService(data,id)
+    }
 }

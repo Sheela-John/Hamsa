@@ -85,4 +85,11 @@ export class AssignDataService {
             return res;
         }), catchError(error => throwError(error)));
     }
+
+    //updateAssignService
+     public updateAssignService(data,id): Observable<any> {
+        return this.httpClient.put('assignService/updateAssignService/'+id, data).pipe(tap(res => {
+            return res;
+        }), catchError(error => throwError(error)));
+    }
 }
