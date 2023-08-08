@@ -1110,6 +1110,7 @@ async function getSlotsForAssignService(data) {
 
                         var AET = Number(bHr1 + bMin1);
                         if (bookedSlots[i].typeOfTreatment == 0) {
+                            console.log("dsadnak")
                             AET = AET + 15;
                         }
                         var sHr = (final[j].slot.split('-')[0].split(':')[0]);
@@ -1128,8 +1129,9 @@ async function getSlotsForAssignService(data) {
                                 if (x >= IST && x <= IET) {
                                     var temp = final[j].slot.split('-')[0]
                                     var temp1 = final[j].slot.split('-')[1]
-                                    console.log("IET",IET,AST,IST,AET)
+                                   
                                     if (IET == AST || IST == AET) {
+                                        console.log("IET",IET,AST,IST,AET)
                                         final[j].bookedStatus = 0;
                                     }
                                     else {
@@ -1152,9 +1154,10 @@ async function getSlotsForAssignService(data) {
                         var bHr1 = (end.split(':')[0]);
                         var bMin1 = (end.split(':')[1]);
                         var AET = Number(bHr1 + bMin1);
-                        if (bookedSlots[i].typeOfTreatment == 2) {
+                        if (bookedSlots[i].typeOfTreatment == 0) {
                             AET = AET + 15;
                         }
+                        console.log("AET",AET)
                         var sHr = (final[j].slot.split('-')[0].split(':')[0]);
                         var sMin = (final[j].slot.split('-')[0].split(':')[1]);
                         var eHr = (final[j].slot.split('-')[1].split(':')[0])
@@ -1168,19 +1171,22 @@ async function getSlotsForAssignService(data) {
                               
                               
                                 if (IET == AST || IST == AET) {
-                                    console.log("IET",IET,AST,IST,AET)
+                                    console.log("IET", final[j].slot)
                                     final[j].bookedStatus = 0;
+                                    console.log(" final[j].bookedStatus", final[j].bookedStatus)
                                 }
                                 else {
                                     final[j].bookedStatus = 1;
                                 }
                             }
                         }
+                        console.log("final",final[j])
                     }
                 }
             }
         }
     }
+    
     if (err1) return Promise.reject(err1);
     if (lodash.isEmpty(final)) return reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(final);
