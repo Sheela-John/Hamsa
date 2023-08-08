@@ -309,13 +309,13 @@
                                                     </div>
                                                     <div class="card-body">
                                                         <div class="row">
-                                                            <ng-container
-                                                                *ngFor="let slot of timeInterval; let i  = index;">
-                                                                <div class="col-md-4 sessionSlots  card"
-                                                                    (click)="slotSelection(slot,i)">
+                                                            <ng-container *ngFor="let slot of timeInterval; let i  = index;">
+                                                                <div class="col-md-4 sessionSlots card"
+                                                                    [ngClass]="(slot.bookedStatus == 1) ? 'bg-gray-300' : 'pointer'"
+                                                                    (click)="(slot.bookedStatus == 1) ? '' : slotSelection(slot,i)">
                                                                     {{slot.slot}}
                                                                     <div class="badge_position">
-                                                                        <span class="badge badge-danger"
+                                                                        <span class="badge bg-teal-400"
                                                                             *ngIf="(i==slotSelectedIndex)">Booked</span>
                                                                     </div>
                                                                 </div>
@@ -393,7 +393,7 @@
                                             <td
                                                 class="border-grey-light border hover:bg-gray-100 p-3 text-red-400 hover:text-red-600 hover:font-medium cursor-pointer">
                                                 <button class="btn"
-                                                    (click)="editAssignServiceClient(assignServiceList.Action)"><i
+                                                    (click)="editAssignServiceClient(assignServiceList._id)"><i
                                                         class='fa fa-edit'></i></button>
                                             </td>
                                         </tr>

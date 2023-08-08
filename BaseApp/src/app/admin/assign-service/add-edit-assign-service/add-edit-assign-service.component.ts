@@ -271,6 +271,7 @@ export class AddEditAssignServiceComponent implements OnInit {
     this.getClientById(id)
   }
 
+  //get client By Id
   getClientById(id) {
     this.ClientService.getClientById(id).subscribe(res => {
       if (res.status) {
@@ -344,7 +345,7 @@ export class AddEditAssignServiceComponent implements OnInit {
     }
   }
 
-  //getAll Services
+  //get All Services
   getAllServices() {
     this.serviceList = [];
     this.ServiceService.getAllServices().subscribe(res => {
@@ -386,6 +387,7 @@ export class AddEditAssignServiceComponent implements OnInit {
     this.getBranchbyId(branchId)
   }
 
+  //getBranch By Id
   getBranchbyId(branchId) {
     this.BranchService.getBranchbyId(branchId).subscribe(res => {
       if (res.status) {
@@ -416,6 +418,7 @@ export class AddEditAssignServiceComponent implements OnInit {
     this.getOtherBranchbyId(branchId)
   }
 
+  //get other Branch By Id
   getOtherBranchbyId(branchId) {
     this.BranchService.getBranchbyId(branchId).subscribe(res => {
       if (res.status) {
@@ -433,6 +436,7 @@ export class AddEditAssignServiceComponent implements OnInit {
     this.getStaffById(this.StaffId);
   }
 
+  //get Staff By Id
   getStaffById(id) {
     this.StaffService.getStaffById(id).subscribe(res => {
       if (res.status) {
@@ -456,8 +460,16 @@ export class AddEditAssignServiceComponent implements OnInit {
   //Onchange Slot 
   Slot(event) {
     var id = event.target.value
+    console.log(id,"ppp")
     this.isShowSlotTime = true
+    console.log(this.assignServiceForm.value.date,"this.assignServiceForm.value.date")
+    if(this.showAddEdit == true){
+      this.AssignServiceDate = this.assignServiceForm.value.date
+    }
+    else{
     this.AssignServiceDate = this.formatDate(this.assignServiceForm.value.date)
+    }
+    console.log(this.AssignServiceDate,"jjjk")
     var data = {
       staffId: this.StaffId,
       slotId: id
@@ -465,6 +477,7 @@ export class AddEditAssignServiceComponent implements OnInit {
     this.getSlotByStaffIdAndSlotId(data)
   }
 
+  //Get Slot by staffId and SlotId
   getSlotByStaffIdAndSlotId(data) {
     this.AssignService.getSlotByStaffIdAndSlotId(data).subscribe(res => {
       if (res.status) {
@@ -488,10 +501,12 @@ export class AddEditAssignServiceComponent implements OnInit {
     this.getSlotsForAssignService(data);
   }
 
+  //get slot for Assign service
   getSlotsForAssignService(data) {
     this.AssignService.getSlotsForAssignService(data).subscribe(res => {
       if (res.status) {
         this.timeInterval = res.data
+        console.log(this.timeInterval,"hjh")
       }
     })
     this.isShowSlotTime = true
@@ -548,16 +563,16 @@ export class AddEditAssignServiceComponent implements OnInit {
 
   //editAssignServiceClient by Id
   editAssignServiceClient(id) {
+    var assignId = id
     this.showAddEdit = true
+    this.getAssignServiceById(assignId);
   }
 
   //updateassignService
   updateassignService() {
-
   }
 
   //getAssignServiceById
-
   getAssignServiceById(id) {
     this.AssignService.getAssignServiceById(id).subscribe(res => {
       if (res.status) {
@@ -573,6 +588,9 @@ export class AddEditAssignServiceComponent implements OnInit {
           this.changeOP(this.assignSercieDataArr.typeOfTreatment)
         }
         if (this.assignSercieDataArr.slot != '') {
+          this.assignServiceClientForm.patchValue({
+            slot: this.assignSercieDataArr.slot,
+          })
           this.AssignServiceDate = this.formatDate(this.assignSercieDataArr.date)
           var datas = {
             staffId: this.assignSercieDataArr.staffId,
@@ -642,13 +660,10 @@ export class AddEditAssignServiceComponent implements OnInit {
           })
           this.getBranchbyId(this.assignSercieDataArr.branchId)
         }
-
         this.assignServiceClientForm.patchValue({
           duration: this.assignSercieDataArr.duration,
           branchType: this.assignSercieDataArr.branchType,
-          // branchId: this.assignSercieDataArr.branchId,
           serviceId: this.assignSercieDataArr.serviceId,
-          slot: this.assignSercieDataArr.slot,
           typeOfTreatment: this.assignSercieDataArr.typeOfTreatment,
           opType: this.assignSercieDataArr.opType,
         })
