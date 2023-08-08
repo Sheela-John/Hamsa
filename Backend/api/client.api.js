@@ -76,7 +76,7 @@ async function create(clientData) {
     }
     let [clientErr, client] = await handle(checkForExistingUser(clientData));
     if (clientErr) return Promise.reject(clientErr);
-    if (!(lodash.isEmpty(client))) return Promise.reject(ERR.DUPLICATE_RECORD);
+    if (!(lodash.isEmpty(client))) return Promise.reject(ERR.MOBILE_NUMBER_NOT_REGISTERED);
     return new Promise((resolve, reject) => {
         if (clientErr) return reject(clientErr);
         if (!lodash.isEmpty(client)) {
@@ -216,7 +216,7 @@ async function checkForExistingUser(loginCred) {
             }
         }]
     return new Promise((resolve, reject) => {
-        Login.aggregate(query).collation({ locale: "en", strength: 2 }).exec((err, client) => {
+        Client.aggregate(query).collation({ locale: "en", strength: 2 }).exec((err, client) => {
             if (err) {
                 log.error(component, { attach: err });
                 log.close();
@@ -275,6 +275,7 @@ async function getAllClientDetails() {
         let [err1, staffData] = await handle(Staff.findOne({ _id: clientData[i].staffId }).lean());
         let [err2, serviceData] = await handle(Service.findOne({ _id: clientData[i].serviceId }).lean());
         clientData[i].homeBranchAddress = branchData.branchAddress;
+        clientData[i].homeBranchName = branchData.branchName;
         clientData[i].staffName = staffData.staffName;
         clientData[i].serviceName = serviceData.serviceName;
     }
