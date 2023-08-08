@@ -65,10 +65,8 @@ const assignServiceClient = async (assignServiceData) => {
     let copiedAppointmentDate = new Date(someDate.getTime());
 
     assignServiceData['date'] = copiedAppointmentDate;
-
-    // assignServiceData.time = someDate.setUTCHours(assignServiceData.time.split(':')[0], assignServiceData.time.split(':')[1]);
-    // assignServiceData['time'] = assignServiceData.time;
     delete assignServiceData._id;
+    console.log
     return new Promise((resolve, reject) => {
         (async () => {
             let [findStaffErr, staffNameData] = await handle(Staff.findOne({ '_id': (assignServiceData.staffId) }));
@@ -80,57 +78,64 @@ const assignServiceClient = async (assignServiceData) => {
             assignServiceData['settingsId'] = settingsData._id;
             assignServiceData['staffName'] = staffNameData.staffName;
             let [findClientErr, findClientData] = await handle(Client.findOne({ '_id': assignServiceData.clientId }));
+            console.log("findClientData", findClientData)
             assignServiceData['clientId'] = findClientData._id;
             if (findClientErr) return Promise.reject(findClientErr);
-            if (findClientData == undefined) {
-                const options = {
-                    provider: 'google',
-                    httpAdapter: 'https',
-                    // Optional depending on the providers
-                    // fetch: customFetchImplementation,
-                    apiKey: 'AIzaSyCX_9dtirFHcsQY8zjjR86cettocdHOT50', // for Mapquest, OpenCage, Google Premier
-                    formatter: null // 'gpx', 'string', ...
-                };
-                const geocoder = NodeGeocoder(options);
-                const res = await geocoder.geocode(assignServiceData.address);
-                let clientData = {
-                    clientName: assignServiceData.clientName,
-                    clientAddress: assignServiceData.address,
-                    phone: assignServiceData.phone,
-                    latitude: res[0].latitude,
-                    longitude: res[0].longitude
+            const options = {
+                provider: 'google',
+                httpAdapter: 'https',
+                apiKey: 'AIzaSyCX_9dtirFHcsQY8zjjR86cettocdHOT50', // for Mapquest, OpenCage, Google Premier
+                formatter: null // 'gpx', 'string', ...
+            };
+            const geocoder = NodeGeocoder(options);
+            const res = await geocoder.geocode(assignServiceData.address);
+            let clientData = {
+                clientName: assignServiceData.clientName,
+                clientAddress: assignServiceData.address,
+                phone: assignServiceData.phone,
+                latitude: res[0].latitude,
+                longitude: res[0].longitude
+            }
+           
+            console.log("assignServiceData", assignServiceData)
+            let [assignErr, assignServiceValue] = await handle(AssignService.find({}).lean());
+            console.log("assignServiceData", assignServiceValue)
+            var typeArray=[1,3,4];
+            var count=1;
+            if(assignServiceValue){
+            for (var j = 0; j < assignServiceValue.length; j++) {
+                if (assignServiceValue[j].date == new Date(assignServiceData.date)) {
+                    console.log("start", slotCheck(assignServiceValue[j].startTime))
+                    console.log("newStart",slotCheck(assignServiceData.startTime));
+                    console.log("end",slotCheck(assignServiceValue[j].endTime));
+                    console.log("newend",slotCheck(assignServiceData.endTime))
+                    console.log("1",(slotCheck(assignServiceValue[j].startTime) >= slotCheck(assignServiceData.startTime)))
+                    console.log("2",slotCheck(assignServiceValue[j].endTime) <= slotCheck(assignServiceData.endTime))
+                    if ((slotCheck(assignServiceValue[j].startTime) >= slotCheck(assignServiceData.startTime)) && (slotCheck(assignServiceValue[j].endTime) <= slotCheck(assignServiceData.endTime)) ){
+                        console.log(true, assignServiceData.typeOfTreatment)
+                        if (typeArray.includes(assignServiceValue[j].typeOfTreatment) && typeArray.includes(assignServiceData.typeOfTreatment)) {
+                            console.log("client.typeOfTreatment", assignServiceValue[j].bookedCount)
+                            count = assignServiceValue[j].bookedCount + 1;
+                            console.log("count", count)
+                            let [assignErr, assignServiceValue1] = await handle(AssignService.findOneAndUpdate({ _id: assignServiceValue[j]._id }, { $set: { bookedCount: count } }, { new: true, useFindAndModify: false }))
+                            console.log("assignServiceValue1", assignServiceValue1)
+                        }
+                    }
                 }
-
-                var saveModel = new Client(clientData);
-                let [err, clientDataSaved] = await handle(saveModel.save())
-
-                if (err) return Promise.reject(err);
-                assignServiceData['clientId'] = clientDataSaved._id;
-                assignServiceData['bookedCount'] = 1;
-                var saveData = new AssignService(assignServiceData);
-                saveData.save().then((assignService) => {
-                    log.debug(component, 'Saved Assign Service successfully');
-                    log.close();
-                    return resolve(assignService);
-                }).catch((err) => {
-                    log.error(component, 'Error while saving Assign Service data', { attach: err });
-                    log.close();
-                    return reject(err);
-                })
             }
-            else {
-                var saveData = new AssignService(assignServiceData);
-                saveData.save().then((assignService) => {
-                    log.debug(component, 'Saved Assign Service successfully');
-                    log.close();
+        }
+        assignServiceData['bookedCount'] = count;
+            var saveData = new AssignService(assignServiceData);
+            saveData.save().then((assignService) => {
+                log.debug(component, 'Saved Assign Service successfully');
+                log.close();
 
-                    return resolve(assignService);
-                }).catch((err) => {
-                    log.error(component, 'Error while saving Assign Service data', { attach: err });
-                    log.close();
-                    return reject(err);
-                })
-            }
+                return resolve(assignService);
+            }).catch((err) => {
+                log.error(component, 'Error while saving Assign Service data', { attach: err });
+                log.close();
+                return reject(err);
+            })
         })();
     })
 }
@@ -1024,7 +1029,7 @@ const updateAssignService = async function (datatoupdate) {
     // datatoupdate.travelDistanceinKM = travelDistanceValue.distance;
     // datatoupdate.travelDuration = travelDistanceValue.duration;
     // }
-    console.log("assignServiceId",assignServiceId,datatoupdate)
+    console.log("assignServiceId", assignServiceId, datatoupdate)
     let [clientErr, clientData] = await handle(AssignService.findOneAndUpdate({ "_id": assignServiceId }, datatoupdate, { new: true, useFindAndModify: false }))
     console.log("clientData", clientData)
     if (clientErr) return Promise.reject(clientErr);
@@ -1033,12 +1038,14 @@ const updateAssignService = async function (datatoupdate) {
 
 
 async function getAssignServiceDataByStaffIdAndDate(data) {
-
+    console.log("data", data)
+    console.log("staff", data.staffId)
     log.debug(component, 'Getting AssignService Data by StaffId And Date');
     log.close();
     let someDate = new Date(data.date);
     let copiedAppointmentDate = new Date(someDate.getTime());
-    let [Err, assignServiceData] = await handle(AssignService.find({ 'staffId': data.staffId, date: copiedAppointmentDate }).lean());
+    console.log("copiedAppointmentDate", copiedAppointmentDate)
+    let [Err, assignServiceData] = await handle(AssignService.find({ 'staffId': data.staffId, date: someDate }).lean());
     console.log("assignServiceData", assignServiceData)
     if (assignServiceData.length != 0) {
         for (var i = 0; i < assignServiceData.length; i++) {
@@ -1065,7 +1072,7 @@ async function getSlotsForAssignService(data) {
     var slotTime = [];
     var temp;
     let [err2, bookedSlots] = await handle(getAssignServiceDataByStaffIdAndDate(data));
-console.log("bookedSlots",bookedSlots)
+    console.log("bookedSlots", bookedSlots)
     var typeOfTreamentArray = [1, 3, 4];
     for (var i = 0; i < roleData.slots.length; i++) {
         if (roleData.slots[i]._id == data.slotId) {
@@ -1078,7 +1085,7 @@ console.log("bookedSlots",bookedSlots)
     }
     var output = makeTimeIntervals(slotTime[0].startTime, slotTime[0].endTime, data.duration)
     var final = [];
-    console.log("output",output)
+    console.log("output", output)
     for (var j = 0; j < output.length; j++) {
         if (j != output.length - 1) {
             var temp = {
@@ -1088,20 +1095,14 @@ console.log("bookedSlots",bookedSlots)
             final.push(temp);
         }
     }
-    var count = 0;
-    console.log("bookedSlots", bookedSlots)
-    if (bookedSlots) {
-        for (var i = 0; i < bookedSlots.length; i++) {
-            if (typeOfTreamentArray.includes(bookedSlots[i].typeOfTreatment)) {
-                count = count + 1
-            }
-        }
-    }
+
+    //var count = 0;
     console.log("count", count)
     if (bookedSlots) {
         for (var i = 0; i < bookedSlots.length; i++) {
             if (bookedSlots[i].date == new Date(data.date)) {
-                console.log("date", bookedSlots[i].typeOfTreatment)
+                var count = bookedSlots[i].bookedCount;
+                console.log("date", count)
                 let typeOfTreament = typeOfTreamentArray.filter(a => (a == data.typeOfTreatment))
                 let bookedTreatment = typeOfTreamentArray.filter(a => (a == bookedSlots[i].typeOfTreatment))
                 console.log(bookedTreatment);
@@ -1126,29 +1127,28 @@ console.log("bookedSlots",bookedSlots)
                         var IST = Number(sHr + sMin);
                         var IET = Number(eHr + eMin);
                         if (bookedTreatment.length != 0) {
-                            console.log(bookedSlots[i].startTime, bookedSlots[i].endTime)
+                            //  console.log(bookedSlots[i].startTime, bookedSlots[i].endTime)
                             var slot = bookedSlots[i].startTime + '-' + bookedSlots[i].endTime;
-                            if (count != 0 && count < 3 && final[j].slot == slot) {
+                            if (count != 0 && count <= 3 && final[j].slot == slot) {
                                 console.log(true);
                                 final[j].bookedStatus = 0;
                             }
-                            else{
-                                console.log(false)
-                              
-                                    for (var x = AST; x <= AET; x++) {
-                                        if (x >= IST && x <= IET) {
-                                            var temp = final[j].slot.split('-')[0]
-                                            var temp1 = final[j].slot.split('-')[1]
-                                            if (IET == AST || IST == AET) {
-                                                final[j].bookedStatus = 0;
-                                            }
-                                            else {
-                                                final[j].bookedStatus = 1;
-                                            }
+                            else {
+                                for (var x = AST; x <= AET; x++) {
+                                    if (x >= IST && x <= IET) {
+                                        var temp = final[j].slot.split('-')[0]
+                                        var temp1 = final[j].slot.split('-')[1]
+                                        if (IET == AST || IST == AET) {
+                                            final[j].bookedStatus = 0;
+                                        }
+                                        else {
+                                            final[j].bookedStatus = 1;
+
                                         }
                                     }
                                 }
-                            
+                            }
+
                         }
                         else {
                             for (var x = AST; x <= AET; x++) {
@@ -1159,6 +1159,7 @@ console.log("bookedSlots",bookedSlots)
                                         final[j].bookedStatus = 0;
                                     }
                                     else {
+
                                         final[j].bookedStatus = 1;
                                     }
                                 }
@@ -1299,6 +1300,13 @@ async function getRoleDetailsByStaffIdAndSlotId(data) {
 
     if (lodash.isEmpty(slotDetails)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(slotDetails);
+}
+function slotCheck(start)
+{
+    var bHr = (start.split(':')[0]);
+    var bMin = (start.split(':')[1]);
+    var AST = Number(bHr + bMin);
+    return AST
 }
 module.exports = {
     assignServiceClient: assignServiceClient,

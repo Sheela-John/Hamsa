@@ -28,13 +28,13 @@ opType:{type:Number }, //0-same branch 1-other branch
     slongitude: {type: Number},
     elatitude: { type: Number},
     elongitude: { type: Number},
-    bookedCount: {type: Number },
+    bookedCount: {type: Number ,default:1},
     travelDistanceinKM: {type: Number },
     travelDuration: {type: String },
     rating: {  type: Number, default: 0},
     feedBack: { type: String},
     paymentRefNum: {type: String },
-    reason:{type:String}
+    reason:{type:String},
 }, {
     collection: 'assignService',
     versionKey: false,
