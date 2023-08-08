@@ -338,11 +338,13 @@ export class AddEditClientComponent implements OnInit {
   }
 
   reverseFormatDate(date) {
+    console.log("date", date);
+    console.log("sdf:", new Date("01-08-2023"), new Date("16-08-2023"))
     var d = new Date(date),
       month = '' + (d.getMonth() + 1),
       day = '' + d.getDate(),
       year = d.getFullYear();
-    console.log("d", d)
+    console.log("d", d, month, year, day);
     if (month.length < 2)
       month = '0' + month;
     if (day.length < 2)
@@ -360,16 +362,32 @@ export class AddEditClientComponent implements OnInit {
 
   addClient() {
     this.showAddSession = true;
-    var data = {
-      startDate: this.reverseFormatDate(this.clientForm.value.startDate),
-      endDate: this.reverseFormatDate(this.clientForm.value.endDate),
-      noOfSession: this.clientForm.value.noOfSession,
-      staffId: this.clientForm.value.staffId,
-      slotId: this.clientForm.value.slot,
-      duration: this.clientForm.value.duration,
-      typeOfTreatment: this.clientForm.value.typeOfTreatment,
-      weekDaysArr: this.clientForm.value.onWeekDay
-    };
+    console.log("this.clientForm.value.startDate",this.clientForm.value.startDate)
+    var data;
+    if(this.clientId != undefined) {
+      data = {
+        startDate: this.clientForm.value.startDate.split("-").reverse().join("-"),
+        endDate: this.clientForm.value.endDate.split("-").reverse().join("-"),
+        noOfSession: this.clientForm.value.noOfSession,
+        staffId: this.clientForm.value.staffId,
+        slotId: this.clientForm.value.slot,
+        duration: this.clientForm.value.duration,
+        typeOfTreatment: this.clientForm.value.typeOfTreatment,
+        weekDaysArr: this.clientForm.value.onWeekDay
+      };
+    }
+    else {
+      data = {
+        startDate: this.reverseFormatDate(this.clientForm.value.startDate),
+        endDate: this.reverseFormatDate(this.clientForm.value.endDate),
+        noOfSession: this.clientForm.value.noOfSession,
+        staffId: this.clientForm.value.staffId,
+        slotId: this.clientForm.value.slot,
+        duration: this.clientForm.value.duration,
+        typeOfTreatment: this.clientForm.value.typeOfTreatment,
+        weekDaysArr: this.clientForm.value.onWeekDay
+      };
+    }
     console.log("data:", data);
     this.clientService.createSession(data).subscribe(res => {
       if (res.status) {
@@ -379,6 +397,7 @@ export class AddEditClientComponent implements OnInit {
         if (this.clientId != undefined) {
           this.clientData.addSession.forEach((ele, index) => {
             console.log("Ele:", ele);
+            this.sessionDate.push(this.formatDate(ele.date));
             var session = this.clientForm.get('addSession') as FormArray;
             session.at(index)['controls']['slotStartTime'].patchValue(ele.slotStartTime);
             session.at(index)['controls']['slotEndTime'].patchValue(ele.slotEndTime);
@@ -418,6 +437,7 @@ export class AddEditClientComponent implements OnInit {
   saveClient() {
     this.isClientFormSubmitted = true;
     var data = this.clientForm.value;
+    console.log("this.clientForm.value",this.clientForm.value)
     data.startDate = this.reverseFormatDate(this.clientForm.value.startDate);
     data.endDate = this.reverseFormatDate(this.clientForm.value.endDate);
     console.log("Data:", data);
@@ -460,6 +480,8 @@ export class AddEditClientComponent implements OnInit {
         this.clientData = res.data;
         this.packageId = res.data.packageId;
         this.clientForm.patchValue(res.data);
+        this.clientForm.controls['startDate'].patchValue(this.formatDate(res.data.startDate));
+        this.clientForm.controls['endDate'].patchValue(this.formatDate(res.data.endDate));
         this.addSessionBasedOnSessionCount(res.data.noOfSession);
         this.getSlotbasedOnStaff(res.data.staffId);
         this.addClient();
