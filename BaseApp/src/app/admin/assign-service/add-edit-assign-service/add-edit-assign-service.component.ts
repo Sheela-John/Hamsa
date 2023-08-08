@@ -246,13 +246,12 @@ export class AddEditAssignServiceComponent implements OnInit {
     this.ClientService.getAllClients().subscribe(res => {
       if (res.status) {
         this.clientData = res.data;
+        console.log(this.clientData,"this.clientData")
         this.clientData.forEach(clientValue => {
-          if (clientValue.status == 0) {
             this.clientList.push({
               _id: clientValue._id,
               clientName: clientValue.clientName
             });
-          }
           this.clientArr = this.clientList
           //setting for ng-multiselect-dropdown
           this.clientId = {
