@@ -1024,7 +1024,6 @@ const updateAssignService = async function (datatoupdate) {
     datatoupdate.travelDistanceinKM = travelDistanceValue.distance;
     datatoupdate.travelDuration = travelDistanceValue.duration;
     }
-    
     console.log("assignServiceId",assignServiceId,datatoupdate)
     let [clientErr, clientData] = await handle(AssignService.findOneAndUpdate({ "_id": assignServiceId }, datatoupdate, { new: true, useFindAndModify: false }))
     console.log("clientData",clientData)
@@ -1050,6 +1049,7 @@ async function getAssignServiceDataByStaffIdAndDate(data) {
             assignServiceData[i].serviceName = serviceData.serviceName;
         }
     }
+    console.log(assignServiceData,"assignServiceData")
     if (Err) return Promise.reject(Err);
     if (lodash.isEmpty(assignServiceData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(assignServiceData);
@@ -1086,6 +1086,7 @@ async function getSlotsForAssignService(data) {
         }
     }
     var count = 0;
+    console.log(bookedSlots)
     if (bookedSlots) {
         for (var i = 0; i < bookedSlots.length; i++) {
             if (typeOfTreamentArray.includes(bookedSlots[i].typeOfTreatment)) {
@@ -1108,7 +1109,7 @@ async function getSlotsForAssignService(data) {
                         var bMin1 = (end.split(':')[1]);
 
                         var AET = Number(bHr1 + bMin1);
-                        if (bookedSlots[i].typeOfTreatment == 2) {
+                        if (bookedSlots[i].typeOfTreatment == 0) {
                             AET = AET + 15;
                         }
                         var sHr = (final[j].slot.split('-')[0].split(':')[0]);
@@ -1127,6 +1128,7 @@ async function getSlotsForAssignService(data) {
                                 if (x >= IST && x <= IET) {
                                     var temp = final[j].slot.split('-')[0]
                                     var temp1 = final[j].slot.split('-')[1]
+                                    console.log("IET",IET,AST,IST,AET)
                                     if (IET == AST || IST == AET) {
                                         final[j].bookedStatus = 0;
                                     }
@@ -1163,9 +1165,10 @@ async function getSlotsForAssignService(data) {
                         var IET = Number(eHr + eMin);
                         for (var x = AST; x <= AET; x++) {
                             if (x >= IST && x <= IET) {
-                                var temp = final[j].slot.split('-')[0]
-                                var temp1 = final[j].slot.split('-')[1]
+                              
+                              
                                 if (IET == AST || IST == AET) {
+                                    console.log("IET",IET,AST,IST,AET)
                                     final[j].bookedStatus = 0;
                                 }
                                 else {
@@ -1217,6 +1220,7 @@ var makeTimeIntervals = function (start_Time, end_Time, increment) {
 const pad = function (n) { return (n < 10) ? '0' + n.toString() : n; };
 
 const travelDistance = async (data) => {
+    let [err,branchData]=await handle(Branch.findOne({"_id":data.branchId}))
     return new Promise((resolve, reject) => {
         const options = {
             method: 'POST',
@@ -1224,8 +1228,8 @@ const travelDistance = async (data) => {
                 "origin": {
                     "location": {
                         "latLng": {
-                            "latitude": data.slatitude, // Home Branch Latitude 
-                            "longitude": data.slongitude  // Home Branch Longitude
+                            "latitude": branchData.latitude, // Home Branch Latitude 
+                            "longitude": branchData.longitude  // Home Branch Longitude
                         }
                     }
                 },
@@ -1256,6 +1260,7 @@ const travelDistance = async (data) => {
                     duration: response.body.routes[0].duration,
                     distance: response.body.routes[0].distanceMeters / 1000
                 }
+                console.log("value",value)
                 return resolve(value)
             })();
         });

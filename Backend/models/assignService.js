@@ -17,7 +17,6 @@ const assignServiceSchema = new mongoose.Schema({
     branchType :{type:Number}, //0- homebranch 1- branch
     status: {type: Number,default: 0 },//0-upcoming   1-completed 2 - reschedule
 opType:{type:Number }, //0-same branch 1-other branch
-onlineLink:{type:String},
     duration: {type: String },
     address: {type: String },
     serviceId: {type: String},

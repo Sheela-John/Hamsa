@@ -445,6 +445,7 @@ async function saveRecurringSession(data) {
             singleArray.push(6)
         }
     })
+    console.log("singleArray",singleArray)
     let recurringRule = {
         freq: RRule.WEEKLY,
         dtstart: new Date(data.startDate),
@@ -454,12 +455,15 @@ async function saveRecurringSession(data) {
     }
     recurringRule['byweekday'] = singleArray
     const rule = new RRule(recurringRule);
+  
     var recurringdate = [];
     recurringdate = rule.all()
+ 
     var dateSlot = []
     for (let i = 0; i < data.noOfSession; i++) {
         dateSlot.push(formattedDate(recurringdate[i].toString()))
     }
+    console.log("dateSlot",dateSlot)
     var slotArr = [];
     for (var i = 0; i < dateSlot.length; i++) {
         let temp = {
@@ -469,7 +473,9 @@ async function saveRecurringSession(data) {
             "duration": data.duration,
             "typeOfTreatment": data.typeOfTreatment
         }
+        console.log("temp",temp)
         let [err, assign] = await handle(AssignServiceAPI.getSlotsForAssignService(temp))
+        console.log("assign",assign)
         var slotsData = {
             date: dateSlot[i],
             slots: assign
@@ -482,13 +488,13 @@ async function saveRecurringSession(data) {
 function formattedDate(date) {
     var d = new Date(date),
         month = '' + (d.getMonth() + 1),
-        day = '' + d.getDate(),
+        day = '' + (d.getDate()),
         year = d.getFullYear();
     if (month.length < 2)
         month = '0' + month;
     if (day.length < 2)
         day = '0' + day;
-    return [day, month, year].join('-');
+    return [year, month, day].join('-');
 }
 async function enableDisableClient(id) {
     // clientApi.clientDetails(req, 'DELETE SPOC');
