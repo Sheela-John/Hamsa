@@ -37,10 +37,7 @@ export class AssignServiceComponent implements OnInit {
   startTimeResults1: string;
   endTimeResults1: any;
 
-  constructor(private router: Router, public AssignService: AssignService) {
-    Parse.initialize(environment.PARSE_APP_ID, environment.PARSE_JS_KEY,);
-    (Parse as any).serverURL = environment.PARSE_SERVER_URL
-  }
+  constructor(private router: Router, public AssignService: AssignService) {}
 
   ngOnInit(): void {
     this.dtOptions = {
