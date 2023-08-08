@@ -16,6 +16,14 @@
                                 <label class="block mb-2 font-bold text-gray-600">UH ID</label>
                                 <input type="text" placeholder="Enter UH ID"
                                     class="border border-gray-300 p-2 w-full rounded" formControlName="uhid">
+                                <div class="error-msg-area">
+                                    <div *ngIf="clientForm.controls['uhid'].errors && (!clientForm.controls['uhid'].pristine || isClientFormSubmitted)"
+                                        class="error-msg">
+                                        <div [hidden]="!clientForm.controls['uhid'].errors.required">
+                                            Please Enter UHID
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-md-8">
                                 <label class="block mb-2 font-bold text-gray-600">Client Name</label>
@@ -24,9 +32,8 @@
                                 <div class="error-msg-area">
                                     <div *ngIf="clientForm.controls['clientName'].errors && (!clientForm.controls['clientName'].pristine || isClientFormSubmitted)"
                                         class="error-msg">
-                                        <div [hidden]="!clientForm.controls['clientName'].errors.required">Please Enter
-                                            Client
-                                            Name
+                                        <div [hidden]="!clientForm.controls['clientName'].errors.required">
+                                            Please Enter Client Name
                                         </div>
                                     </div>
                                 </div>
@@ -35,16 +42,8 @@
                     </div>
                     <div class="col-md-6">
                         <label class="block mb-2 font-bold text-gray-600">Email</label>
-                        <input type="text" placeholder="Enter Email"
-                            class="border border-gray-300 p-2 w-full rounded" formControlName="email">
-                        <div class="error-msg-area">
-                            <div *ngIf="clientForm.controls['email'].errors && (!clientForm.controls['email'].pristine|| isClientFormSubmitted)"
-                                class="error-msg">
-                                <div [hidden]="!clientForm.controls['email'].errors.required">Please Enter Valid Email
-                                    Id
-                                </div>
-                            </div>
-                        </div>
+                        <input type="text" placeholder="Enter Email" class="border border-gray-300 p-2 w-full rounded"
+                            formControlName="email">
                     </div>
                 </div>
                 <div class="row">
@@ -55,8 +54,8 @@
                         <div class="error-msg-area">
                             <div *ngIf="clientForm.controls['phoneNumber'].errors && (!clientForm.controls['phoneNumber'].pristine|| isClientFormSubmitted)"
                                 class="error-msg">
-                                <div [hidden]="!clientForm.controls['phoneNumber'].errors.required">Please Enter valid
-                                    Phone Number
+                                <div [hidden]="!clientForm.controls['phoneNumber'].errors.required">
+                                    Please Enter Phone Number
                                 </div>
                             </div>
                         </div>
@@ -104,7 +103,7 @@
                             </div>
                         </div>
                         <label class="block mb-2 font-bold text-gray-600">Home Branch Address</label>
-                        <textarea class="border border-gray-300 p-2 w-full rounded" rows="3"
+                        <textarea class="border border-gray-300 p-2 w-full rounded disabled" rows="3"
                             ngx-google-places-autocomplete [options]='options' formControlName="homeBranchAddress"
                             #placesRef="ngx-places" autocomplete="false">
                         </textarea>
@@ -115,7 +114,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        <label class="block mb-2 font-bold text-gray-600 ">No.of Session</label>
+                        <label class="block mb-2 font-bold text-gray-600">No.of Session</label>
                         <input type="text" placeholder="Enter No.of Session"
                             class="border border-gray-300 p-2 w-full rounded" formControlName="noOfSession"
                             (change)="addSessionBasedOnSessionCount($event)">
@@ -139,8 +138,8 @@
                 <div class="row">
                     <div class="col-md-6">
                         <label class="block mb-2 font-bold text-gray-600">Amount</label>
-                        <input type="text" placeholder="Enter Amount"
-                            class="border border-gray-300 p-2 w-full rounded" formControlName="amount">
+                        <input type="text" placeholder="Enter Amount" class="border border-gray-300 p-2 w-full rounded"
+                            formControlName="amount">
                         <div class="error-msg-area">
                             <div *ngIf="clientForm.controls['amount'].errors && (!clientForm.controls['amount'].pristine|| isClientFormSubmitted)"
                                 class="error-msg">
@@ -198,26 +197,24 @@
                         <label for="type" class="block mb-1 mt-3 font-bold text-gray-600">Type</label>
                         <div class="btn-group btn-group-toggle p-3 pl-2">
                             <label class="btn-primary">
-                                <input class="form-check-input" type="radio" name="typeofTreatment"
-                                    formControlName="typeofTreatment" id="exampleRadios1" value="0">
-                                Home
+                                <input class="form-check-input" type="radio" formControlName="typeOfTreatment"
+                                    id="exampleRadios1" [value]=0>Home
                             </label>
                             <label class="btn-primary ml-5">
-                                <input class="form-check-input" type="radio" name="typeofTreatment"
-                                    formControlName="typeofTreatment" id="exampleRadios1" value="1"> OP
+                                <input class="form-check-input" type="radio" formControlName="typeOfTreatment"
+                                    id="exampleRadios1" [value]=1>OP
                             </label>
                             <label class="btn-primary ml-5">
-                                <input class="form-check-input" type="radio" name="typeofTreatment"
-                                    formControlName="typeofTreatment" id="exampleRadios1" value="2">Teletherapy
+                                <input class="form-check-input" type="radio" formControlName="typeOfTreatment"
+                                    id="exampleRadios1" [value]=2>Teletherapy
                             </label>
                             <label class="btn-primary ml-5">
-                                <input class="form-check-input" type="radio" name="typeofTreatment"
-                                    formControlName="typeofTreatment" id="exampleRadios1" value="3"> IP
+                                <input class="form-check-input" type="radio" formControlName="typeOfTreatment"
+                                    id="exampleRadios1" [value]=3>IP
                             </label>
                             <label class="btn-primary ml-5">
-                                <input class="form-check-input" type="radio" name="typeofTreatment"
-                                    formControlName="typeofTreatment" id="exampleRadios1" value="4">
-                                Assessment
+                                <input class="form-check-input" type="radio" formControlName="typeOfTreatment"
+                                    id="exampleRadios1" [value]=4>Assessment
                             </label>
                         </div>
                     </div>
@@ -246,13 +243,13 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                            <label class="block mb-2 mt-3 font-bold text-gray-600">Start Time</label>
-                            <input class="border border-gray-300 p-2 w-full rounded" type="text"
-                                placeholder="Select Start Time" formControlName="startTime" [format]="24"
-                                [ngxTimepicker]="startRange" [min]=startTime [max]=endTime>
-                            <ngx-material-timepicker #startRange (opened)="startpickerOpened = true;" 
-                                [minutesGap]="5" (timeChanged)="calculateEndTime($event)" [defaultTime]="startTime">
-                            </ngx-material-timepicker>
+                        <label class="block mb-2 mt-3 font-bold text-gray-600">Start Time</label>
+                        <input class="border border-gray-300 p-2 w-full rounded" type="text"
+                            placeholder="Select Start Time" formControlName="startTime" [format]="24"
+                            [ngxTimepicker]="startRange" [min]=startTime [max]=endTime>
+                        <ngx-material-timepicker #startRange (opened)="startpickerOpened = true;" [minutesGap]="5"
+                            (timeChanged)="calculateEndTime($event)" [defaultTime]="startTime">
+                        </ngx-material-timepicker>
                     </div>
                     <div class="col-md-6">
                         <label class="block mb-2 mt-3 font-bold text-gray-600">End Time</label>
@@ -279,7 +276,8 @@
                                                 </div>
                                                 <div class="card-body">
                                                     <div class="row">
-                                                        <ng-container *ngFor="let session of addSessionData[i]?.slots; let j = index">
+                                                        <ng-container
+                                                            *ngFor="let session of addSessionData[i]?.slots; let j = index">
                                                             <div class="col-md-4 sessionSlots card"
                                                                 [ngClass]="(session.bookedStatus == 1) ? 'bg-gray-300' : 'pointer'"
                                                                 (click)="(session.bookedStatus == 1) ? '' : slotSelection(session.slot, i, j)">
@@ -302,16 +300,17 @@
                                             <div>
                                                 <label class="block mb-2 font-bold text-gray-600">Slot Start
                                                     Time</label>
-                                                <input class="border border-gray-300 p-2 w-full rounded disabled" type="text"
-                                                    placeholder="Start Time" formControlName="slotStartTime">
+                                                <input class="border border-gray-300 p-2 w-full rounded disabled"
+                                                    type="text" placeholder="Start Time"
+                                                    formControlName="slotStartTime">
                                             </div>
                                         </div>
                                         <div class="col-6">
                                             <div>
                                                 <label class="block mb-2 font-bold text-gray-600">Slot End
                                                     Time</label>
-                                                <input class="border border-gray-300 p-2 w-full rounded disabled" type="text"
-                                                    placeholder="End Time" formControlName="slotEndTime">
+                                                <input class="border border-gray-300 p-2 w-full rounded disabled"
+                                                    type="text" placeholder="End Time" formControlName="slotEndTime">
                                             </div>
                                         </div>
                                     </div>

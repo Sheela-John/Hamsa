@@ -27,4 +27,9 @@ export class ClientService {
     public getAllClients() {
         return this.clientDataService.getAllClients();
     }
+
+    //Update Client
+    public updateClient(id, data) {
+        return this.clientDataService.updateClient(id, data);
+    }
 }

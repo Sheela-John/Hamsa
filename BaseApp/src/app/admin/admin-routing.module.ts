@@ -133,7 +133,7 @@ const routes: Routes = [
         component:AddEditClientComponent
     },
     {
-        path:'client/:clientId/addEditClient/:packageId',
+        path:'client/addEditClient/:clientId',
         component:AddEditClientComponent
     },
     {

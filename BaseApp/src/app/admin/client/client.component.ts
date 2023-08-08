@@ -37,8 +37,8 @@ export class ClientComponent implements OnInit {
     this.router.navigateByUrl('admin/client/addEditClient')
   }
 
-  editClient(clientId, PackageId) {
-    this.router.navigateByUrl('admin/client/' + clientId + '/addEditClient/' + PackageId);
+  editClient(clientId) {
+    this.router.navigateByUrl('admin/client/addEditClient/' + clientId);
   }
 
   getAllClients() {

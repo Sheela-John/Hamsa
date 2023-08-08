@@ -40,4 +40,12 @@ export class ClientDataService {
             return res;
         }), catchError(error => throwError(error)));
     }
+
+    //Update Client
+    public updateClient(id, data): Observable<any> {
+        console.log("UpdateL:", data);
+        return this.httpClient.put('client/' + id, data).pipe(tap(res => {
+            return res;
+        }), catchError(error => throwError(error)));
+    }
 }
