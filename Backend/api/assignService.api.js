@@ -1018,12 +1018,12 @@ const updateAssignService = async function (datatoupdate) {
     let assignServiceId = datatoupdate.assignServiceId;
     delete datatoupdate.assignServiceId;
     console.log(datatoupdate)
-    if((datatoupdate.slatitude) || (datatoupdate.elatitude))
-    {
-    let [err, travelDistanceValue] = await handle(travelDistance(datatoupdate));
-    datatoupdate.travelDistanceinKM = travelDistanceValue.distance;
-    datatoupdate.travelDuration = travelDistanceValue.duration;
-    }
+    // if((datatoupdate.slatitude) || (datatoupdate.elatitude))
+    // {
+    // let [err, travelDistanceValue] = await handle(travelDistance(datatoupdate));
+    // datatoupdate.travelDistanceinKM = travelDistanceValue.distance;
+    // datatoupdate.travelDuration = travelDistanceValue.duration;
+    // }
     console.log("assignServiceId",assignServiceId,datatoupdate)
     let [clientErr, clientData] = await handle(AssignService.findOneAndUpdate({ "_id": assignServiceId }, datatoupdate, { new: true, useFindAndModify: false }))
     console.log("clientData",clientData)
@@ -1063,7 +1063,7 @@ async function getSlotsForAssignService(data) {
     var slotTime = [];
     var temp;
     let [err2, bookedSlots] = await handle(getAssignServiceDataByStaffIdAndDate(data));
-
+console.log("bookedSlots",bookedSlots)
     var typeOfTreamentArray = [1, 3, 4];
     for (var i = 0; i < roleData.slots.length; i++) {
         if (roleData.slots[i]._id == data.slotId) {
@@ -1076,6 +1076,7 @@ async function getSlotsForAssignService(data) {
     }
     var output = makeTimeIntervals(slotTime[0].startTime, slotTime[0].endTime, data.duration)
     var final = [];
+    console.log("output",output)
     for (var j = 0; j < output.length; j++) {
         if (j != output.length - 1) {
             var temp = {
