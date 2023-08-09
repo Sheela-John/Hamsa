@@ -33,8 +33,8 @@
                             class="border-grey-light border hover:bg-gray-100 p-3 text-red-400 hover:text-red-600 hover:font-medium cursor-pointer">
                             <button class="btn" *ngIf="!service.isAssigned && service.status==0"(click)="assignServiceRequest(service._id)">Assign</button>&nbsp;&nbsp;
                             <button class="btn" *ngIf="!service.isAssigned && service.status==1"(click)="assignServiceRequest(service._id)">Reschedule</button>&nbsp;&nbsp;
-                            <button class="btn" *ngIf="service.isAssigned && service.status==0"(click)="assignServiceRequest(service._id)" disabled>Assigned</button>&nbsp;&nbsp;
-                            <button class="btn" *ngIf="service.isAssigned && service.status==1"(click)="assignServiceRequest(service._id)" disabled>Rescheduled</button>&nbsp;&nbsp;
+                            <button class="btn" *ngIf="service.isAssigned && service.status==0"(click)="assignServiceRequest(service._id)" style="background-color: red;" disabled>Assigned</button>&nbsp;&nbsp;
+                            <button class="btn" *ngIf="service.isAssigned && service.status==1"(click)="assignServiceRequest(service._id)" style="background-color: red;" disabled>Rescheduled</button>&nbsp;&nbsp;
                         </td>
                     </tr>
                 </tbody>

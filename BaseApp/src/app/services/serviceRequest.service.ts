@@ -6,7 +6,7 @@ import { ServiceRequestDataService } from '../api/serviceRequest-data.service';
 })
 
 export class ServiceRequestService {
-    constructor(private ServiceRequestDataService:ServiceRequestDataService) { }
+    constructor(private ServiceRequestDataService: ServiceRequestDataService) { }
 
     //Get All setting
     public getAllServiceRequest() {
@@ -16,5 +16,10 @@ export class ServiceRequestService {
     //update Setting
     public getServiceRequestById(id) {
         return this.ServiceRequestDataService.getServiceRequestById(id);
-      }
+    }
+
+    //updateServiceRequest
+    public updateServiceRequest(data, id) {
+        return this.ServiceRequestDataService.updateServiceRequest(data, id)
+    }
 }

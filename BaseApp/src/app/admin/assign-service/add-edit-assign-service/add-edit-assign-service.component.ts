@@ -118,6 +118,7 @@ export class AddEditAssignServiceComponent implements OnInit {
   constructor(private fb: FormBuilder, public StaffService: StaffService, public ClientService: ClientService, private route: ActivatedRoute, public ServiceService: ServiceService, public BranchService: BranchService, public AssignService: AssignService, public ServiceRequestService: ServiceRequestService, private FlashMessageService: FlashMessageService, private router: Router, private RoleService: RoleService) {
     this.route.params.subscribe((param) => {
       this.assignServiceId = param['assignServiceId'];
+      this.serviceRequestId = param['serviceRequestId']
     })
   }
 
@@ -139,6 +140,9 @@ export class AddEditAssignServiceComponent implements OnInit {
     if (this.assignServiceId != undefined) {
       this.showAddEdit = true
       this.getAssignServiceById(this.assignServiceId);
+    }
+    if (this.serviceRequestId != undefined) {
+      this.getServiceRequestById(this.serviceRequestId)
     }
 
   }
@@ -246,12 +250,12 @@ export class AddEditAssignServiceComponent implements OnInit {
     this.ClientService.getAllClients().subscribe(res => {
       if (res.status) {
         this.clientData = res.data;
-        console.log(this.clientData,"this.clientData")
+        console.log(this.clientData, "this.clientData")
         this.clientData.forEach(clientValue => {
-            this.clientList.push({
-              _id: clientValue._id,
-              clientName: clientValue.clientName
-            });
+          this.clientList.push({
+            _id: clientValue._id,
+            clientName: clientValue.clientName
+          });
           this.clientArr = this.clientList
           //setting for ng-multiselect-dropdown
           this.clientId = {
@@ -433,13 +437,12 @@ export class AddEditAssignServiceComponent implements OnInit {
 
   //onChangeStaff
   onChangeStaff(event) {
-    if(event.target){
+    if (event.target) {
       this.StaffId = event.target.value
     }
-    else{
+    else {
       this.StaffId = event
     }
-    
     this.getStaffById(this.StaffId);
   }
 
@@ -466,21 +469,21 @@ export class AddEditAssignServiceComponent implements OnInit {
 
   //Onchange Slot 
   Slot(event) {
-   if(event.target){
-    this.slotId = event.target.value
-    this.assignServiceClientForm.patchValue({
-      duration:''
-    })
-   }
-   else{
-    this.slotId = event
-   }
+    if (event.target) {
+      this.slotId = event.target.value
+      this.assignServiceClientForm.patchValue({
+        duration: ''
+      })
+    }
+    else {
+      this.slotId = event
+    }
     this.isShowSlotTime = true
-    if(this.showAddEdit == true){
+    if (this.showAddEdit == true) {
       this.AssignServiceDate = this.assignServiceForm.value.date
     }
-    else{
-    this.AssignServiceDate = this.formatDate(this.assignServiceForm.value.date)
+    else {
+      this.AssignServiceDate = this.formatDate(this.assignServiceForm.value.date)
     }
     var data = {
       staffId: this.StaffId,
@@ -501,18 +504,18 @@ export class AddEditAssignServiceComponent implements OnInit {
 
   //On select the duration
   dividingSlot(event) {
-    if(event.target){
+    if (event.target) {
       this.duration = event.target.value
     }
-    else{
+    else {
       this.duration = event
     }
     var formattedDates = this.formattedDate(this.assignServiceForm.value.date)
     var data = {
       staffId: this.assignServiceForm.value.staffId,
       date: formattedDates,
-      slotId:this.slotId,
-      duration:this.duration,
+      slotId: this.slotId,
+      duration: this.duration,
       typeOfTreatment: this.assignServiceClientForm.value.typeOfTreatment
     }
     this.getSlotsForAssignService(data);
@@ -565,6 +568,16 @@ export class AddEditAssignServiceComponent implements OnInit {
     }
     this.AssignService.createAssignServiceClient(data).subscribe(res => {
       if (res.status) {
+        if (this.serviceRequestId != undefined) {
+          var data = {
+            "isAssigned": 1
+          }
+          this.ServiceRequestService.updateServiceRequest(data,this.serviceRequestId).subscribe(res =>{
+            if(res.status){
+              console.log(res.data,"oooo")
+            }
+          })
+        }
         this.FlashMessageService.successMessage("Assign service Client Created Successfully", 2);
         this.router.navigateByUrl("admin/assignService")
       }
@@ -578,11 +591,6 @@ export class AddEditAssignServiceComponent implements OnInit {
   editAssignServiceClient(id) {
     this.assignId = id
     this.showAddEdit = true
-    this.getAssignServiceById(this.assignId);
-  }
-
-  //getAssignServiceById
-  getAssignServiceById(id) {
     this.AssignService.getAssignServiceById(id).subscribe(res => {
       if (res.status) {
         this.assignSercieDataArr = res.data;
@@ -590,20 +598,17 @@ export class AddEditAssignServiceComponent implements OnInit {
           staffId: this.assignSercieDataArr.staffId,
           date: this.formatDate(this.assignSercieDataArr.date),
         })
-        if (this.assignSercieDataArr.staffId != '') {
-          this.onChangeStaff(this.assignSercieDataArr.staffId)
-        }
         if (this.assignSercieDataArr.typeOfTreatment != '') {
           this.changeOP(this.assignSercieDataArr.typeOfTreatment)
         }
         if (this.assignSercieDataArr.slot != '') {
           this.assignServiceClientForm.patchValue({
-            slot:this.assignSercieDataArr.slot 
+            slot: this.assignSercieDataArr.slot
           })
-         this.Slot(this.assignSercieDataArr.slot)
+          this.Slot(this.assignSercieDataArr.slot)
         }
 
-        if (this.assignSercieDataArr.duration != '') {  
+        if (this.assignSercieDataArr.duration != '') {
           var formattedDates = this.formattedDate(this.assignSercieDataArr.date)
           var data = {
             staffId: this.assignSercieDataArr.staffId,
@@ -671,7 +676,104 @@ export class AddEditAssignServiceComponent implements OnInit {
           serviceId: this.assignSercieDataArr.serviceId,
           typeOfTreatment: this.assignSercieDataArr.typeOfTreatment,
           opType: this.assignSercieDataArr.opType,
-         
+
+        })
+
+      }
+    })
+  }
+
+  //getAssignServiceById
+  getAssignServiceById(id) {
+    this.AssignService.getAssignServiceById(id).subscribe(res => {
+      if (res.status) {
+        this.assignSercieDataArr = res.data;
+        this.assignServiceForm.patchValue({
+          staffId: this.assignSercieDataArr.staffId,
+          date: this.formatDate(this.assignSercieDataArr.date),
+        })
+        if (this.assignSercieDataArr.staffId != '') {
+          this.onChangeStaff(this.assignSercieDataArr.staffId)
+        }
+        if (this.assignSercieDataArr.typeOfTreatment != '') {
+          this.changeOP(this.assignSercieDataArr.typeOfTreatment)
+        }
+        if (this.assignSercieDataArr.slot != '') {
+          this.assignServiceClientForm.patchValue({
+            slot: this.assignSercieDataArr.slot
+          })
+          this.Slot(this.assignSercieDataArr.slot)
+        }
+
+        if (this.assignSercieDataArr.duration != '') {
+          var formattedDates = this.formattedDate(this.assignSercieDataArr.date)
+          var data = {
+            staffId: this.assignSercieDataArr.staffId,
+            date: formattedDates,
+            slotId: this.assignSercieDataArr.slot,
+            duration: this.assignSercieDataArr.duration,
+            typeOfTreatment: this.assignSercieDataArr.typeOfTreatment
+          }
+          this.getSlotsForAssignService(data);
+          this.dividingSlot(this.assignSercieDataArr.duration)
+        }
+        this.clientArr = []
+        this.ClientService.getClientById(this.assignSercieDataArr.clientId).subscribe(res => {
+          if (res.status) {
+            this.clientArr.push({
+              _id: res.data._id,
+              clientName: res.data.clientName
+            }
+            )
+          }
+          this.assignServiceClientForm.patchValue({
+            clientId: this.clientArr
+          })
+        })
+        if (this.assignSercieDataArr.opType != '') {
+          let type = this.assignSercieDataArr.opType
+          if (type == 1) {
+            this.typeSelection = true;
+            this.getAllBranch();
+            this.assignServiceClientForm.patchValue({
+              otherBranchId: this.assignSercieDataArr.otherBranchId
+            })
+            this.getOtherBranchbyId(this.assignSercieDataArr.otherBranchId)
+          }
+          else {
+            this.typeSelection = false
+          }
+        }
+        if (this.assignSercieDataArr.branchType == 0) {
+          this.branchList = []
+          this.BranchService.getBranchbyId(this.assignSercieDataArr.branchId).subscribe(res => {
+            if (res.status) {
+              this.branchList.push({
+                _id: res.data._id,
+                branchName: res.data.branchName
+              });
+
+            }
+            this.assignServiceClientForm.patchValue({
+              branchId: this.assignSercieDataArr.branchId
+            })
+            this.getBranchbyId(this.assignSercieDataArr.branchId)
+          })
+        }
+        else {
+          this.getAllBranch();
+          this.assignServiceClientForm.patchValue({
+            branchId: this.assignSercieDataArr.branchId
+          })
+          this.getBranchbyId(this.assignSercieDataArr.branchId)
+        }
+        this.assignServiceClientForm.patchValue({
+          duration: this.assignSercieDataArr.duration,
+          branchType: this.assignSercieDataArr.branchType,
+          serviceId: this.assignSercieDataArr.serviceId,
+          typeOfTreatment: this.assignSercieDataArr.typeOfTreatment,
+          opType: this.assignSercieDataArr.opType,
+
         })
 
       }
@@ -704,8 +806,18 @@ export class AddEditAssignServiceComponent implements OnInit {
       startTime: this.slotStartTime,
       endTime: this.slotEndTime
     }
-    this.AssignService.updateAssignService(data,assignId).subscribe(res => {
+    this.AssignService.updateAssignService(data, assignId).subscribe(res => {
       if (res.status) {
+        if (this.serviceRequestId != undefined) {
+          var data = {
+            "isAssigned": 1
+          }
+          this.ServiceRequestService.updateServiceRequest(data,this.serviceRequestId).subscribe(res =>{
+            if(res.status){
+              console.log(res.data,"gggg")
+            }
+          })
+        }
         this.FlashMessageService.successMessage("Assign service Client updated Successfully", 2);
         this.router.navigateByUrl("admin/assignService")
       }
@@ -715,5 +827,135 @@ export class AddEditAssignServiceComponent implements OnInit {
     })
   }
 
-  
+  //getServiceRequestById
+  getServiceRequestById(id) {
+    this.ServiceRequestService.getServiceRequestById(id).subscribe(res => {
+      if (res.status) {
+        console.log(res.data, "bbb")
+        this.serviceData = res.data
+        if (this.serviceData.status != 0) {
+          this.showAddEdit = true
+          this.assignServiceForm.patchValue({
+            staffId: this.serviceData.staffId,
+            date: this.formatDate(this.serviceData.date),
+          })
+          this.clientArr = []
+          this.ClientService.getClientById(this.serviceData.clientId).subscribe(res => {
+            if (res.status) {
+              this.clientArr.push({
+                _id: res.data._id,
+                clientName: res.data.clientName
+              }
+              )
+            }
+            this.assignServiceClientForm.patchValue({
+              clientId: this.clientArr
+            })
+          })
+          this.assignServiceClientForm.patchValue({
+            serviceId: this.serviceData.serviceId
+          })
+          this.AssignService.getAssignServiceById(this.serviceData.assignServiceId).subscribe(res => {
+            if (res.status) {
+              this.assignSercieDataArr = res.data;
+              console.log(this.assignSercieDataArr, "assignSercieDataArr")
+             
+              if (this.assignSercieDataArr.branchType == 0) {
+                this.branchList = []
+                this.BranchService.getBranchbyId(this.assignSercieDataArr.branchId).subscribe(res => {
+                  if (res.status) {
+                    this.branchList.push({
+                      _id: res.data._id,
+                      branchName: res.data.branchName
+                    });
+
+                  }
+                  this.assignServiceClientForm.patchValue({
+                    branchId: this.assignSercieDataArr.branchId
+                  })
+                  this.getBranchbyId(this.assignSercieDataArr.branchId)
+                })
+              }
+              else {
+                this.getAllBranch();
+                this.assignServiceClientForm.patchValue({
+                  branchId: this.assignSercieDataArr.branchId
+                })
+                this.getBranchbyId(this.assignSercieDataArr.branchId)
+              }
+              if (this.serviceData.staffId != '') {
+                this.onChangeStaff(this.serviceData.staffId)
+              }
+              if (this.assignSercieDataArr.typeOfTreatment != '') {
+                this.changeOP(this.assignSercieDataArr.typeOfTreatment)
+              }
+              if (this.assignSercieDataArr.slot != '') {
+                this.assignServiceClientForm.patchValue({
+                  slot: this.assignSercieDataArr.slot
+                })
+                this.Slot(this.assignSercieDataArr.slot)
+              }
+
+              if (this.assignSercieDataArr.duration != '') {
+                var data = {
+                  staffId: this.serviceData.staffId,
+                  date: this.serviceData.date,
+                  slotId: this.assignSercieDataArr.slot,
+                  duration: this.assignSercieDataArr.duration,
+                  typeOfTreatment: this.assignSercieDataArr.typeOfTreatment
+                }
+                this.getSlotsForAssignService(data);
+                this.dividingSlot(this.assignSercieDataArr.duration)
+              }
+              if (this.assignSercieDataArr.opType != '') {
+                let type = this.assignSercieDataArr.opType
+                if (type == 1) {
+                  this.typeSelection = true;
+                  this.getAllBranch();
+                  this.assignServiceClientForm.patchValue({
+                    otherBranchId: this.assignSercieDataArr.otherBranchId
+                  })
+                  this.getOtherBranchbyId(this.assignSercieDataArr.otherBranchId)
+                }
+                else {
+                  this.typeSelection = false
+                }
+              }
+              this.assignServiceClientForm.patchValue({
+                duration: this.assignSercieDataArr.duration,
+                branchType: this.assignSercieDataArr.branchType,
+                typeOfTreatment: this.assignSercieDataArr.typeOfTreatment,
+                opType: this.assignSercieDataArr.opType,
+              })
+            }
+          })
+        }
+        else{
+          this.assignServiceForm.patchValue({
+            staffId: this.serviceData.staffId,
+            date: this.formatDate(this.serviceData.date),
+          })
+          this.clientArr = []
+          this.ClientService.getClientById(this.serviceData.clientId).subscribe(res => {
+            if (res.status) {
+              this.clientArr.push({
+                _id: res.data._id,
+                clientName: res.data.clientName
+              }
+              )
+            }
+            this.assignServiceClientForm.patchValue({
+              clientId: this.clientArr
+            })
+          })
+          this.assignServiceClientForm.patchValue({
+            serviceId: this.serviceData.serviceId
+          })
+          this.onChangeStaff(this.serviceData.staffId)
+        }
+      }
+    })
+  }
+
+
 }

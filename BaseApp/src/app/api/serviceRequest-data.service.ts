@@ -19,10 +19,17 @@ export class ServiceRequestDataService {
         }), catchError(error => throwError(error)));
     }
 
-    //Update Setting
+    //get Service Request By Id
     public getServiceRequestById(id): Observable<any> {
         return this.httpClient.get('serviceRequest/'+id).pipe(tap(res => {
           return res;
         }), catchError(error => throwError(error)));
       }
+
+    //Update service Request 
+    public updateServiceRequest(data,id): Observable<any> {
+     return this.httpClient.put('serviceRequest/'+id ,data).pipe(tap(res => {
+        return res;
+     }),catchError(error => throwError(error)))
+    }  
 }
