@@ -47,6 +47,7 @@ export class ViewStaffBranchTransferComponent implements OnInit {
   roleDatavalue: any;
   staffData: any;
   branchTransferData: any = [];
+  public formatsDateTest:string= 'dd-MM-yyyy HH:mm';
 
 
 
@@ -107,6 +108,7 @@ export class ViewStaffBranchTransferComponent implements OnInit {
     this.branchTransferService.getBranchTransferbyStaffId(id).subscribe(res => {
       if (res.status) {
         this.branchTransferData = res.data;
+        console.log( this.branchTransferData,' this.branchTransferData')
         for (var i = 0; i < this.branchTransferData.length; i++) {
           this.branchTransferData[i].Type = (this.branchTransferData[i].branchTransferType == 0) ? 'Temporary' : 'Permanent';
 

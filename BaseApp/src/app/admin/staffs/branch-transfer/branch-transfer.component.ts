@@ -105,7 +105,6 @@ export class BranchTransferComponent implements OnInit {
             this.branchList.push(branchValue);
           }
         });
-        console.log(this.branchList, "this.branchList")
       }
     })
   }
@@ -113,16 +112,15 @@ export class BranchTransferComponent implements OnInit {
     this.branchTransferService.getBranchTransferbyId(id).subscribe(res => {
       if (res.data) {
         this.BranchDatavalue = res.data
-        console.log("this.BranchDatavalue", this.BranchDatavalue)
         this.branchTransferForm.controls['branchId'].patchValue(this.BranchDatavalue.branchId);
         this.branchTransferForm.controls['branchTransferType'].patchValue(this.BranchDatavalue.branchTransferType);
         this.branchTypeChange();
         if (this.BranchDatavalue.branchTransferType == 0) {
-          this.branchTransferForm.controls['startDate'].patchValue(this.formattedDate(this.BranchDatavalue.startDate));
-          this.branchTransferForm.controls['endDate'].patchValue(this.formattedDate(this.BranchDatavalue.endDate));
+          this.branchTransferForm.controls['startDate'].patchValue(this.BranchDatavalue.startDate);
+          this.branchTransferForm.controls['endDate'].patchValue(this.BranchDatavalue.endDate);
         }
         else {
-          this.branchTransferForm.controls['startDate'].patchValue(this.formattedDate(this.BranchDatavalue.startDate));
+          this.branchTransferForm.controls['startDate'].patchValue(this.BranchDatavalue.startDate);
         }
         if (this.BranchDatavalue.startDate == this.BranchDatavalue.endDate) {
           this.branchTransferForm.controls['startTime'].patchValue(this.BranchDatavalue.startTime);
@@ -137,7 +135,6 @@ export class BranchTransferComponent implements OnInit {
     var id = event.target.value
     this.BranchService.getBranchbyId(id).subscribe(res => {
       if (res.status) {
-        console.log(res.data, "sS")
         this.BranchDatavalue = res.data
         this.branchTransferForm.controls['branchAddress'].patchValue(this.BranchDatavalue.branchAddress);
       }
@@ -150,7 +147,6 @@ export class BranchTransferComponent implements OnInit {
   }
 
   handleAddressChange(address: any) {
-    console.log("Address Changed", address);
     this.formattedAddress = address.address_components
     this.branchTransferForm.controls['branchAddress'].setValue(address.formatted_address)
   }
@@ -158,7 +154,6 @@ export class BranchTransferComponent implements OnInit {
   //branchTypeshow Based on Flied
   branchTypeChange() {
     var type = this.branchTransferForm.value.branchTransferType
-    console.log(typeof (type), "type")
     if (type == 0) {
       this.ishidden = true;
     }
@@ -168,13 +163,14 @@ export class BranchTransferComponent implements OnInit {
       this.branchTransferForm.controls['endTime'].setValue('')
       this.branchTransferForm.controls['endDate'].setValue('')
     }
-    if (this.startDate != 'undefined' && this.endDate != 'undefined') {
+    if (this.startDate != 'undefined' && this.endDate != 'undefined' ) {
       this.isShowDate = true;
-      this.branchTransferForm.controls['endDate'].setValidators([Validators.required]);
+      // this.branchTransferForm.controls['endDate'].setValidators([Validators.required]);
     }
     else {
       this.isShowDate = false;
     }
+   
   }
   formattedDate(date) {
     var d = new Date(date),
@@ -189,17 +185,12 @@ export class BranchTransferComponent implements OnInit {
   }
   //dateSame show Time
   dateValueSame() {
-    console.log("this.sDate", this.sDate, this.eDate)
     if (this.sDate != undefined && this.eDate != undefined) {
-      console.log("fff")
-      console.log(this.startDateData, this.endDateData)
       if (this.sDate == this.eDate) {
-        console.log(true)
         this.isShowTime = true;
         this.branchTransferForm.controls['startTime'].setValidators([Validators.required]);
         this.branchTransferForm.controls['endTime'].setValidators([Validators.required]);
       } else {
-        console.log(false)
         this.isShowTime = false
       }
     }
@@ -215,6 +206,7 @@ export class BranchTransferComponent implements OnInit {
     this.startDateData = eve
     if (eve != undefined) {
       this.sDate = this.formattedDate(eve)// eve.toLocaleString("en-ca").slice(0, 10)
+
     }
     this.dateValueSame()
   }
@@ -235,15 +227,20 @@ export class BranchTransferComponent implements OnInit {
 
 
   sumbitbranchTranser() {
-    console.log(this.branchTransferForm.value)
+    
   }
 
   updateBranchTransfer() {
+ 
     var id = this.routerData
     this.isbranchTransferFormSubmitted = true;
     this.branchTransferForm.value._id = this.routerData;
     this.branchTransferForm.value.startDate = this.sDate;
-    this.branchTransferForm.value.endDate = this.eDate;
+    
+    if(this.branchTransferForm.value.endDate){
+      this.branchTransferForm.value.endDate = this.eDate;
+    }
+  
     if (this.branchTransferForm.valid) {
       this.branchTransferService.updateBranchTransferById(this.branchTransferForm.value).subscribe(res => {
         if (res.status) {
@@ -258,10 +255,11 @@ export class BranchTransferComponent implements OnInit {
   }
   addBranchTransfer() {
     this.isbranchTransferFormSubmitted = true;
+
     if (this.branchTransferForm.valid) {
-      console.log("iam inside branch")
-      this.branchTransferForm.value.branchTransferType = this.branchTransferType;
-      console.log("this.branchTransferType", this.branchTransferType)
+  
+      // this.branchTransferForm.value.branchTransferType = this.branchTransferType;
+    
       this.branchTransferForm.value.staffId = this.StaffId;
       this.branchTransferForm.value.startDate = this.sDate;
       this.branchTransferForm.value.endDate = this.eDate;
