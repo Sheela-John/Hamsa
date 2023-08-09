@@ -1146,6 +1146,8 @@ async function getSlotsForAssignService(data) {
                                         }
                                     }
                                 }
+                                if(data.startTime && data.EndTime )
+                                {
                                 for (var x = NewStart; x <= NewEnd; x++) {
                                     if (x >= IST && x <= IET) {
                                         //tempArray.push(final[j]);
@@ -1165,6 +1167,7 @@ async function getSlotsForAssignService(data) {
                                 isAvailableTemp.push(false);
                             }
                         }
+                        }
                         else {
                             for (var x = AST; x <= AET; x++) {
                                 if (x >= IST && x <= IET) {
@@ -1179,6 +1182,8 @@ async function getSlotsForAssignService(data) {
                                     }
                                 }
                             }
+                            if(data.startTime && data.EndTime )
+                            {
                             for (var x = NewStart; x <= NewEnd; x++) {
                                 if (x >= IST && x <= IET) {
                                     //tempArray.push(final[j]);
@@ -1196,6 +1201,7 @@ async function getSlotsForAssignService(data) {
                             else {
                                 isAvailableTemp.push(false);
                             }
+                        }
                         }
                     }
                 }
@@ -1231,6 +1237,8 @@ async function getSlotsForAssignService(data) {
                             }
                         }
                         //   console.log("IST >=NewStart && NewEnd<=IET",IST >=NewStart && NewEnd<=IET)
+                        if(data.startTime && data.EndTime )
+                        {
                         for (var x = NewStart; x <= NewEnd; x++) {
                             if (x >= IST && x <= IET) {
                                 //tempArray.push(final[j]);
@@ -1248,7 +1256,7 @@ async function getSlotsForAssignService(data) {
                         else {
                             isAvailableTemp.push(false);
                         }
-                    
+                        }
                     }
                     
                 }
