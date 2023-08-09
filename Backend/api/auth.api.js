@@ -4,6 +4,7 @@ const StaffAPI = require('./staff.api');
 const models = require('../models');
 const Staff = models.Staff;
 const LoginModel = models.Login;
+const Client=models.Client;
 const ERR = require('../errors.json');
 const lodash = require('lodash');
 const security = require('../util/security');
@@ -38,14 +39,19 @@ async function login(loginCred, password, role) {
     return new Promise((resolve, reject) => {
         if (err) return reject(err);
         if (!lodash.isEmpty(user)) {
-            // if (!(user[0].password == security.hash(user[0].createdAt, password))) {
-            //     return reject(ERR.INVALID_CREDENTIALS);
-            // }
             return resolve(user[0]);
         }
         else
             return reject(ERR.NO_RECORDS_FOUND);
     })
+}
+async function loginClient(data) {
+    {
+        let [clientErr, clientData] = await handle(Client.findOne({ 'phoneNumber': data.phoneNumber }).lean());
+        if(clientErr) return Promise.reject(clientErr);
+        if (lodash.isEmpty(clientData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+        return Promise.resolve(clientData);
+    }
 }
 
 // const checkPasswordDoctor = async (userId, password) => {
@@ -474,5 +480,6 @@ module.exports = {
     genaratePassword: genaratePassword,
     verifyResetPasswordToken: verifyResetPasswordToken,
     contactUs: contactUs,
-    forgotUserName: forgotUserName
+    forgotUserName: forgotUserName,
+    loginClient:loginClient
 }

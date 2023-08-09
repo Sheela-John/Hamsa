@@ -65,6 +65,14 @@ router.post('/change-password', authenticate("PORTAL_STAFF,PORTAL_ADMIN"), async
     else res.status(200).json({ status: true, "message": "Password Changed Successfully" });
 
 });
+router.post('/loginClient', async (req, res) => {
+    console.log("req",req.body)
+    if (lodash.isEmpty(req.body)) return res.status(200).json(lodash.merge({ status: false }, ERR.MANDATORY_FIELD_MISSING));
+    let [err, statusData] = await (handle(AuthAPI.loginClient(req.body)));
+    if (err) res.status(200).json(lodash.merge({ status: false }, err));
+    else res.status(200).json({ status: true,data: statusData });
+
+});
 
 router.post('/forgot-password', async (req, res) => {
     if (lodash.isEmpty(req.body)) return res.status(200).json(lodash.merge({ status: false }, ERR.MANDATORY_FIELD_MISSING));
