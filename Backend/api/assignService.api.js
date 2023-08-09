@@ -1094,7 +1094,7 @@ async function getSlotsForAssignService(data) {
         }
     }
     var condition = 0;
-    //var count = 0;
+   var isAvailableTemp=[];
     if (bookedSlots) {
         for (var i = 0; i < bookedSlots.length; i++) {
             if (bookedSlots[i].date == new Date(data.date)) {
@@ -1230,17 +1230,26 @@ async function getSlotsForAssignService(data) {
                                 }
                             }
                         }
+                        if (condition == 0) {
+                            isAvailableTemp.push( true);
+                        }
+                        else {
+                            isAvailableTemp.push(false);
+                        }
+                    
                     }
+                    
                 }
             }
         }
     }
-    if (condition == 0) {
-        isAvailable = true;
-    }
-    else {
-        isAvailable = false;
-    }
+   if(isAvailableTemp.includes(false))
+   {
+    isAvailable=false;
+   }
+   else{
+    isAvailable=true;
+   }
     var returnValue = {
         final: final,
         isAvailable: isAvailable
