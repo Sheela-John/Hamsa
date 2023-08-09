@@ -136,7 +136,9 @@ async function create(clientData) {
                             "typeOfTreatment": client.typeOfTreatment,
                             "latitude": client.clientAddressLatitude,
                             "longitude": client.clientAddressLogitude,
-                            "bookedCount": count
+                            "bookedCount": count,
+                            "branchId":client.homeBranchId,
+                            "branchType":0
                         }
                         var saveAssignData = new AssignService(assignData);
                         let [err1, assignServiceData] = await handle(saveAssignData.save())
@@ -299,13 +301,11 @@ const UpdateClient = async function (datatoupdate) {
     else {
 
         clientData = await handle(Client.findOneAndUpdate({ _id: clientId, }, { $push: { packageId: { $each: [datatoupdate.packageId], $sort: -1 } } }, { new: true, useFindAndModify: false }).lean());
-
     }
-
-    //   let [err, clientData] = await handle(Client.findOneAndUpdate({ "_id": clientId }, datatoupdate, { new: true, useFindAndModify: false }))
     let [err2, assignData1] = await handle(AssignService.find({ 'packageId': datatoupdate.packageId }))
     if (assignData1.length != 0) {
-        let [err1, assignData] = await handle(AssignService.deleteMany({ 'packageId': datatoupdate.packageId }))
+        let [err1, assignData] = await handle(AssignService.find({ 'packageId': datatoupdate.packageId }))
+        console.log("assignData",assignData)
         for (var i = 0; i < datatoupdate.addSession.length; i++) {
             var assign = {
 
@@ -325,7 +325,9 @@ const UpdateClient = async function (datatoupdate) {
                 "typeOfTreatment": datatoupdate.typeOfTreatment,
                 "latitude": datatoupdate.clientAddressLatitude,
                 "longitude": datatoupdate.clientAddressLogitude,
-                "bookedCount": 1
+                "bookedCount": 1,
+                "branchId":client.homeBranchId,
+                "branchType":0
             }
 
             var saveAssignData = new AssignService(assign);
@@ -353,7 +355,9 @@ const UpdateClient = async function (datatoupdate) {
                 "typeOfTreatment": datatoupdate.typeOfTreatment,
                 "latitude": datatoupdate.clientAddressLatitude,
                 "longitude": datatoupdate.clientAddressLogitude,
-                "bookedCount": 1
+                "bookedCount": 1,
+                "branchId":client.homeBranchId,
+                "branchType":0
             }
 
             var saveAssignData = new AssignService(assign);
@@ -493,14 +497,17 @@ async function saveRecurringSession(data) {
             "date": dateSlot[i],
             "slotId": data.slotId,
             "duration": data.duration,
-            "typeOfTreatment": data.typeOfTreatment
+            "typeOfTreatment": data.typeOfTreatment,
+            "startTime":data.startTime,
+            "endTime":data.endTime
         }
         console.log("temp", temp)
         let [err, assign] = await handle(AssignServiceAPI.getSlotsForAssignService(temp))
         console.log("assign", assign)
         var slotsData = {
             date: dateSlot[i],
-            slots: assign
+            slots: assign.final,
+            isAvailable:assign.isAvailable
         }
         slotArr.push(slotsData)
     }

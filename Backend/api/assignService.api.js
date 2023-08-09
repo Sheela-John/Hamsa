@@ -79,9 +79,9 @@ const assignServiceClient = async (assignServiceData) => {
             assignServiceData['staffName'] = staffNameData.staffName;
             let [findClientErr, findClientData] = await handle(Client.findOne({ '_id': assignServiceData.clientId }));
             console.log("findClientData", findClientData)
-           // assignServiceData['clientId'] = findClientData._id;
-           assignServiceData['latitude'] =findClientData.clientAddressLatitude;
-           assignServiceData['longitude']=findClientData.clientAddressLongitude;
+            // assignServiceData['clientId'] = findClientData._id;
+            assignServiceData['latitude'] = findClientData.clientAddressLatitude;
+            assignServiceData['longitude'] = findClientData.clientAddressLongitude;
             if (findClientErr) return Promise.reject(findClientErr);
             const options = {
                 provider: 'google',
@@ -98,35 +98,35 @@ const assignServiceClient = async (assignServiceData) => {
                 latitude: res[0].latitude,
                 longitude: res[0].longitude
             }
-           
+
             console.log("assignServiceData", assignServiceData)
             let [assignErr, assignServiceValue] = await handle(AssignService.find({}).lean());
             console.log("assignServiceData", assignServiceValue)
-            var typeArray=[1,3,4];
-            var count=1;
-            if(assignServiceValue){
-            for (var j = 0; j < assignServiceValue.length; j++) {
-                if (assignServiceValue[j].date == new Date(assignServiceData.date)) {
-                    console.log("start", slotCheck(assignServiceValue[j].startTime))
-                    console.log("newStart",slotCheck(assignServiceData.startTime));
-                    console.log("end",slotCheck(assignServiceValue[j].endTime));
-                    console.log("newend",slotCheck(assignServiceData.endTime))
-                    console.log("1",(slotCheck(assignServiceValue[j].startTime) >= slotCheck(assignServiceData.startTime)))
-                    console.log("2",slotCheck(assignServiceValue[j].endTime) <= slotCheck(assignServiceData.endTime))
-                    if ((slotCheck(assignServiceValue[j].startTime) >= slotCheck(assignServiceData.startTime)) && (slotCheck(assignServiceValue[j].endTime) <= slotCheck(assignServiceData.endTime)) ){
-                        console.log(true, assignServiceData.typeOfTreatment)
-                        if (typeArray.includes(assignServiceValue[j].typeOfTreatment) && typeArray.includes(assignServiceData.typeOfTreatment)) {
-                            console.log("client.typeOfTreatment", assignServiceValue[j].bookedCount)
-                            count = assignServiceValue[j].bookedCount + 1;
-                            console.log("count", count)
-                            let [assignErr, assignServiceValue1] = await handle(AssignService.findOneAndUpdate({ _id: assignServiceValue[j]._id }, { $set: { bookedCount: count } }, { new: true, useFindAndModify: false }))
-                            console.log("assignServiceValue1", assignServiceValue1)
+            var typeArray = [1, 3, 4];
+            var count = 1;
+            if (assignServiceValue) {
+                for (var j = 0; j < assignServiceValue.length; j++) {
+                    if (assignServiceValue[j].date == new Date(assignServiceData.date)) {
+                        console.log("start", slotCheck(assignServiceValue[j].startTime))
+                        console.log("newStart", slotCheck(assignServiceData.startTime));
+                        console.log("end", slotCheck(assignServiceValue[j].endTime));
+                        console.log("newend", slotCheck(assignServiceData.endTime))
+                        console.log("1", (slotCheck(assignServiceValue[j].startTime) >= slotCheck(assignServiceData.startTime)))
+                        console.log("2", slotCheck(assignServiceValue[j].endTime) <= slotCheck(assignServiceData.endTime))
+                        if ((slotCheck(assignServiceValue[j].startTime) >= slotCheck(assignServiceData.startTime)) && (slotCheck(assignServiceValue[j].endTime) <= slotCheck(assignServiceData.endTime))) {
+                            console.log(true, assignServiceData.typeOfTreatment)
+                            if (typeArray.includes(assignServiceValue[j].typeOfTreatment) && typeArray.includes(assignServiceData.typeOfTreatment)) {
+                                console.log("client.typeOfTreatment", assignServiceValue[j].bookedCount)
+                                count = assignServiceValue[j].bookedCount + 1;
+                                console.log("count", count)
+                                let [assignErr, assignServiceValue1] = await handle(AssignService.findOneAndUpdate({ _id: assignServiceValue[j]._id }, { $set: { bookedCount: count } }, { new: true, useFindAndModify: false }))
+                                console.log("assignServiceValue1", assignServiceValue1)
+                            }
                         }
                     }
                 }
             }
-        }
-        assignServiceData['bookedCount'] = count;
+            assignServiceData['bookedCount'] = count;
             var saveData = new AssignService(assignServiceData);
             saveData.save().then((assignService) => {
                 log.debug(component, 'Saved Assign Service successfully');
@@ -1069,6 +1069,7 @@ async function getSlotsForAssignService(data) {
     var slotTime = [];
     var temp;
     let [err2, bookedSlots] = await handle(getAssignServiceDataByStaffIdAndDate(data));
+    var isAvailable = false;
     console.log("bookedSlots", bookedSlots)
     var typeOfTreamentArray = [1, 3, 4];
     for (var i = 0; i < roleData.slots.length; i++) {
@@ -1092,19 +1093,16 @@ async function getSlotsForAssignService(data) {
             final.push(temp);
         }
     }
-
+    var condition = 0;
     //var count = 0;
-    console.log("count", count)
     if (bookedSlots) {
         for (var i = 0; i < bookedSlots.length; i++) {
             if (bookedSlots[i].date == new Date(data.date)) {
                 var count = bookedSlots[i].bookedCount;
-                console.log("date", count)
                 let typeOfTreament = typeOfTreamentArray.filter(a => (a == data.typeOfTreatment))
                 let bookedTreatment = typeOfTreamentArray.filter(a => (a == bookedSlots[i].typeOfTreatment))
-                console.log(bookedTreatment);
                 if (typeOfTreament.length != 0) {
-                    console.log("data.typeOfTreatment", data.typeOfTreatment)
+
                     for (var j = 0; j < final.length; j++) {
                         var start = bookedSlots[i].startTime.split(' ')[0];
                         var end = bookedSlots[i].endTime.split(' ')[0];
@@ -1123,16 +1121,20 @@ async function getSlotsForAssignService(data) {
                         var eMin = (final[j].slot.split('-')[1].split(':')[1])
                         var IST = Number(sHr + sMin);
                         var IET = Number(eHr + eMin);
+                        var NewStart = Number(data.startTime.split(':')[0] + data.startTime.split(':')[1]);
+                        var NewEnd = Number(data.endTime.split(':')[0] + data.endTime.split(':')[1]);
                         if (bookedTreatment.length != 0) {
-                            //  console.log(bookedSlots[i].startTime, bookedSlots[i].endTime)
                             var slot = bookedSlots[i].startTime + '-' + bookedSlots[i].endTime;
                             if (count != 0 && count < 3 && final[j].slot == slot) {
                                 console.log(true);
                                 final[j].bookedStatus = 0;
                             }
                             else {
+                                console.log("inside else", AST, AET)
                                 for (var x = AST; x <= AET; x++) {
                                     if (x >= IST && x <= IET) {
+                                        console.log("true");
+                                        //final[j].bookedStatus = 1;
                                         var temp = final[j].slot.split('-')[0]
                                         var temp1 = final[j].slot.split('-')[1]
                                         if (IET == AST || IST == AET) {
@@ -1144,8 +1146,18 @@ async function getSlotsForAssignService(data) {
                                         }
                                     }
                                 }
+                                for (var x = NewStart; x <= NewEnd; x++) {
+                                    if (x >= IST && x <= IET) {
+                                        //tempArray.push(final[j]);
+                                        if (final[j].bookedStatus == 0) {
+                                            condition = 0
+                                        }
+                                        if (final[j].bookedStatus == 1) {
+                                            condition = 1;
+                                        }
+                                    }
+                                }
                             }
-
                         }
                         else {
                             for (var x = AST; x <= AET; x++) {
@@ -1158,6 +1170,17 @@ async function getSlotsForAssignService(data) {
                                     else {
 
                                         final[j].bookedStatus = 1;
+                                    }
+                                }
+                            }
+                            for (var x = NewStart; x <= NewEnd; x++) {
+                                if (x >= IST && x <= IET) {
+                                    //tempArray.push(final[j]);
+                                    if (final[j].bookedStatus == 0) {
+                                        condition = 0
+                                    }
+                                    if (final[j].bookedStatus == 1) {
+                                        condition = 1;
                                     }
                                 }
                             }
@@ -1183,6 +1206,8 @@ async function getSlotsForAssignService(data) {
                         var eMin = (final[j].slot.split('-')[1].split(':')[1])
                         var IST = Number(sHr + sMin);
                         var IET = Number(eHr + eMin);
+                        var NewStart = Number(data.startTime.split(':')[0] + data.startTime.split(':')[1]);
+                        var NewEnd = Number(data.endTime.split(':')[0] + data.endTime.split(':')[1]);
                         for (var x = AST; x <= AET; x++) {
                             if (x >= IST && x <= IET) {
                                 if (IET == AST || IST == AET) {
@@ -1193,15 +1218,36 @@ async function getSlotsForAssignService(data) {
                                 }
                             }
                         }
+                        //   console.log("IST >=NewStart && NewEnd<=IET",IST >=NewStart && NewEnd<=IET)
+                        for (var x = NewStart; x <= NewEnd; x++) {
+                            if (x >= IST && x <= IET) {
+                                //tempArray.push(final[j]);
+                                if (final[j].bookedStatus == 0) {
+                                    condition = 0
+                                }
+                                if (final[j].bookedStatus == 1) {
+                                    condition = 1;
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
     }
-
+    if (condition == 0) {
+        isAvailable = true;
+    }
+    else {
+        isAvailable = false;
+    }
+    var returnValue = {
+        final: final,
+        isAvailable: isAvailable
+    }
     if (err1) return Promise.reject(err1);
     if (lodash.isEmpty(final)) return reject(ERR.NO_RECORDS_FOUND);
-    return Promise.resolve(final);
+    return Promise.resolve(returnValue);
 }
 
 var makeTimeIntervals = function (start_Time, end_Time, increment) {
@@ -1298,20 +1344,18 @@ async function getRoleDetailsByStaffIdAndSlotId(data) {
     if (lodash.isEmpty(slotDetails)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(slotDetails);
 }
-function slotCheck(start)
-{
+function slotCheck(start) {
     var bHr = (start.split(':')[0]);
     var bMin = (start.split(':')[1]);
     var AST = Number(bHr + bMin);
     return AST
 }
-async function assignServiceForClientByPhone(data)
-{
+async function assignServiceForClientByPhone(data) {
     let [clientErr, clientData] = await handle(Client.findOne({ 'phoneNumber': data.phoneNumber }).lean());
-    if(clientErr) return Promise.reject(clientErr);
+    if (clientErr) return Promise.reject(clientErr);
     if (lodash.isEmpty(clientData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     let [Err, assignServiceData] = await handle(AssignService.find({ 'clientId': clientData._id }).lean());
-    if(Err) return Promise.reject(Err);
+    if (Err) return Promise.reject(Err);
     if (lodash.isEmpty(assignServiceData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(assignServiceData);
 }
@@ -1338,5 +1382,5 @@ module.exports = {
     getSlotsForAssignService: getSlotsForAssignService,
     travelDistance: travelDistance,
     getRoleDetailsByStaffIdAndSlotId: getRoleDetailsByStaffIdAndSlotId,
-    assignServiceForClientByPhone:assignServiceForClientByPhone
+    assignServiceForClientByPhone: assignServiceForClientByPhone
 }
