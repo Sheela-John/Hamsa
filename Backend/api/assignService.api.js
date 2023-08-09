@@ -1158,6 +1158,12 @@ async function getSlotsForAssignService(data) {
                                     }
                                 }
                             }
+                            if (condition == 0) {
+                                isAvailableTemp.push( true);
+                            }
+                            else {
+                                isAvailableTemp.push(false);
+                            }
                         }
                         else {
                             for (var x = AST; x <= AET; x++) {
@@ -1183,6 +1189,12 @@ async function getSlotsForAssignService(data) {
                                         condition = 1;
                                     }
                                 }
+                            }
+                            if (condition == 0) {
+                                isAvailableTemp.push( true);
+                            }
+                            else {
+                                isAvailableTemp.push(false);
                             }
                         }
                     }
