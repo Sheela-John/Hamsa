@@ -1151,7 +1151,7 @@ async function getSlotsForAssignService(data) {
                                     var NewStart = Number(data.startTime.split(':')[0] + data.startTime.split(':')[1]);
                                     var NewEnd = Number(data.endTime.split(':')[0] + data.endTime.split(':')[1]);
                                     for (var x = NewStart; x <= NewEnd; x++) {
-                                        if (x >= IST && x <= IET) {
+                                        if (x > IST && x < IET) {
                                             //tempArray.push(final[j]);
                                             if (final[j].bookedStatus == 0) {
                                                 condition = 0
@@ -1187,7 +1187,7 @@ async function getSlotsForAssignService(data) {
                             }
                             if (data.startTime) {
                                 for (var x = NewStart; x <= NewEnd; x++) {
-                                    if (x >= IST && x <= IET) {
+                                    if (x > IST && x < IET) {
                                         //tempArray.push(final[j]);
                                         if (final[j].bookedStatus == 0) {
                                             condition = 0
@@ -1245,7 +1245,7 @@ async function getSlotsForAssignService(data) {
                             var NewStart = Number(data.startTime.split(':')[0] + data.startTime.split(':')[1]);
                         var NewEnd = Number(data.endTime.split(':')[0] + data.endTime.split(':')[1]);
                             for (var x = NewStart; x <= NewEnd; x++) {
-                                if (x >= IST && x <= IET) {
+                                if (x > IST && x < IET) {
                                     //tempArray.push(final[j]);
                                     if (final[j].bookedStatus == 0) {
                                         condition = 0
