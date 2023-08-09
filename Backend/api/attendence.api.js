@@ -4,6 +4,7 @@ const models = require('../models');
 const Security = require("../util/security");
 const Attendence = models.Attendence;
 const AssignService = models.AssignService;
+const Branch = models.Branch;
 const Staff = models.Staff;
 const lodash = require('lodash');
 const ERR = require('../errors.json');
@@ -26,6 +27,8 @@ const momentTz = require('moment-timezone');
 const generateRandomPassword = require('../util/generateCode').randomString;
 const genrateDefaultImage = require('../util/generateCode').genrateDefaultImage;
 const NodeGeocoder = require('node-geocoder');
+
+const request = require('request');
 
 const s3 = new AWS.S3({
     accessKeyId: config.AWSCredentails.AWS_ACCESS_KEY,
@@ -79,6 +82,7 @@ const getAttendenceofStaffByDateRange = async (data) => {
                 'date': { '$gte': new Date(data.startDate), '$lte': new Date(data.endDate) },
             }
         },
+
         {
             $addFields: {
                 'staffObjId': { $toObjectId: '$staffId' }
@@ -107,15 +111,45 @@ const getAttendenceofStaffByDateRange = async (data) => {
             }
         },
         {
+            $sort: {
+                date: 1
+            }
+        },
+        {
             $group: {
                 "_id": "$staffId",
                 "doc": { "$addToSet": "$$ROOT" }
             }
         },
+
     ]
     let [err, attendenceData] = await handle(Attendence.aggregate(query));
     for (var i = 0; i < attendenceData.length; i++) {
         for (var j = 0; j < attendenceData[i].doc.length; j++) {
+            if (attendenceData[i].doc[j].outTime == undefined) {
+
+                let [err, assign] = await handle(AssignService.find({ "staffId": (attendenceData[i]._id).toString(), "date": attendenceData[i].doc[j].date }))
+
+                var out;
+
+                if (assign.length != 0) {
+                    var val = Number(assign[0].endTime.split(':')[0] + assign[0].endTime.split(':')[1])
+                    console.log("inside")
+                    for (var x = 1; x < assign.length; x++) {
+                        if (Number(assign[x].endTime.split(':')[0] + assign[x].endTime.split(':')[1]) > val) {
+                            val = Number(assign[x].endTime.split(':')[0] + assign[x].endTime.split(':')[1])
+                            out = assign[x].endTime;
+                            //  console.log("out",out)
+                        }
+                    }
+
+                    attendenceData[i].doc[j].outTime = out;
+                }
+                else {
+                    attendenceData[i].doc[j].outTime = attendenceData[i].doc[j].endTime
+                }
+            }
+            console.log("attendenceData[i].doc[j]", attendenceData[i].doc[j])
             var startTime = attendenceData[i].doc[j].startTime.split(':');
             var endTime = attendenceData[i].doc[j].inTime.split(':');
             var startHr = parseInt(startTime[0], 10);
@@ -123,6 +157,7 @@ const getAttendenceofStaffByDateRange = async (data) => {
             var endHr = parseInt(endTime[0], 10);
             var endMin = parseInt(endTime[1], 10);
             var lateBy, ot;
+
             if (startHr == endHr) {
                 lateBy = (endMin - startMin);
             }
@@ -137,6 +172,7 @@ const getAttendenceofStaffByDateRange = async (data) => {
                 attendenceData[i].doc[j].earlyBy = 0
                 attendenceData[i].doc[j].lateBy = lateBy;
             }
+
             attendenceData[i].doc[j].totalOT = ot;
 
             var tempDate = attendenceData[i].doc[j].date.toLocaleDateString().split('/')[2] + "-" + attendenceData[i].doc[j].date.toLocaleDateString().split('/')[1] + "-" + attendenceData[i].doc[j].date.toLocaleDateString().split('/')[0]
@@ -154,31 +190,85 @@ const getAttendenceofStaffByDateRange = async (data) => {
             if (data1 == 480 || data1 < 480) {
                 attendenceData[i].doc[j].totalOT = "0:0";
             }
+
             var distance = 0;
-            var duration=0;
+            var duration = 0;
             let [Err, assignServiceData] = await handle(AssignService.find({ 'staffId': attendenceData[i].doc[j].staffId, date: attendenceData[i].doc[j].date.toString() }).lean());
-           
+            console.log("assignServiceData", assignServiceData)
             if (assignServiceData.length != 0) {
                 for (var k = 0; k < assignServiceData.length; k++) {
-                    distance = distance + assignServiceData[k].travelDistanceinKM;
-                    console.log(Number(assignServiceData[k].travelDuration.split('s')[0]));
-                    var val=Number(assignServiceData[k].travelDuration.split('s')[0]);
-                    duration=duration + val;
-                } 
-                duration=Math.floor(duration/60);
-                attendenceData[i].doc[j].travelDistance = distance;
-                attendenceData[i].doc[j].travelDuration = duration;
+                    var temp = {
+                        "branchId": assignServiceData[i].branchId,
+                        "elatitude": assignServiceData[i].latitude,
+                        "elongitude": assignServiceData[i].longitude
+                    }
+                    var [err3, tmep] = await handle(travelDistance(temp));
+                    console.log("dd", tmep)
+                    distance = distance + tmep.distance;
+                    var val = Number(tmep.duration.split('s')[0]);
+                    duration = duration + val;
+                    duration = Math.floor(duration / 60);
+                    console.log("distance", distance, duration)
+                    attendenceData[i].doc[j].travelDistance = distance;
+                    attendenceData[i].doc[j].travelDuration = duration;
+                }
             }
             else {
                 attendenceData[i].doc[j].travelDistance = distance;
                 attendenceData[i].doc[j].travelDuration = duration;
             }
+
         }
     }
     if (err) return Promise.reject(err);
     else return Promise.resolve(attendenceData);
 }
-
+const travelDistance = async (data) => {
+    let [err, branchData] = await handle(Branch.findOne({ "_id": data.branchId }))
+    return new Promise((resolve, reject) => {
+        const options = {
+            method: 'POST',
+            body: {
+                "origin": {
+                    "location": {
+                        "latLng": {
+                            "latitude": data.elatitude,
+                            "longitude": data.elongitude
+                        }
+                    }
+                },
+                "destination": {
+                    "location": {
+                        "latLng": {
+                            "latitude": branchData.latitude,
+                            "longitude": branchData.longitude
+                        }
+                    }
+                },
+            },
+            url: 'https://routes.googleapis.com/directions/v2:computeRoutes',
+            headers: {
+                'X-Goog-Api-Key': 'AIzaSyCX_9dtirFHcsQY8zjjR86cettocdHOT50',
+                'Content-Type': 'application/json',
+                'X-Goog-FieldMask': 'routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline'
+            },
+            json: true //Parse the JSON string in the response
+        };
+        request(options, function (error, response, body) {
+            if (error) {
+                return reject(error);
+            }
+            log.debug('Travel Distance response', { attach: response.body }); log.close();
+            (async () => {
+                var value = {
+                    duration: response.body.routes[0].duration,
+                    distance: response.body.routes[0].distanceMeters / 1000
+                }
+                return resolve(value)
+            })();
+        });
+    });
+}
 const getAttendenceofToday = async (data) => {
     var query = [
         {
@@ -209,10 +299,25 @@ const getAttendenceofToday = async (data) => {
     else return Promise.resolve(attendenceData);
 }
 
+async function toUpdateCount(data) {
+    let [Err, assignServiceData] = await handle(AssignService.find({ 'staffId': data.staffId, date: new Date(data.date) }).lean());
+    console.log(assignServiceData)
+    //var len=assignServiceData.length;
+    let i;
+    for (i = 0; i < assignServiceData.length; i++) {
+        console.log(i)
+        var temp=0;
+        temp = assignServiceData[i].travelCount + 1;
+        let [Err1, assignServiceData1] = await handle(AssignService.findOneAndUpdate({ '_id': assignServiceData[i]._id }, { "$set": { "travelCount": temp } }).lean());
+    }
+    if (Err) return Promise.reject(Err);
+    else return Promise.resolve(assignServiceData);
+}
 module.exports = {
     entryAttendence: entryAttendence,
-    UpdateAttendence:UpdateAttendence,
+    UpdateAttendence: UpdateAttendence,
     getAttendenceofStaff: getAttendenceofStaff,
     getAttendenceofStaffByDateRange: getAttendenceofStaffByDateRange,
-    getAttendenceofToday: getAttendenceofToday
+    getAttendenceofToday: getAttendenceofToday,
+    toUpdateCount: toUpdateCount
 }

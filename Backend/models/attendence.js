@@ -7,7 +7,9 @@ const attendenceSchema = new mongoose.Schema({
     startTime: { type: String,default:"09:00" },
     endTime: { type: String,default:"17:30" },
     inTime:{type:String},
-    outTime:{type:String}
+    outTime:{type:String},
+    inTimeArray:{type:Array},
+    outTimeArray:{type:Array}
 }, {
     collection: 'attendence',
     versionKey: false,

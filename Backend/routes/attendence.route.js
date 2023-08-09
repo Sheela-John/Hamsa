@@ -44,7 +44,11 @@ router.post('/getAttendenceReport', async (req, res, next) => {
     if (err) return next(err);
     else return res.status(200).json({ status: true, data: attendenceData });
 })
-
+router.post('/toUpdateCount', async (req, res, next) => {
+    let [err, attendenceData] = await handle(AttendenceAPI.toUpdateCount(req.body));
+    if (err) return next(err);
+    else return res.status(200).json({ status: true, data: attendenceData });
+})
 /* Get Attendence of Particluar Staff of Today */
 router.post('/getAttendenceofToday', async (req, res, next) => {
     let [err, attendenceData] = await handle(AttendenceAPI.getAttendenceofToday(req.body));
