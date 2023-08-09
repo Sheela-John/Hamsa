@@ -1147,7 +1147,7 @@ async function getSlotsForAssignService(data) {
                                         }
                                     }
                                 }
-                                if (data.startTime && data.EndTime) {
+                                if (data.startTime) {
                                     var NewStart = Number(data.startTime.split(':')[0] + data.startTime.split(':')[1]);
                                     var NewEnd = Number(data.endTime.split(':')[0] + data.endTime.split(':')[1]);
                                     for (var x = NewStart; x <= NewEnd; x++) {
@@ -1185,7 +1185,7 @@ async function getSlotsForAssignService(data) {
                                     }
                                 }
                             }
-                            if (data.startTime && data.EndTime) {
+                            if (data.startTime) {
                                 for (var x = NewStart; x <= NewEnd; x++) {
                                     if (x >= IST && x <= IET) {
                                         //tempArray.push(final[j]);
@@ -1238,8 +1238,10 @@ async function getSlotsForAssignService(data) {
                                 }
                             }
                         }
+                        console.log("data.start",data.startTime,data.endTime);
                         //   console.log("IST >=NewStart && NewEnd<=IET",IST >=NewStart && NewEnd<=IET)
-                        if (data.startTime && data.EndTime) {
+                        if (data.startTime) {
+                            console.log(true)
                             var NewStart = Number(data.startTime.split(':')[0] + data.startTime.split(':')[1]);
                         var NewEnd = Number(data.endTime.split(':')[0] + data.endTime.split(':')[1]);
                             for (var x = NewStart; x <= NewEnd; x++) {
@@ -1266,6 +1268,7 @@ async function getSlotsForAssignService(data) {
             }
         }
     }
+    console.log("isAvailableTemp", isAvailableTemp);
     if (isAvailableTemp.includes(false)) {
         isAvailable = false;
     }
@@ -1278,7 +1281,7 @@ async function getSlotsForAssignService(data) {
     }
     if (err1) return Promise.reject(err1);
     if (lodash.isEmpty(final)) return reject(ERR.NO_RECORDS_FOUND);
-    if (data.startTime && data.endTime) {
+    if (data.startTime) {
         return Promise.resolve(returnValue);
     }
     else {

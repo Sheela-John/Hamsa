@@ -130,8 +130,7 @@
                     <div class="col-md-6">
                         <label for="days" class="block mb-2 font-bold text-gray-600">Select Days</label>
                         <ng-multiselect-dropdown class="w-full mt-3" formControlName="onWeekDay"
-                            [placeholder]="'Please Select Days'" [settings]="weekArr" [data]="weekData"
-                            (ngModelChange)="weekly($event)">
+                            [placeholder]="'Please Select Days'" [settings]="weekArr" [data]="weekData">
                         </ng-multiselect-dropdown>
                     </div>
                 </div>
@@ -167,8 +166,16 @@
                             <input type="text" class="form-control data-picker-color user-font"
                                 formControlName="startDate" bsDatepicker
                                 [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
-                                (bsValueChange)="onDateChangeStart($event)" (input)="inputdobValidator($event)"
+                                (bsValueChange)="onDateChangeStart()" (input)="inputdobValidator($event)"
                                 placeholder="DD-MM-YYYY">
+                        </div>
+                        <div class="error-msg-area">
+                            <div *ngIf="clientForm.controls['startDate'].errors && (!clientForm.controls['startDate'].pristine|| isClientFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!clientForm.controls['startDate'].errors.required">Please Select
+                                    Start Date
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -178,8 +185,15 @@
                             <input type="text" class="form-control data-picker-color user-font"
                                 formControlName="endDate" bsDatepicker
                                 [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
-                                (bsValueChange)="onDateChangeEnd($event)" (input)="inputdobValidator($event)"
-                                maxlength="10" placeholder="DD-MM-YYYY">
+                                (input)="inputdobValidator($event)" maxlength="10" placeholder="DD-MM-YYYY">
+                        </div>
+                        <div class="error-msg-area">
+                            <div *ngIf="clientForm.controls['endDate'].errors && (!clientForm.controls['endDate'].pristine|| isClientFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!clientForm.controls['endDate'].errors.required">Please Select End
+                                    Date
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -233,7 +247,7 @@
                     <div class="col-md-6">
                         <label for="Branch" class="block mb-2 font-bold text-gray-600">Duration</label>
                         <select class="border border-gray-300 p-2 w-full rounded" formControlName="duration"
-                            (change)="dividingSlot($event)">
+                            (change)="onChangeDuration()">
                             <option value="" disabled>--select--</option>
                             <option value="{{Duration.id}}" *ngFor="let Duration of sessionDuration">
                                 {{Duration.time}}
@@ -243,18 +257,30 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        <label class="block mb-2 mt-3 font-bold text-gray-600">Start Time</label>
-                        <input class="border border-gray-300 p-2 w-full rounded" type="text"
-                            placeholder="Select Start Time" formControlName="startTime" [format]="24"
-                            [ngxTimepicker]="startRange" [min]=startTime [max]=endTime>
-                        <ngx-material-timepicker #startRange (opened)="startpickerOpened = true;" [minutesGap]="5"
-                            (timeChanged)="calculateEndTime($event)" [defaultTime]="startTime">
-                        </ngx-material-timepicker>
+                        <div class="input-group">
+                            <label class="block mb-2 mt-3 font-bold text-gray-600">Start Time</label>
+                            <input class="border border-gray-300 p-2 w-full rounded" type="text"
+                                placeholder="Select Start Time" formControlName="startTime" [format]="24"
+                                [ngxTimepicker]="startRange" [min]=startTime [max]=endTime>
+                            <ngx-material-timepicker #startRange (opened)="startpickerOpened = true;" [minutesGap]="5"
+                                (timeSet)="calculateEndTime($event)" [defaultTime]="startTime">
+                            </ngx-material-timepicker>
+                        </div>
+                        <div class="error-msg-area">
+                            <div *ngIf="clientForm.controls['startTime'].errors && (!clientForm.controls['startTime'].pristine|| isClientFormSubmitted)"
+                                class="error-msg">
+                                <div [hidden]="!clientForm.controls['startTime'].errors.required">
+                                    Please Select Start Time
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="block mb-2 mt-3 font-bold text-gray-600">End Time</label>
-                        <input class="border border-gray-300 p-2 w-full rounded disabled" type="text"
-                            placeholder="End Time" formControlName="endTime">
+                        <div class="input-group">
+                            <label class="block mb-2 mt-3 font-bold text-gray-600">End Time</label>
+                            <input class="border border-gray-300 p-2 w-full rounded disabled" type="text"
+                                placeholder="End Time" formControlName="endTime">
+                        </div>
                     </div>
                 </div>
                 <div>
