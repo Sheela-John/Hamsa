@@ -1376,6 +1376,17 @@ async function assignServiceForClientByPhone(data) {
     if (clientErr) return Promise.reject(clientErr);
     if (lodash.isEmpty(clientData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     let [Err, assignServiceData] = await handle(AssignService.find({ 'clientId': clientData._id }).lean());
+    for(var i=0;i<assignServiceData.length;i++)
+    {
+        let [Err, staffData] = await handle(Staff.findOne({ '_id': assignServiceData[i].staffId }).lean());
+        let [Err1, branchData] = await handle(Branch.findOne({ '_id': assignServiceData[i].branchId }).lean());
+        console.log("branchData",branchData)
+        assignServiceData[i].staffName=staffData.staffName;
+        if(branchData!=null)
+        {
+        assignServiceData[i].branchName=branchData.branchName;
+        }
+    }
     if (Err) return Promise.reject(Err);
     if (lodash.isEmpty(assignServiceData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(assignServiceData);
