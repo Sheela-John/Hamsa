@@ -44,8 +44,8 @@ router.post('/getAttendenceReport', async (req, res, next) => {
     if (err) return next(err);
     else return res.status(200).json({ status: true, data: attendenceData });
 })
-router.post('/toUpdateCount', async (req, res, next) => {
-    let [err, attendenceData] = await handle(AttendenceAPI.toUpdateCount(req.body));
+router.post('/tosaveCount', async (req, res, next) => {
+    let [err, attendenceData] = await handle(AttendenceAPI.tosaveCount(req.body));
     if (err) return next(err);
     else return res.status(200).json({ status: true, data: attendenceData });
 })
@@ -55,5 +55,12 @@ router.post('/getAttendenceofToday', async (req, res, next) => {
     if (err) return next(err);
     else return res.status(200).json({ status: true, data: attendenceData });
 })
+router.post('/togetPreviouseCount', async (req, res, next) => {
+ 
+    let [err, attendenceData] = await handle(AttendenceAPI.togetPreviouseCount(req.body));
+    if (err) return next(err);
+    else return res.status(200).json({ status: true, data: attendenceData });
+})
+
 
 module.exports = router;

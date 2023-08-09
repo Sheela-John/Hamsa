@@ -96,27 +96,27 @@ async function create(clientData) {
                     clientData.role = "PORTAL_CLIENT";
                     var saveModel = new Client(clientData);
                     let [err, client] = await handle(saveModel.save())
-                    var count=1;
-                    var typeArray=[1,3,4];
+                    var count = 1;
+                    var typeArray = [1, 3, 4];
                     for (var i = 0; i < client.addSession.length; i++) {
                         let [assignErr, assignServiceValue] = await handle(AssignService.find({}).lean());
-                        console.log("assignServiceData",assignServiceValue)
+                        console.log("assignServiceData", assignServiceValue)
                         for (var j = 0; j < assignServiceValue.length; j++) {
 
                             if (assignServiceValue[j].date == new Date(client.addSession[i].date)) {
-                                console.log("check",slotCheck(assignServiceValue[j].startTime))
+                                console.log("check", slotCheck(assignServiceValue[j].startTime))
                                 if (slotCheck(assignServiceValue[j].startTime) >= slotCheck(client.addSession[i].slotStartTime) && slotCheck(assignServiceValue[j].endTime) <= slotCheck(client.addSession[i].slotEndTime)) {
-                                    console.log(true,client.typeOfTreatment)
-                                    if (typeArray.includes(assignServiceValue[j].typeOfTreatment) && typeArray.includes( client.typeOfTreatment)) {
-                                        console.log("client.typeOfTreatment",assignServiceValue[j].bookedCount)
+                                    console.log(true, client.typeOfTreatment)
+                                    if (typeArray.includes(assignServiceValue[j].typeOfTreatment) && typeArray.includes(client.typeOfTreatment)) {
+                                        console.log("client.typeOfTreatment", assignServiceValue[j].bookedCount)
                                         count = assignServiceValue[j].bookedCount + 1;
-                                        console.log("count",count)
-                                        let [assignErr, assignServiceValue1] = await handle(AssignService.findOneAndUpdate({_id:assignServiceValue[j]._id},{$set:{bookedCount:count}},{ new: true, useFindAndModify: false }))
-                                        console.log("assignServiceValue1",assignServiceValue1)
+                                        console.log("count", count)
+                                        let [assignErr, assignServiceValue1] = await handle(AssignService.findOneAndUpdate({ _id: assignServiceValue[j]._id }, { $set: { bookedCount: count } }, { new: true, useFindAndModify: false }))
+                                        console.log("assignServiceValue1", assignServiceValue1)
                                     }
                                 }
                             }
-                           
+
                         }
 
                         var assignData = {
@@ -135,10 +135,10 @@ async function create(clientData) {
                             "slot": client.addSession[i].slot,
                             "typeOfTreatment": client.typeOfTreatment,
                             "latitude": client.clientAddressLatitude,
-                            "longitude": client.clientAddressLogitude,
+                            "longitude": client.clientAddressLongitude,
                             "bookedCount": count,
-                            "branchId":client.homeBranchId,
-                            "branchType":0
+                            "branchId": client.homeBranchId,
+                            "branchType": 0
                         }
                         var saveAssignData = new AssignService(assignData);
                         let [err1, assignServiceData] = await handle(saveAssignData.save())
@@ -239,15 +239,15 @@ async function getClientDatabyId(clientId) {
     log.close();
     let [clientErr, clientData] = await handle(Client.findOne({ '_id': clientId }).lean());
     console.log(clientData.packageId)
-    clientData.startDate=new Date(clientData.startDate).toDateString();
-    clientData.endDate=new Date(clientData.endDate).toDateString();
+    clientData.startDate = new Date(clientData.startDate).toDateString();
+    clientData.endDate = new Date(clientData.endDate).toDateString();
     var sessionArray = [];
     for (var j = 0; j < clientData.packageId.length; j++) {
         let [Err, assignServiceData] = await handle(AssignService.find({ 'packageId': clientData.packageId[j] }).sort({ "date": 1 }).lean());
 
         for (var i = 0; i < assignServiceData.length; i++) {
             var temp = {
-                date:assignServiceData[i].date,
+                date: assignServiceData[i].date,
                 startTime: assignServiceData[i].startTime,
                 endTime: assignServiceData[i].endTime,
                 duration: assignServiceData[i].duration
@@ -307,7 +307,7 @@ const UpdateClient = async function (datatoupdate) {
     let [err2, assignData1] = await handle(AssignService.find({ 'packageId': datatoupdate.packageId }))
     if (assignData1.length != 0) {
         let [err1, assignData] = await handle(AssignService.find({ 'packageId': datatoupdate.packageId }))
-        console.log("assignData",assignData)
+        console.log("assignData", assignData)
         for (var i = 0; i < datatoupdate.addSession.length; i++) {
             var assign = {
 
@@ -326,10 +326,10 @@ const UpdateClient = async function (datatoupdate) {
                 "slot": datatoupdate.addSession[i].slot,
                 "typeOfTreatment": datatoupdate.typeOfTreatment,
                 "latitude": datatoupdate.clientAddressLatitude,
-                "longitude": datatoupdate.clientAddressLogitude,
+                "longitude": datatoupdate.clientAddressLongitude,
                 "bookedCount": 1,
-                "branchId":client.homeBranchId,
-                "branchType":0
+                "branchId": client.homeBranchId,
+                "branchType": 0
             }
 
             var saveAssignData = new AssignService(assign);
@@ -356,10 +356,10 @@ const UpdateClient = async function (datatoupdate) {
                 "slot": datatoupdate.addSession[i].slot,
                 "typeOfTreatment": datatoupdate.typeOfTreatment,
                 "latitude": datatoupdate.clientAddressLatitude,
-                "longitude": datatoupdate.clientAddressLogitude,
+                "longitude": datatoupdate.clientAddressLongitude,
                 "bookedCount": 1,
-                "branchId":client.homeBranchId,
-                "branchType":0
+                "branchId": client.homeBranchId,
+                "branchType": 0
             }
 
             var saveAssignData = new AssignService(assign);
@@ -486,13 +486,19 @@ async function saveRecurringSession(data) {
 
     var recurringdate = [];
     recurringdate = rule.all()
-
+    console.log("recurringdate", recurringdate.length,data.noOfSession,recurringdate.length < data.noOfSession)
     var dateSlot = []
-    for (let i = 0; i < data.noOfSession; i++) {
-        dateSlot.push(formattedDate(recurringdate[i].toString()))
+    if (recurringdate.length < data.noOfSession) {
+        console.log("true")
+        return Promise.reject(ERR.NO_OF_SESSION_GREATER_THAN_NO_OF_SLOTS);
     }
-    console.log("dateSlot", dateSlot)
-    var slotArr = [];
+    else{
+        for (let i = 0; i < data.noOfSession; i++) {
+            dateSlot.push(formattedDate(recurringdate[i].toString()))
+        }
+        console.log("dateSlot", dateSlot)
+      
+        var slotArr = [];
     for (var i = 0; i < dateSlot.length; i++) {
         let temp = {
             "staffId": data.staffId,
@@ -500,8 +506,8 @@ async function saveRecurringSession(data) {
             "slotId": data.slotId,
             "duration": data.duration,
             "typeOfTreatment": data.typeOfTreatment,
-            "startTime":data.startTime,
-            "endTime":data.endTime
+            "startTime": data.startTime,
+            "endTime": data.endTime
         }
         console.log("temp", temp)
         let [err, assign] = await handle(AssignServiceAPI.getSlotsForAssignService(temp))
@@ -509,12 +515,13 @@ async function saveRecurringSession(data) {
         var slotsData = {
             date: dateSlot[i],
             slots: assign.final,
-            isAvailable:assign.isAvailable
+            isAvailable: assign.isAvailable
         }
         slotArr.push(slotsData)
     }
     if (lodash.isEmpty(slotArr)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(slotArr);
+}
 }
 function formattedDate(date) {
     var d = new Date(date),
@@ -548,8 +555,7 @@ async function generatePackageId(id) {
     console.log("clientData", clientData)
 
 }
-function slotCheck(start)
-{
+function slotCheck(start) {
     var bHr = (start.split(':')[0]);
     var bMin = (start.split(':')[1]);
     var AST = Number(bHr + bMin);

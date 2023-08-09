@@ -257,5 +257,10 @@
     "NUMBER_OF_DAYS": {
         "code": 161,
         "message": "Number of Days shoud not be greater than 31 days"
+    },
+    "NO_OF_SESSION_GREATER_THAN_NO_OF_SLOTS":
+    {
+        "code": 162,
+        "message": "Please update your package duration"
     }
 }

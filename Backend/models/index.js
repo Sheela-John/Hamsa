@@ -22,5 +22,5 @@ db.ServiceRequest=require('./serviceRequest');
 db.RolePosition = require('./rolePosition');
 db.BranchTransfer = require('./branchTransfer');
 db.QRcodeImage = require('./QRcodeImage')
-
+db.TravelCount=require('./travelCount')
 module.exports = db;

@@ -5,6 +5,7 @@ const Security = require("../util/security");
 const Attendence = models.Attendence;
 const AssignService = models.AssignService;
 const Branch = models.Branch;
+const TravelCount = models.TravelCount;
 const Staff = models.Staff;
 const lodash = require('lodash');
 const ERR = require('../errors.json');
@@ -193,38 +194,55 @@ const getAttendenceofStaffByDateRange = async (data) => {
 
             var distance = 0;
             var duration = 0;
-            let [Err, assignServiceData] = await handle(AssignService.find({ 'staffId': attendenceData[i].doc[j].staffId, date: attendenceData[i].doc[j].date.toString() }).lean());
-            console.log("assignServiceData", assignServiceData)
-            if (assignServiceData.length != 0) {
-                for (var k = 0; k < assignServiceData.length; k++) {
+            let [Err1, travelCountData] = await handle(TravelCount.find({ 'staffId': attendenceData[i].doc[j].staffId, date: attendenceData[i].doc[j].date }).sort({ count: 1 }).lean());
+            console.log("travelCountData", travelCountData)
+            var totalDistance = [];
+            for (var l = 0; l < travelCountData.length; l++) {
+                let [Err, assignServiceData] = await handle(AssignService.findOne({ '_id': travelCountData[l].assignServiceId }).lean());
+                console.log("assignServiceData", assignServiceData)
+                if (l == 0) {
+                    let [err, branchData] = await handle(Branch.findOne({ "_id": assignServiceData.branchId }))
+                    console.log("branchData", branchData)
                     var temp = {
-                        "branchId": assignServiceData[i].branchId,
-                        "elatitude": assignServiceData[i].latitude,
-                        "elongitude": assignServiceData[i].longitude
+                        "latitude": branchData.latitude,
+                        "longitude": branchData.longitude,
+                        "elatitude": assignServiceData.slatitude,
+                        "elongitude": assignServiceData.slongitude
                     }
-                    var [err3, tmep] = await handle(travelDistance(temp));
-                    console.log("dd", tmep)
-                    distance = distance + tmep.distance;
-                    var val = Number(tmep.duration.split('s')[0]);
-                    duration = duration + val;
-                    duration = Math.floor(duration / 60);
-                    console.log("distance", distance, duration)
-                    attendenceData[i].doc[j].travelDistance = distance;
-                    attendenceData[i].doc[j].travelDuration = duration;
+                    console.log(temp)
+                    var [err3, val] = await handle(travelDistance(temp));
+                    console.log("val", val)
+                    totalDistance.push(val.distance);
                 }
+                else {
+                    let [Err, assignServiceData1] = await handle(AssignService.findOne({ '_id': travelCountData[l - 1].assignServiceId }).lean());
+                    var temp = {
+                        "latitude": assignServiceData1.slatitude,
+                        "longitude": assignServiceData1.slongitude,
+                        "elatitude": assignServiceData.slatitude,
+                        "elongitude": assignServiceData.slongitude
+                    }
+                    console.log(temp)
+                    var [err3, val] = await handle(travelDistance(temp));
+                    console.log("val1", val)
+                    totalDistance.push(val.distance);
+                }
+        
+                
             }
-            else {
-                attendenceData[i].doc[j].travelDistance = distance;
-                attendenceData[i].doc[j].travelDuration = duration;
-            }
-
+            console.log("totalDistance", totalDistance)
+            console.log(
+                totalDistance.reduce((a, b) => a + b, 0)
+            )
+            distance = totalDistance.reduce((a, b) => a + b, 0);
+            attendenceData[i].doc[j].travelDistance = distance;
+            attendenceData[i].doc[j].travelDuration = duration;
         }
     }
     if (err) return Promise.reject(err);
     else return Promise.resolve(attendenceData);
 }
 const travelDistance = async (data) => {
-    let [err, branchData] = await handle(Branch.findOne({ "_id": data.branchId }))
     return new Promise((resolve, reject) => {
         const options = {
             method: 'POST',
@@ -240,8 +258,8 @@ const travelDistance = async (data) => {
                 "destination": {
                     "location": {
                         "latLng": {
-                            "latitude": branchData.latitude,
-                            "longitude": branchData.longitude
+                            "latitude": data.latitude,
+                            "longitude": data.longitude
                         }
                     }
                 },
@@ -299,19 +317,20 @@ const getAttendenceofToday = async (data) => {
     else return Promise.resolve(attendenceData);
 }
 
-async function toUpdateCount(data) {
-    let [Err, assignServiceData] = await handle(AssignService.find({ 'staffId': data.staffId, date: new Date(data.date) }).lean());
-    console.log(assignServiceData)
-    //var len=assignServiceData.length;
-    let i;
-    for (i = 0; i < assignServiceData.length; i++) {
-        console.log(i)
-        var temp=0;
-        temp = assignServiceData[i].travelCount + 1;
-        let [Err1, assignServiceData1] = await handle(AssignService.findOneAndUpdate({ '_id': assignServiceData[i]._id }, { "$set": { "travelCount": temp } }).lean());
-    }
+async function tosaveCount(data) {
+    console.log("ds", new Date(new Date(data.date).getTime()))
+    data.date = new Date(data.date)
+    var saveModel = new TravelCount(data);
+    let [err, attendenceDataSaved] = await handle(saveModel.save())
+    if (err) return Promise.reject(err);
+    else return Promise.resolve(attendenceDataSaved)
+
+}
+async function togetPreviouseCount(data) {
+    let [Err, countData] = await handle(TravelCount.find({ 'staffId': data.staffId, 'date': new Date(data.date) }));
     if (Err) return Promise.reject(Err);
-    else return Promise.resolve(assignServiceData);
+    else return Promise.resolve(countData)
+
 }
 module.exports = {
     entryAttendence: entryAttendence,
@@ -319,5 +338,6 @@ module.exports = {
     getAttendenceofStaff: getAttendenceofStaff,
     getAttendenceofStaffByDateRange: getAttendenceofStaffByDateRange,
     getAttendenceofToday: getAttendenceofToday,
-    toUpdateCount: toUpdateCount
+    tosaveCount: tosaveCount,
+    togetPreviouseCount: togetPreviouseCount
 }
