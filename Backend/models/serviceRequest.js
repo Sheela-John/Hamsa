@@ -24,6 +24,10 @@ const serviceRequestSchema = new mongoose.Schema({
    },
    reason:{
     type:String
+   },
+   isAssigned:{
+    type:String,
+    default:0    //0 - Not Assigned   1-Assigned
    }
 }, {
     collection: 'serviceRequest',
