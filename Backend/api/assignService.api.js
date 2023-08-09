@@ -1126,7 +1126,7 @@ async function getSlotsForAssignService(data) {
                        
                         if (bookedTreatment.length != 0) {
                             var slot = bookedSlots[i].startTime + '-' + bookedSlots[i].endTime;
-                            if (count != 0 && count < 3 && final[j].slot == slot) {
+                            if (count != 0 && count <= 3 && final[j].slot == slot) {
                                 console.log(true);
                                 final[j].bookedStatus = 0;
                             }
