@@ -239,13 +239,15 @@ async function getClientDatabyId(clientId) {
     log.close();
     let [clientErr, clientData] = await handle(Client.findOne({ '_id': clientId }).lean());
     console.log(clientData.packageId)
+    clientData.startDate=new Date(clientData.startDate).toDateString();
+    clientData.endDate=new Date(clientData.endDate).toDateString();
     var sessionArray = [];
     for (var j = 0; j < clientData.packageId.length; j++) {
         let [Err, assignServiceData] = await handle(AssignService.find({ 'packageId': clientData.packageId[j] }).sort({ "date": 1 }).lean());
 
         for (var i = 0; i < assignServiceData.length; i++) {
             var temp = {
-                date: assignServiceData[i].date,
+                date:assignServiceData[i].date,
                 startTime: assignServiceData[i].startTime,
                 endTime: assignServiceData[i].endTime,
                 duration: assignServiceData[i].duration
