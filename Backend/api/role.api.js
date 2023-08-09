@@ -53,31 +53,12 @@ async function create(roleData) {
 
 /* To Update Role - API */
 const UpdateRole = async function (datatoupdate) {
-    log.debug(component, 'Updating a Role', { 'attach': datatoupdate });
-    log.close();
-    var slotArray = datatoupdate.slots;
-    for (var i = 0; i < slotArray.length; i++) {
-        if (slotArray[i].slotId) {
-            console.log("i am in", i, slotArray[i])
-            let [error, updatedRole] = await handle(Role.findOneAndUpdate({ "_id": mongoose.Types.ObjectId(datatoupdate._id), "slots._id": mongoose.Types.ObjectId(slotArray[i].slotId) },
-                {
-                    '$set': {
-                        'slots.$.slotName': slotArray[i].slotName,
-                        'slots.$.startTime': slotArray[i].startTime,
-                        'slots.$.endTime': slotArray[i].endTime,
-                        'slots.$.isDeleted': slotArray[i].isDeleted
-                    }
-                },
-                { new: true, useFindAndModify: false }));
-            if (error) return Promise.reject(error);
-            console.log("updatedRole", updatedRole)
-        }
-        if (!slotArray[i].slotId) {
-            let [error, slots] = await handle(Role.findOneAndUpdate({ "_id": datatoupdate._id }, { $push: { 'slots': slotArray[i] } }, { new: true, useFindAndModify: false }));
-            console.log("slots", slots)
-            if (error) return Promise.reject(error);
-        }
-    }
+    log.debug(component, 'Updating a Role', { 'attach': datatoupdate }); log.close();
+    let roleId = datatoupdate._id;
+    delete datatoupdate._id
+    let [roleErr, roleData] = await handle(Role.findOneAndUpdate({ "_id": roleId }, datatoupdate, { new: true, useFindAndModify: false }))
+    if (roleErr) return Promise.reject(roleErr);
+    else return Promise.resolve(roleData);
 }
 
 /* Get Role by Id */
@@ -86,40 +67,22 @@ async function getRoleDataById(roleId) {
     log.close();
     let [roleErr, roleData] = await handle(Role.findOne({ '_id': roleId }).lean());
     if (roleErr) return Promise.reject(roleErr);
-    var temp = [];
-    var arrayslot = roleData.slots;
-    for (var j = 0; j < arrayslot.length; j++) {
-        if (arrayslot[j].isDeleted == 0) {
-            temp.push(arrayslot[j])
-        }
-    }
     if (lodash.isEmpty(roleData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
-    return Promise.resolve(temp);
+    return Promise.resolve(roleData);
 }
 
-/* Get All Role Details */
+/* Get All Role Detail */
 async function getAllRoleDetails() {
     log.debug(component, 'Get All Role Detail'); log.close();
     let [err, roleData] = await handle(Role.find({}).lean());
     if (err) return Promise.reject(err);
-    var temp = [];
-    for (var i = 0; i < roleData.length; i++) {
-        for (var j = 0; j < roleData[i].slots.length; j++) {
-            if (roleData[i].slots[j].isDeleted == 0) {
-
-                temp.push(roleData[i].slots[j])
-            }
-        }
-    }
     if (lodash.isEmpty(roleData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
-    return Promise.resolve(temp);
-
+    return Promise.resolve(roleData);
 }
-
 
 /* Enable / Disable Role By Role Id */
 const enableDisableRole = async (roleId) => {
-    log.debug(component, 'Enable and Disable functionality');
+    log.debug(component, 'Enable and Disable functionality' );
     log.close();
     let [enableDisableErr, enableDisableData] = await handle(Role.findOne({ "_id": roleId }));
     if (enableDisableErr) return Promise.reject(enableDisableErr);
@@ -132,13 +95,17 @@ const enableDisableRole = async (roleId) => {
 
 
 async function deleteSlot(data) {
+
     log.debug(component, 'delete slot');
     log.close();
     let [err, roleData] = await handle(Role.findOne({ "_id": data.id }));
     if (err) return Promise.reject(err);
+    console.log("roleData.length", roleData.slots.length)
+    console.log("roleData",roleData)
     for (var i = 0; i < roleData.slots.length; i++) {
         if (roleData.slots[i].id == data.slotId) {
             console.log("data.slotId", data.slotId)
+            console.log("roleData.slots[i].id", roleData.slots[i].id)
             let [error, slotData] = await handle(Role.findOneAndUpdate({ "_id": data.id, "slots": { "$elemMatch": { "_id": (data.slotId) } } }, { $set: { 'slots.$.isDeleted': 1 } }, { new: true, useFindAndModify: false }).lean());
             if (error) return Promise.reject(error);
             return Promise.resolve(slotData);
