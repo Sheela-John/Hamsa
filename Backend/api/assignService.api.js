@@ -1123,27 +1123,27 @@ async function getSlotsForAssignService(data) {
                         var eMin = (final[j].slot.split('-')[1].split(':')[1])
                         var IST = Number(sHr + sMin);
                         var IET = Number(eHr + eMin);
-                       
+
                         if (bookedTreatment.length != 0) {
                             var slot = bookedSlots[i].startTime + '-' + bookedSlots[i].endTime;
-                            if (count != 0 && count <= 3 && final[j].slot == slot) {
+                            if (count < 3) {
                                 console.log(true);
                                 final[j].bookedStatus = 0;
+                                condition = 0;
                             }
                             else {
-                                console.log("inside else", AST, AET)
+                            
                                 for (var x = AST; x <= AET; x++) {
                                     if (x >= IST && x <= IET) {
-                                        console.log("true");
-                                        //final[j].bookedStatus = 1;
                                         var temp = final[j].slot.split('-')[0]
                                         var temp1 = final[j].slot.split('-')[1]
                                         if (IET == AST || IST == AET) {
                                             final[j].bookedStatus = 0;
                                         }
                                         else {
+                                         
                                             final[j].bookedStatus = 1;
-
+                                            condition = 1
                                         }
                                     }
                                 }
@@ -1152,13 +1152,16 @@ async function getSlotsForAssignService(data) {
                                     var NewEnd = Number(data.endTime.split(':')[0] + data.endTime.split(':')[1]);
                                     for (var x = NewStart; x <= NewEnd; x++) {
                                         if (x > IST && x < IET) {
-                                            //tempArray.push(final[j]);
                                             if (final[j].bookedStatus == 0) {
                                                 condition = 0
                                             }
                                             if (final[j].bookedStatus == 1) {
                                                 condition = 1;
                                             }
+                                        }
+                                        else{
+                                            console.log("inside")
+                                            isAvailable = true;
                                         }
                                     }
                                 }
@@ -1188,7 +1191,6 @@ async function getSlotsForAssignService(data) {
                             if (data.startTime) {
                                 for (var x = NewStart; x <= NewEnd; x++) {
                                     if (x > IST && x < IET) {
-                                        //tempArray.push(final[j]);
                                         if (final[j].bookedStatus == 0) {
                                             condition = 0
                                         }
@@ -1196,12 +1198,19 @@ async function getSlotsForAssignService(data) {
                                             condition = 1;
                                         }
                                     }
+                                    else{
+                                        isAvailable = true;
+                                    }
                                 }
+                                
                                 if (condition == 0) {
+
                                     isAvailableTemp.push(true);
+
                                 }
                                 else {
                                     isAvailableTemp.push(false);
+
                                 }
                             }
                         }
@@ -1227,7 +1236,7 @@ async function getSlotsForAssignService(data) {
                         var eMin = (final[j].slot.split('-')[1].split(':')[1])
                         var IST = Number(sHr + sMin);
                         var IET = Number(eHr + eMin);
-                        
+
                         for (var x = AST; x <= AET; x++) {
                             if (x >= IST && x <= IET) {
                                 if (IET == AST || IST == AET) {
@@ -1238,12 +1247,12 @@ async function getSlotsForAssignService(data) {
                                 }
                             }
                         }
-                        console.log("data.start",data.startTime,data.endTime);
+                        console.log("data.start", data.startTime, data.endTime);
                         //   console.log("IST >=NewStart && NewEnd<=IET",IST >=NewStart && NewEnd<=IET)
                         if (data.startTime) {
                             console.log(true)
                             var NewStart = Number(data.startTime.split(':')[0] + data.startTime.split(':')[1]);
-                        var NewEnd = Number(data.endTime.split(':')[0] + data.endTime.split(':')[1]);
+                            var NewEnd = Number(data.endTime.split(':')[0] + data.endTime.split(':')[1]);
                             for (var x = NewStart; x <= NewEnd; x++) {
                                 if (x > IST && x < IET) {
                                     //tempArray.push(final[j]);
@@ -1253,6 +1262,9 @@ async function getSlotsForAssignService(data) {
                                     if (final[j].bookedStatus == 1) {
                                         condition = 1;
                                     }
+                                }
+                                else{
+                                    isAvailable = true;
                                 }
                             }
                             if (condition == 0) {
@@ -1268,13 +1280,16 @@ async function getSlotsForAssignService(data) {
             }
         }
     }
-    console.log("isAvailableTemp", isAvailableTemp);
+     console.log("isAvailableTemp", isAvailableTemp);
+    if(isAvailable!=true)
+    {
     if (isAvailableTemp.includes(false)) {
         isAvailable = false;
     }
     else {
         isAvailable = true;
     }
+}
     var returnValue = {
         final: final,
         isAvailable: isAvailable
@@ -1404,8 +1419,8 @@ async function assignServiceForClientByPhone(data) {
         if (branchData != null) {
             assignServiceData[i].branchName = branchData.branchName;
         }
-        assignServiceData[i].clientName=clientData.clientName;
-        assignServiceData[i].serviceName=serviceData.serviceName;
+        assignServiceData[i].clientName = clientData.clientName;
+        assignServiceData[i].serviceName = serviceData.serviceName;
     }
     if (Err) return Promise.reject(Err);
     if (lodash.isEmpty(assignServiceData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
