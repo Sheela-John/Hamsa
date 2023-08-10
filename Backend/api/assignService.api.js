@@ -1066,6 +1066,7 @@ async function getSlotsForAssignService(data) {
     let [err, staffData] = await handle(Staff.findOne({ _id: data.staffId }).lean());
     let [err1, roleData] = await handle(Role.findOne({ "_id": staffData.staffRole }).lean());
     var slotTime = [];
+    var notInBooked = [];
     var temp;
     let [err2, bookedSlots] = await handle(getAssignServiceDataByStaffIdAndDate(data));
     var isAvailable = false;
@@ -1094,13 +1095,13 @@ async function getSlotsForAssignService(data) {
         }
     }
 
-    var condition = 0;
+    var condition;
+    //console.log("bookedSlots.length",bookedSlots.length)
     var isAvailableTemp = [];
     if (bookedSlots) {
 
         for (var i = 0; i < bookedSlots.length; i++) {
             if (bookedSlots[i].date == new Date(data.date)) {
-
                 var count = bookedSlots[i].bookedCount;
                 let typeOfTreament = typeOfTreamentArray.filter(a => (a == data.typeOfTreatment))
                 let bookedTreatment = typeOfTreamentArray.filter(a => (a == bookedSlots[i].typeOfTreatment))
@@ -1130,9 +1131,9 @@ async function getSlotsForAssignService(data) {
                                 console.log(true);
                                 final[j].bookedStatus = 0;
                                 condition = 0;
+
                             }
                             else {
-                            
                                 for (var x = AST; x <= AET; x++) {
                                     if (x >= IST && x <= IET) {
                                         var temp = final[j].slot.split('-')[0]
@@ -1141,37 +1142,15 @@ async function getSlotsForAssignService(data) {
                                             final[j].bookedStatus = 0;
                                         }
                                         else {
-                                         
+
                                             final[j].bookedStatus = 1;
-                                            condition = 1
+
                                         }
                                     }
                                 }
-                                if (data.startTime) {
-                                    var NewStart = Number(data.startTime.split(':')[0] + data.startTime.split(':')[1]);
-                                    var NewEnd = Number(data.endTime.split(':')[0] + data.endTime.split(':')[1]);
-                                    for (var x = NewStart; x <= NewEnd; x++) {
-                                        if (x > IST && x < IET) {
-                                            if (final[j].bookedStatus == 0) {
-                                                condition = 0
-                                            }
-                                            if (final[j].bookedStatus == 1) {
-                                                condition = 1;
-                                            }
-                                        }
-                                        else{
-                                            console.log("inside")
-                                            isAvailable = true;
-                                        }
-                                    }
-                                }
-                                if (condition == 0) {
-                                    isAvailableTemp.push(true);
-                                }
-                                else {
-                                    isAvailableTemp.push(false);
-                                }
+
                             }
+
                         }
                         else {
                             console.log("sfsfsf")
@@ -1188,31 +1167,7 @@ async function getSlotsForAssignService(data) {
                                     }
                                 }
                             }
-                            if (data.startTime) {
-                                for (var x = NewStart; x <= NewEnd; x++) {
-                                    if (x > IST && x < IET) {
-                                        if (final[j].bookedStatus == 0) {
-                                            condition = 0
-                                        }
-                                        if (final[j].bookedStatus == 1) {
-                                            condition = 1;
-                                        }
-                                    }
-                                    else{
-                                        isAvailable = true;
-                                    }
-                                }
-                                
-                                if (condition == 0) {
 
-                                    isAvailableTemp.push(true);
-
-                                }
-                                else {
-                                    isAvailableTemp.push(false);
-
-                                }
-                            }
                         }
                     }
                 }
@@ -1249,47 +1204,76 @@ async function getSlotsForAssignService(data) {
                         }
                         console.log("data.start", data.startTime, data.endTime);
                         //   console.log("IST >=NewStart && NewEnd<=IET",IST >=NewStart && NewEnd<=IET)
-                        if (data.startTime) {
-                            console.log(true)
-                            var NewStart = Number(data.startTime.split(':')[0] + data.startTime.split(':')[1]);
-                            var NewEnd = Number(data.endTime.split(':')[0] + data.endTime.split(':')[1]);
-                            for (var x = NewStart; x <= NewEnd; x++) {
-                                if (x > IST && x < IET) {
-                                    //tempArray.push(final[j]);
-                                    if (final[j].bookedStatus == 0) {
-                                        condition = 0
-                                    }
-                                    if (final[j].bookedStatus == 1) {
-                                        condition = 1;
-                                    }
-                                }
-                                else{
-                                    isAvailable = true;
-                                }
-                            }
-                            if (condition == 0) {
-                                isAvailableTemp.push(true);
-                            }
-                            else {
-                                isAvailableTemp.push(false);
-                            }
-                        }
+
                     }
 
                 }
             }
         }
     }
-     console.log("isAvailableTemp", isAvailableTemp);
-    if(isAvailable!=true)
-    {
-    if (isAvailableTemp.includes(false)) {
-        isAvailable = false;
+
+console.log("final",final)
+    for (var z = 0; z < final.length; z++) {
+        var sHr = (final[z].slot.split('-')[0].split(':')[0]);
+        var sMin = (final[z].slot.split('-')[0].split(':')[1]);
+        var eHr = (final[z].slot.split('-')[1].split(':')[0])
+        var eMin = (final[z].slot.split('-')[1].split(':')[1])
+        var IST = Number(sHr + sMin);
+        var IET = Number(eHr + eMin);
+        if (data.startTime) {
+            
+            var NewStart = Number(data.startTime.split(':')[0] + data.startTime.split(':')[1]);
+            var NewEnd = Number(data.endTime.split(':')[0] + data.endTime.split(':')[1]);
+            for (var x = NewStart; x <= NewEnd; x++) {
+                console.log("x",x >= IST && x <= IET,x,IST,IET)
+                if (x >= IST && x <= IET) {
+                    if (final[z].bookedStatus == 0) {
+                        condition = 0
+                    }
+                    if (final[z].bookedStatus == 1) {
+                        condition = 1;
+                    }
+                }
+                else {
+                    if (final[z].bookedStatus == 0) {
+                        condition = 0
+                    }
+                    if (final[z].bookedStatus == 1) {
+                        condition = 1;
+                    }
+                    // isAvailable = true;
+                    // z = final.length + 1;
+                    // break;
+                }
+                console.log("z",z,condition);
+            }
+            if (condition == 0) {
+                console.log("if")
+                isAvailableTemp.push(true);
+            }
+            else if(condition==1){
+                console.log("else")
+                isAvailableTemp.push(false);
+            }
+            console.log(isAvailableTemp, "isAvailableTemp")
+        }
+    }
+
+
+   
+    if (isAvailableTemp.length != 0) {
+        if (isAvailableTemp.includes(false)) {
+            isAvailable = false;
+        }
+        else {
+            isAvailable = true;
+        }
     }
     else {
         isAvailable = true;
     }
-}
+    //}
+console.log("date",data.date)
     var returnValue = {
         final: final,
         isAvailable: isAvailable
