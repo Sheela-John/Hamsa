@@ -38,4 +38,34 @@ router.post('/uploadQRcodeImageData', async (req, res, next) => {
         }
     })
 
+    .get('/get/allQRcdeImage', async (req, res, next) => {
+        log.debug(COMPONENT, 'Searching for all QRcodeImage'); log.close();
+        let [err, QRcodeImageData] = await handle(QRcodeImageAPI.getAllQRcodeImage())
+        if (err) {
+            log.error(COMPONENT, 'find all QRcodeImage error', { attach: err });
+            log.close();
+            return res.json({ status: false, err: Object.assign(ERR.UNKNOWN, { message: err.message }) });
+        }
+        else {
+            log.debug(COMPONENT, 'All QRcodeImage fetch Successful');
+            log.close();
+            return res.json({ status: true, data: QRcodeImageData, message: 'Get all QRcodeImage Data Successfully!' });
+        }
+    })
+
+    .delete('/deleteQRcodeImage/:_id', async (req, res, next) => {
+        log.debug(COMPONENT, 'Delete QRcodeImage Data '); log.close();
+        let [err, mentorData] = await handle(QRcodeImageAPI.deleteQRcodeImage(req.params._id));
+        if (err) {
+            log.error(COMPONENT, 'Change QRcodeImage status error', { attach: err });
+            log.close();
+            return res.json({ status: false, err: Object.assign(ERR.UNKNOWN, { message: err.message }) });
+        }
+        else {
+            log.debug(COMPONENT, 'Changing QRcodeImage Status');
+            log.close();
+            return res.json({ "status": true, data: mentorData, "message": "QRcodeImage Status Changed!" })
+        }
+    });
+    
 module.exports = router;

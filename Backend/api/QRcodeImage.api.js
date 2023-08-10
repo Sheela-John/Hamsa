@@ -142,9 +142,31 @@ async function getImagePresignedUrl(data) {
     })
 }
 
+async function getAllQRcodeImage() {
+    log.debug(component, 'Get All QRcodeImage Details'); log.close();
+    let [err, QRcodeImageData] = await handle(QrCodeImageModel.find({isDeleted:0}).lean());
+    if (err) return Promise.reject(err);
+    if (lodash.isEmpty(QRcodeImageData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+    return Promise.resolve(QRcodeImageData);
+}
+
+async function deleteQRcodeImage(id) {
+
+    log.debug(component, 'Enable and Disable QRcodeImage');
+    log.close();
+    let [err, singleData] = await handle(QrCodeImageModel.findOne({ _id: id }));
+    if (err) return Promise.reject(err);
+    let status = (singleData.isDeleted == 0) ? 1 : 0;
+    let [error, QRcodeImageData] = await handle(QrCodeImageModel.findByIdAndUpdate({ _id: singleData._id }, { "$set": { "isDeleted": status } }, { new: true, useFindAndModify: false }));
+    if (error) return Promise.reject(error);
+    return Promise.resolve(QRcodeImageData);
+}
+
 module.exports = {
 
     uploadQRcodeImageData: uploadQRcodeImageData,
-    getImagePresignedUrl: getImagePresignedUrl
+    getImagePresignedUrl: getImagePresignedUrl,
+    getAllQRcodeImage:getAllQRcodeImage,
+    deleteQRcodeImage:deleteQRcodeImage
 
 }
