@@ -9,7 +9,7 @@
   </div>
   <section>
     <div class="container">
-      <section id="blog_area" class="pt-5">
+      <section id="blog_area" class="pt-5">  
         <div id="masonry">
           <div class="card" *ngFor="let travelExpense of travelExpenseArr">
             <div class="card__content">
@@ -84,6 +84,7 @@
           </div>
         </div>
       </section>
+      <h4 class="text-center" *ngIf="travelExpenseArr.length == 0">No Data Available</h4>
     </div>
   </section>
 </div>

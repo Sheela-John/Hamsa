@@ -35,7 +35,7 @@ export class AddEditTransportExpenseComponent {
   public newPerKmCost: any;
   public isShowCost: boolean = false
   public showdelete: boolean = false;
-
+  public show: boolean = false
 
 
   constructor(private fb: FormBuilder, private router: Router, public TransportExpenseService: TransportExpenseService, private route: ActivatedRoute,
@@ -70,7 +70,6 @@ export class AddEditTransportExpenseComponent {
     });
     this.costArr = this.travelExpenseForm.get('addCost') as FormArray;
     if (this.costArr.length == 0) {
-
       this.showdelete = true
     }
     console.log(this.costArr.length)
@@ -79,28 +78,52 @@ export class AddEditTransportExpenseComponent {
   //InitializeAddCostForm
   initializeAddCostForm() {
     return this.fb.group({
-      from: ['', [Validators.required]],
-      to: ['', [Validators.required]],
-      cost: ['', [Validators.required]]
+      from: [''],
+      to: [''],
+      cost: ['']
     });
   }
 
+  /*For changing  field based onthe Radio button  value*/
   changeCostType(eve) {
     console.log("value", eve, typeof (eve.target.value));
-    this.costArr.clear();
-    if (eve.target.value == 1) {
-      this.costArr.push(this.initializeAddCostForm());
 
-      this.hideAddCost = true;
-      this.hideAddCostHeader = true;
+    if (this.travelExpenseId == undefined) {
+      if (eve.target.value == 1) {
+        this.costArr.clear();
+        this.costArr.push(this.initializeAddCostForm());
+        this.hideAddCost = true;
+        this.show = true;
+        this.hideAddCostHeader = true;
+      }
+      else {
+        this.show = false
+        this.hideAddCost = true;
+        this.hideAddCostHeader = false;
+      }
     }
     else {
-      this.hideAddCost = true;
-      this.hideAddCostHeader = false;
-    }
+      if (eve.target.value == 1) {
+        this.hideAddCost = true;
+        this.hideAddCostHeader = true;
+        this.show = true;
+        if (this.travelExpenseDatavalue.distance == "") {
+          this.costArr.clear();
+          this.costArr.push(this.initializeAddCostForm());
+        }
 
+      }
+      else {
+        this.show = false;
+        this.hideAddCost = true;
+        this.hideAddCostHeader = false;
+
+      }
+    }
   }
-    clearValidator(control, form) {
+
+  /*Clear Validation*/
+  clearValidator(control, form) {
     form.get(control).clearValidators();
     form.get(control).updateValueAndValidity();
   }
@@ -111,28 +134,39 @@ export class AddEditTransportExpenseComponent {
     form.get(control).updateValueAndValidity();
   }
 
-
-
   //saveTravelExpense
   addtravelExpense() {
     this.isTravelExpenseFormSubmitted = true;
     var data = this.travelExpenseForm.value;
-    
-    
     if (data.costType == 0) {
       // if (data.newPerKmCost == 0) {
       this.isShowCost = true;
       this.travelExpenseForm.controls['newPerKmCost'].setValidators([Validators.required]);
       this.travelExpenseForm.controls['newPerKmCost'].updateValueAndValidity();
+      for (let i = 0; i < this.costArr.value.length; i++) {
+        var costvalid = this.travelExpenseForm.get('addCost') as FormArray
+        costvalid.at(i)['controls']["from"].clearValidators();
+        costvalid.at(i)['controls']["to"].clearValidators();
+        costvalid.at(i)['controls']["cost"].clearValidators();
+        costvalid.at(i)['controls']["from"].updateValueAndValidity();
+        costvalid.at(i)['controls']["to"].updateValueAndValidity();
+        costvalid.at(i)['controls']["cost"].updateValueAndValidity();
+      }
 
     } else {
       this.isShowCost = false;
       this.travelExpenseForm.controls['newPerKmCost'].clearValidators();
       this.travelExpenseForm.controls['newPerKmCost'].updateValueAndValidity();
-
+      for (let i = 0; i < this.costArr.value.length; i++) {
+        var costvalid = this.travelExpenseForm.get('addCost') as FormArray
+        costvalid.at(i)['controls']["from"].setValidators([Validators.required]);
+        costvalid.at(i)['controls']["to"].setValidators([Validators.required]);
+        costvalid.at(i)['controls']["cost"].setValidators([Validators.required]);
+        costvalid.at(i)['controls']["from"].updateValueAndValidity();
+        costvalid.at(i)['controls']["to"].updateValueAndValidity();
+        costvalid.at(i)['controls']["cost"].updateValueAndValidity()
+      }
     }
- 
-
     var arr = [];
     for (var i = 0; i < data.addCost.length; i++) {
       var temp = {
@@ -163,7 +197,6 @@ export class AddEditTransportExpenseComponent {
     }
   }
 
-  
   // Get TravelExpenseById
   gettravelExpensebyId(id) {
     this.TransportExpenseService.gettravelExpensebyId(id).pipe(takeUntil(this.destroy$)).subscribe(res => {
@@ -172,10 +205,8 @@ export class AddEditTransportExpenseComponent {
         console.log("this.travelExpenseDatavalue", this.travelExpenseDatavalue);
         this.travelExpenseForm.controls['travelExpenseMode'].setValue(this.travelExpenseDatavalue.travelExpenseMode);
         this.travelExpenseForm.controls['newPerKmCost'].setValue(this.travelExpenseDatavalue.newPerKmCost);
-
         this.travelExpenseForm.controls['costType'].setValue(this.travelExpenseDatavalue.costType.toString());
         this.costArr.clear();
-
         for (let distance of this.travelExpenseDatavalue.distance) {
           const addCostFormGroup = this.initializeAddCostForm();
           addCostFormGroup.patchValue(distance);
@@ -188,15 +219,17 @@ export class AddEditTransportExpenseComponent {
         if (this.travelExpenseForm.controls['costType'].value === '1') {
           this.hideAddCost = true;
           this.hideAddCostHeader = true;
-        } else {
+          this.show = true;
+        }
+        else {
           this.hideAddCost = false;
+          this.show = false
           this.hideAddCostHeader = false;
         }
       }
     });
   }
 
-  
   //Update Travel Expense By Id
   updatetravelExpenseById() {
     this.isTravelExpenseFormSubmitted = true;
@@ -206,11 +239,39 @@ export class AddEditTransportExpenseComponent {
     var data = {
       _id: this.travelExpenseId,
       travelExpenseMode: this.travelExpenseForm.controls['travelExpenseMode'].value,
-      newPerKmCost: this.travelExpenseForm.controls['newPerKmCost'].value,
-
+      newPerKmCost: (this.travelExpenseForm.value.costType == 0) ? this.travelExpenseForm.controls['newPerKmCost'].value : '',
       costType: this.travelExpenseForm.controls['costType'].value,
-      distance: this.travelExpenseForm.controls['addCost'].value,
+      distance: (this.travelExpenseForm.value.costType == 1) ? this.travelExpenseForm.controls['addCost'].value : '',
     }
+    if (data.costType == 0) {
+      this.isShowCost = true;
+      this.travelExpenseForm.controls['newPerKmCost'].setValidators([Validators.required]);
+      this.travelExpenseForm.controls['newPerKmCost'].updateValueAndValidity();
+      for (let i = 0; i < this.costArr.value.length; i++) {
+        var costvalid = this.travelExpenseForm.get('addCost') as FormArray
+        costvalid.at(i)['controls']["from"].clearValidators();
+        costvalid.at(i)['controls']["to"].clearValidators();
+        costvalid.at(i)['controls']["cost"].clearValidators();
+        costvalid.at(i)['controls']["from"].updateValueAndValidity();
+        costvalid.at(i)['controls']["to"].updateValueAndValidity();
+        costvalid.at(i)['controls']["cost"].updateValueAndValidity();
+      }
+
+    } else {
+      this.isShowCost = false;
+      this.travelExpenseForm.controls['newPerKmCost'].clearValidators();
+      this.travelExpenseForm.controls['newPerKmCost'].updateValueAndValidity();
+      for (let i = 0; i < this.costArr.value.length; i++) {
+        var costvalid = this.travelExpenseForm.get('addCost') as FormArray
+        costvalid.at(i)['controls']["from"].setValidators([Validators.required]);
+        costvalid.at(i)['controls']["to"].setValidators([Validators.required]);
+        costvalid.at(i)['controls']["cost"].setValidators([Validators.required]);
+        costvalid.at(i)['controls']["from"].updateValueAndValidity();
+        costvalid.at(i)['controls']["to"].updateValueAndValidity();
+        costvalid.at(i)['controls']["cost"].updateValueAndValidity()
+      }
+    }
+    console.log(data)
     console.log("Travel Expense", data)
     if (this.travelExpenseForm.valid) {
       this.TransportExpenseService.updatetravelExpenseById(data).pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
@@ -236,16 +297,12 @@ export class AddEditTransportExpenseComponent {
     }
   }
 
-
   //addCost
   addCost() {
     this.costArr.push(this.initializeAddCostForm());
     console.log(this.costArr.length, "hhhh")
     this.showdelete = false;
   }
-
-
-
 
   //Back
   back() {
