@@ -32,4 +32,10 @@ export class ReportDataService {
             return res;
         }), catchError(error => throwError(error)));
     }
+      //Get getAttendenace Hours
+      public getAttendenace(data): Observable<any> {
+        return this.httpClient.post('attendence/getAttendenceReport', data).pipe(tap(res => {
+            return res;
+        }), catchError(error => throwError(error)));
+    }
 }

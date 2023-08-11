@@ -21,4 +21,8 @@ export class ReportService {
     public  getTravelExpenseReport(data) {
         return this.reportDataService. getTravelExpenseReport(data);
     }
+    //Get getAttendenace Hours
+    public  getAttendenace(data) {
+        return this.reportDataService. getAttendenace(data);
+    }
 }

@@ -8,22 +8,23 @@
     </div>
 
     <div class="warpper mt-3">
-        <input class="radio" id="one" name="group" type="radio" checked>
+        <input class="radio" id="one" name="group" type="radio" >
         <input class="radio" id="two" name="group" type="radio">
         <input class="radio" id="three" name="group" type="radio">
-        <input class="radio" id="four" name="group" type="radio">
+        <input class="radio" id="four" name="group" type="radio" checked>
 
         <div class="tabs">
+            <label class="tab" id="four-tab" for="four">Attendance Report</label>
             <label class="tab" id="one-tab" for="one">Activity Report</label>
             <label class="tab" id="two-tab" for="two">Therapist Report</label>
             <label class="tab" id="three-tab" for="three">Travel Expense Report</label>
-            <label class="tab" id="four-tab" for="four">Working Hours Report</label>
+            
         </div>
 
         <div class="panels">
             <div class="panel" id="one-panel">
                 <!-- <div class="panel-title">Activity Report</div> -->
-                <form class="form" novalidate="" [formGroup]="activityReportForm">
+                <form class="form" novalidate="" [formGroup]="TravelHours">
                     <div class="grid sm:grid-cols-1 md:grid-cols-3 md:gap-3">
                         <!-- <div>
                             <label for="staffId" class="block mb-2 font-bold text-gray-600">Staff Name</label>
@@ -40,13 +41,24 @@
                                 </div>
                             </div>
                         </div> -->
+                        <!-- <div>
+                            <div>
+                                <label for="staffRole" class="block mb-2 font-bold text-gray-600">Staff Name</label>
+                                <select class="form-control data-picker-color user-font" formControlName="staffId">
+                                    <option>--select--</option>
+                                    <option  value="{{staff._id}}" *ngFor="let staff of staffList">
+                                        {{staff.staffName}}
+                                    </option>
+                                </select>
+                            </div>        
+                        </div> -->
                         <div>
                             <label for="startDate" class="block mb-2 font-bold text-gray-600">Start Date</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                 </div>
                                 <input type="text" class="form-control data-picker-color user-font"
-                                    formControlName="startDate" bsDatepicker
+                                    formControlName="startDate" bsDatepicker 
                                     [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
                                     (bsValueChange)="onDateChangeStart($event)"  (input)="inputdobValidator($event)"
                                      placeholder="DD-MM-YYYY">
@@ -125,7 +137,6 @@
                 </section>
             </div>
             <div class="panel" id="two-panel">
-                <!-- <div class="panel-title"></div> -->
                 <form class="form" novalidate="" [formGroup]="therapistReportForm">
                     <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
                         <div>
@@ -195,10 +206,23 @@
                 </section>
             </div>
             <div class="panel" id="three-panel">
-                <!-- <div class="panel-title">3</div> -->
                 <form class="form" novalidate="" [formGroup]="travelExpenseReportForm">
-                    <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
+                    <div class="grid sm:grid-cols-1 md:grid-cols-3 md:gap-3">
                         <div>
+                            <div>
+                                <label for="StaffId" class="block mb-2 font-bold text-gray-600">Staff Name</label>
+                         
+                                
+                                    <ng-multiselect-dropdown [placeholder]="'-- Select --'" class="text-muted"
+                                        [settings]="StaffId" formControlName="staffId1" [data]="staffLists" >
+                                    </ng-multiselect-dropdown>
+                                    
+                                
+                            </div> 
+                           
+                        </div>
+                        <div>
+                            
                             <label for="startDate" class="block mb-2 font-bold text-gray-600">Start Date</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
@@ -248,8 +272,8 @@
                                 <tr
                                     class="bg-teal-400 flex flex-col flex-no wrap sm:table-row rounded-l-lg sm:rounded-none mb-2 sm:mb-0">
                                     <th class="p-3 text-left">Staff Name</th>
+                                    <th class="p-3 text-left">Date</th>
                                     <th class="p-3 text-left">Travel Distance</th>
-                                    <th class="p-3 text-left">Amount per KM</th>
                                     <th class="p-3 text-left">Total Amount</th>
                                   
                                 </tr>
@@ -257,15 +281,10 @@
                             <tbody class="flex-1 sm:flex-none" *ngFor="let travelExpense of TravelExpenseData">
                                 <tr class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0">
                                     <td class="border-grey-light border hover:bg-gray-100 p-3">{{travelExpense.staffName}}</td>
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{travelExpense.date}}</td>
                                     <td class="border-grey-light border hover:bg-gray-100 p-3">{{travelExpense.travelDistanceinKm}}</td>
-                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{travelExpense.travelExpenseCost}}</td>
                                     <td class="border-grey-light border hover:bg-gray-100 p-3">{{travelExpense.amount}}
                                     </td>
-                                   
-                                    <!-- <td
-                                        class="border-grey-light border hover:bg-gray-100 p-3 text-red-400 hover:text-red-600 hover:font-medium cursor-pointer">
-                                        <button class="btn" (click)="editStaff()"><i class='fa fa-edit'></i></button>
-                                    </td> -->
                                 </tr>
                             </tbody>
                         </table>
@@ -273,34 +292,147 @@
                 </section>
             </div>
             <div class="panel" id="four-panel">
-                <!-- <div class="panel-title">4</div> -->
-                <form class="form" novalidate="" [formGroup]="activityReportForm">
+                <form class="form" novalidate="" [formGroup]="TravelHours">
                     <div class="grid sm:grid-cols-1 md:grid-cols-3 md:gap-3">
-                               
+                        <div>
+                            <div>
+                                <label for="staffRole" class="block mb-2 font-bold text-gray-600">Staff Name</label>
+                                <select class="form-control data-picker-color user-font" formControlName="staffId">
+                                    <option>--select--</option>
+                                    <option  value="{{staff._id}}" *ngFor="let staff of staffList">
+                                        {{staff.staffName}}
+                                    </option>
+                                </select>
+                            </div>        
+                        </div>
+                        <div>
+                            <label for="startDate" class="block mb-2 font-bold text-gray-600">Start Date</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                </div>
+                                <input type="text" class="form-control data-picker-color user-font"
+                                    formControlName="startDate" bsDatepicker  
+                                    [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
+                                    (bsValueChange)="onDateChangeStart($event)"  (input)="inputdobValidator($event)"
+                                     placeholder="DD-MM-YYYY">
+                            </div>
+                            <div class="error-msg-area">
+                                <div *ngIf="TravelHours.controls['startDate'].errors && (!TravelHours.controls['startDate'].pristine|| isTravelHoursSubmitted)"
+                                    class="error-msg">
+                                    <div [hidden]="!TravelHours.controls['startDate'].errors.required">Please Enter Start Date
+                                    </div>
+                                </div>
+                            </div>
+                        </div>      
                         <div>
                             <label for="endDate" class="block mb-2 font-bold text-gray-600">End Date</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                 </div>
                                 <input type="text" class="form-control data-picker-color user-font"
-                                    formControlName="endDate" bsDatepicker
+                                    formControlName="endDate" bsDatepicker [minDate]="minDate"  
                                     [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
-                                    (bsValueChange)="onDateChangeEnd($event)" (input)="inputdobValidator($event)"
+                                    (bsValueChange)="onDateChangeEnd($event)" (input)="inputdobValidator1($event)"
                                     maxlength="10" placeholder="DD-MM-YYYY">
                             </div>
                             <div class="error-msg-area">
-                                <div *ngIf="activityReportForm.controls['endDate'].errors && (!activityReportForm.controls['endDate'].pristine|| isActivityReportSubmitted)"
+                                <div *ngIf="TravelHours.controls['endDate'].errors && (!TravelHours.controls['endDate'].pristine|| isTravelHoursSubmitted)"
                                     class="error-msg">
-                                    <div [hidden]="!activityReportForm.controls['endDate'].errors.required">Please Enter End Date
-                                    </div>
+                                    <div [hidden]="!TravelHours.controls['endDate'].errors.required">Please Enter End Date </div>
                                 </div>
                             </div>
                             <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg"
-                        (click)="submitActivityReport()">Submit</button>
+                        (click)="Save()">Submit</button>
                         </div>
                     </div>
                 </form>
+                <section class="flex items-center justify-center">
+                    <div class="container">
+                        <table style="display: block !important;overflow-x: auto;" datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" *ngIf="isTravelHoursSubmitted"
+                            class="flex sm:bg-white rounded-lg sm:shadow-lg my-5">
+                            <thead class="text-white">
+                                <tr class="bg-teal-400 flex flex-col flex-no wrap sm:table-row rounded-l-lg sm:rounded-none mb-2 sm:mb-0">
+                                    <div class="d-flex">
+                                        <tr >
+                                            <th class="head-size p-3 text-left">Date</th>
+                                        </tr>
+                                        <td *ngFor="let data of AllData" class="size border-grey-light border hover:bg-gray-100 p-3">{{data.date}}</td>
+                                    </div>
+                                </tr>
+                            </thead>
+                            <tbody class="flex-1 sm:flex-none scrollmenu" >
+                                <div class="d-flex">
+                                    <tr >
+                                        <th class="p-3 text-left head-size">Travel Distance</th>
+                                    </tr>
+                                    <td *ngFor="let data of AllData" class="size border-grey-light border hover:bg-gray-100 p-3">{{data.travelDistance}}</td>
+                                </div>
+                                <div class="d-flex">
+                                    <tr>
+                                        <th class="p-3 text-left head-size">Travel Duration</th>
+                                    </tr>    
+                                    <td *ngFor="let data of AllData" class="size border-grey-light border hover:bg-gray-100 p-3">{{data.travelDistance}}</td>
+                                </div>
+                                <div class="d-flex">
+                                    <tr>
+                                        <th class="p-3 text-left head-size">Staff Name</th>
+                                    </tr>
+                                    <td *ngFor="let data of AllData" class="size border-grey-light border hover:bg-gray-100 p-3">{{data.staffName}}</td>  
+                                </div>
+                                <div class="d-flex">
+                                    <tr>
+                                        <th class="p-3 text-left head-size">In Time</th>
+                                    </tr>      
+                                    <td *ngFor="let data of AllData" class="size border-grey-light border hover:bg-gray-100 p-3">{{data.inTime}}</td>
+                                </div>
+                                <div class="d-flex">
+                                    <tr>
+                                        <th class="p-3 text-left head-size">Out Time</th>
+                                    </tr>
+                                    <td *ngFor="let data of AllData" class="size border-grey-light border hover:bg-gray-100 p-3">{{data.outTime}}</td>   
+                                </div>
+                                <div class="d-flex">
+                                    <tr>
+                                        <th class="p-3 text-left head-size">Duration</th>
+                                    </tr>     
+                                    <td *ngFor="let data of AllData" class="size border-grey-light border hover:bg-gray-100 p-3">{{data.duration}}</td>
+                                </div>
+                                <div class="d-flex">
+                                    <tr>
+                                        <th class="p-3 text-left head-size">Start Time</th>
+                                    </tr>
+                                    <td *ngFor="let data of AllData" class="size border-grey-light border hover:bg-gray-100 p-3">{{data.startTime}}</td>                                   
+                                </div>
+                                <div class="d-flex">
+                                    <tr>
+                                        <th class="p-3 text-left head-size">End Time</th>
+                                    </tr>        
+                                    <td *ngFor="let data of AllData" class="size border-grey-light border hover:bg-gray-100 p-3">{{data.endTime}}</td>
+                                </div>
+                                <div class="d-flex">
+                                    <tr>
+                                        <th class="p-3 text-left head-size">LateBy</th>
+                                    </tr>
+                                    <td *ngFor="let data of AllData" class="size border-grey-light border hover:bg-gray-100 p-3">{{data.lateBy}}</td>                                       
+                                </div>
+                                <div class="d-flex">
+                                    <tr>
+                                        <th class="p-3 text-left head-size">EarlyBy</th>
+                                    </tr>    
+                                    <td *ngFor="let data of AllData" class="size border-grey-light border hover:bg-gray-100 p-3">{{data.earlyBy}}</td>
+                                </div>
+                                <div class="d-flex">
+                                    <tr>
+                                        <th class="p-3 text-left head-size">TotalIOT</th>
+                                    </tr> 
+                                    <td *ngFor="let data of AllData" class="size border-grey-light border hover:bg-gray-100 p-3">{{data.totalOT}}</td>     
+                                </div>                                        
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
             </div>
         </div>
     </div>
+    <app-flash-message></app-flash-message>
 </div>
