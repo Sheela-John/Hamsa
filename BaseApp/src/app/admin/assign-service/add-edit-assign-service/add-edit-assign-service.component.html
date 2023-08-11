@@ -13,7 +13,7 @@
                     <div class="row">
                         <div class="col-md-5">
                             <label for="staffName" class="block mb-2 font-bold text-gray-600">Staff
-                                Name</label>
+                                Name<span class="required">*</span></label>
                             <select class="border border-gray-300  p-2 w-full rounded" formControlName="staffId"
                                 placeholder="--select--"  (change)="onChangeStaff($event)">
                                 <option value="">--select--</option>
@@ -21,9 +21,15 @@
                                     {{staff?.staffName}}
                                 </option>
                             </select>
+                            <div class="error-msg-area">
+                                <div *ngIf="assignServiceForm.controls['staffId'].errors && (!assignServiceForm.controls['staffId'].pristine|| isassignServiceFormSubmitted)"
+                                    class="error-msg">
+                                    <div [hidden]="!assignServiceForm.controls['staffId'].errors.required">Please Choose Staff</div>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-5">
-                            <label for="name" class="block mb-2 font-bold text-gray-600 ">Date</label>
+                            <label for="name" class="block mb-2 font-bold text-gray-600 ">Date<span class="required">*</span></label>
                             <input type="text" class="form-control data-picker-color user-font" formControlName="date"
                                 bsDatepicker
                                 [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
@@ -31,9 +37,7 @@
                             <div class="error-msg-area">
                                 <div *ngIf="assignServiceForm.controls['date'].errors && (!assignServiceForm.controls['date'].pristine|| isassignServiceFormSubmitted)"
                                     class="error-msg">
-                                    <div [hidden]="!assignServiceForm.controls['date'].errors.required">Please Enter
-                                        Staff Name
-                                    </div>
+                                    <div [hidden]="!assignServiceForm.controls['date'].errors.required">Please Enter Date</div>
                                 </div>
                             </div>
                         </div>
@@ -56,14 +60,22 @@
                             <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
                                 <div>
                                     <label for="clientId" class="block mb-2 font-bold text-gray-600">Client
-                                        Name</label>
+                                        Name<span class="required">*</span></label>
                                     <ng-multiselect-dropdown [placeholder]="'-- Select --'" class="text-muted"
                                         [settings]="clientId" formControlName="clientId" [data]="clientArr" (ngModelChange)="onChangeClient($event)">
                                     </ng-multiselect-dropdown>
+                                    <div class="error-msg-area">
+                                        <div *ngIf="assignServiceClientForm.controls['clientId'].errors && (!assignServiceClientForm.controls['clientId'].pristine|| isassignServiceClientFormSubmitted)"
+                                            class="error-msg">
+                                            <div [hidden]="!assignServiceClientForm.controls['clientId'].errors.required">
+                                                Please Choose Client
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div>
                                     <label for="address" class="block mb-2 font-bold text-gray-600">Phone
-                                        Number</label>
+                                        Number<span class="required">*</span></label>
                                     <input type="text" class="border border-gray-300 p-2 w-full rounded disabled"
                                         formControlName="phone" placeholder="Enter Phone Number">
                                     <div class="error-msg-area">
@@ -78,7 +90,7 @@
                             </div>
                             <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
                                 <div>
-                                    <label for="address" class="block mb-2 font-bold text-gray-600">Address</label>
+                                    <label for="address" class="block mb-2 font-bold text-gray-600">Address<span class="required">*</span></label>
                                     <textarea class="border border-gray-300  p-2 w-full rounded disabled"
                                         id="inputPhysicalStreet" rows="3" ngx-google-places-autocomplete
                                         [options]='options' formControlName="address" name="address"
@@ -96,7 +108,7 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <label for="name" class="block mb-2 font-bold text-gray-600 ">Type</label>
+                                    <label for="name" class="block mb-2 font-bold text-gray-600 ">Type<span class="required">*</span></label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <div class="form-check form-check-inline">
@@ -131,11 +143,19 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="error-msg-area">
+                                        <div *ngIf="assignServiceClientForm.controls['typeOfTreatment'].errors && (!assignServiceClientForm.controls['typeOfTreatment'].pristine|| isassignServiceClientFormSubmitted)"
+                                            class="error-msg">
+                                            <div [hidden]="!assignServiceClientForm.controls['typeOfTreatment'].errors.required">
+                                                Please Select Type Of Treatment
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3 ">
                                 <div>
-                                    <label for="name" class="block mb-2 font-bold text-gray-600 ">Select Branch</label>
+                                    <label for="name" class="block mb-2 font-bold text-gray-600 ">Select Branch<span class="required">*</span></label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <div class="form-check form-check-inline">
@@ -150,9 +170,17 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="error-msg-area">
+                                        <div *ngIf="assignServiceClientForm.controls['branchType'].errors && (!assignServiceClientForm.controls['branchType'].pristine|| isassignServiceClientFormSubmitted)"
+                                            class="error-msg">
+                                            <div [hidden]="!assignServiceClientForm.controls['branchType'].errors.required">
+                                                Please Select Branch Type
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div>
-                                    <label for="name" class="block mb-2 font-bold text-gray-600 ">Service</label>
+                                    <label for="name" class="block mb-2 font-bold text-gray-600 ">Service<span class="required">*</span></label>
                                     <select class="border border-gray-300  p-2 w-full rounded"
                                         formControlName="serviceId">
                                         <option value="">--select--</option>
@@ -165,7 +193,7 @@
                                             class="error-msg">
                                             <div
                                                 [hidden]="!assignServiceClientForm.controls['serviceId'].errors.required">
-                                                Please Enter Service
+                                                Please Choose Service
                                             </div>
                                         </div>
                                     </div>
@@ -174,7 +202,7 @@
                             <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
                                 <div>
                                     <label for="branchId" class="block mb-2 font-bold text-gray-600">Branch
-                                        Name</label>
+                                        Name<span class="required">*</span></label>
                                     <select class="border border-gray-300 p-2 w-full rounded" formControlName="branchId"
                                         (change)="onChangegetBranchbyId($event)">
                                         <option value="">--select--</option>
@@ -187,14 +215,14 @@
                                             class="error-msg">
                                             <div
                                                 [hidden]="!assignServiceClientForm.controls['branchId'].errors.required">
-                                                Please Select Client Name
+                                                Please Choose Branch
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div>
                                     <label for="address" class="block mb-2 font-bold text-gray-600">Branch
-                                        Address</label>
+                                        Address<span class="required">*</span></label>
                                     <textarea class="border border-gray-300 p-2 w-full rounded disabled"
                                         id="branchAddress" rows="3" ngx-google-places-autocomplete [options]='options'
                                         formControlName="branchAddress" name="branchAddress" #placesRef="ngx-places"
@@ -204,7 +232,7 @@
                             </div>
                             <div class="grid sm:grid-cols-1 md:grid-cols-1 md:gap-3" *ngIf="showOp">
                                 <div>
-                                    <label  class="block mb-2 font-bold text-gray-600">OP
+                                    <label  class="block mb-2 font-bold text-gray-600">OP<span class="required">*</span>
                                     </label>
                                     <select class="border border-gray-300 shadow p-2 w-full rounded"
                                         formControlName="opType" (change)="onChangeOpType($event)">
@@ -214,11 +242,11 @@
                                         </option>
                                     </select>
                                     <div class="error-msg-area">
-                                        <div *ngIf="assignServiceClientForm.controls['branchId'].errors && (!assignServiceClientForm.controls['branchId'].pristine|| isassignServiceClientFormSubmitted)"
+                                        <div *ngIf="assignServiceClientForm.controls['opType'].errors && (!assignServiceClientForm.controls['opType'].pristine|| isassignServiceClientFormSubmitted)"
                                             class="error-msg">
                                             <div
-                                                [hidden]="!assignServiceClientForm.controls['branchId'].errors.required">
-                                                Please Select Client Name
+                                                [hidden]="!assignServiceClientForm.controls['opType'].errors.required">
+                                                Please Select OP Type
                                             </div>
                                         </div>
                                     </div>
@@ -227,7 +255,7 @@
                             </div>
                             <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3" *ngIf="typeSelection">
                                 <div>
-                                    <label for="branchId" class="block mb-2 font-bold text-gray-600">Other Branch
+                                    <label for="branchId" class="block mb-2 font-bold text-gray-600">Other Branch<span class="required">*</span>
                                     </label>
                                     <select class="border border-gray-300 shadow p-2 w-full rounded"
                                         formControlName="otherBranchId" (change)="getotherBranchbyId($event)">
@@ -241,14 +269,14 @@
                                             class="error-msg">
                                             <div
                                                 [hidden]="!assignServiceClientForm.controls['otherBranchId'].errors.required">
-                                                Please Select Branch Name
+                                                Please Select Other Branch Name
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div>
                                     <label for="address" class="block mb-2 font-bold text-gray-600 ">Other Branch
-                                        Address</label>
+                                        Address<span class="required">*</span></label>
                                     <textarea class="border border-gray-300  p-2 w-full rounded disabled" id="otherBranchAddress"
                                         rows="3" ngx-google-places-autocomplete [options]='options'
                                         formControlName="otherBranchAddress" name="branchAddress"
@@ -268,7 +296,7 @@
                             </div>
                             <div class="grid sm:grid-cols-1 md:grid-cols-1 md:gap-3" *ngIf="showonline">
                                 <div>
-                                    <label for="address" class="block mb-2 font-bold text-gray-600">Online Link
+                                    <label for="address" class="block mb-2 font-bold text-gray-600">Online Link<span class="required">*</span>
                                     </label>
                                     <input type="textarea" class="border border-gray-300 p-2 w-full rounded "
                                         formControlName="onlineLink" placeholder="Online Link">
@@ -277,7 +305,7 @@
                             </div>
                             <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
                                 <div>
-                                    <label for="Branch" class="block mb-2 font-bold text-gray-600 ">Slots</label>
+                                    <label for="Branch" class="block mb-2 font-bold text-gray-600 ">Slots<span class="required">*</span></label>
                                     <select class="border border-gray-300  p-2 w-full rounded"
                                         formControlName="slot" (change)="Slot($event)">
                                         <option value="">--select--</option>+
@@ -285,10 +313,17 @@
                                             {{slot.slotName}}
                                         </option>
                                     </select>
-                                  
+                                    <div class="error-msg-area">
+                                        <div *ngIf="assignServiceClientForm.controls['slot'].errors && (!assignServiceClientForm.controls['slot'].pristine|| isassignServiceClientFormSubmitted)"
+                                            class="error-msg">
+                                            <div [hidden]="!assignServiceClientForm.controls['slot'].errors.required">
+                                                Please Choose slot
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div>
-                                    <label for="Branch" class="block mb-2 font-bold text-gray-600">Duration</label>
+                                    <label for="Branch" class="block mb-2 font-bold text-gray-600">Duration<span class="required">*</span></label>
                                     <select class="border border-gray-300  p-2 w-full rounded"
                                     (change)="dividingSlot($event)" formControlName="duration">
                                         <option value="">--select--</option>
@@ -296,6 +331,14 @@
                                             {{Duration.time}}
                                         </option>
                                     </select>
+                                    <div class="error-msg-area">
+                                        <div *ngIf="assignServiceClientForm.controls['duration'].errors && (!assignServiceClientForm.controls['duration'].pristine|| isassignServiceClientFormSubmitted)"
+                                            class="error-msg">
+                                            <div [hidden]="!assignServiceClientForm.controls['duration'].errors.required">
+                                                Please select duration
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class=" col-12" *ngIf="isShowSlotTime">
                                     <div class="card min-h-37">

@@ -151,7 +151,7 @@ export class AddEditAssignServiceComponent implements OnInit {
   //initialAssignServiceForm
   initializeassignServiceForm() {
     this.assignServiceForm = this.fb.group({
-      staffId: [''],
+      staffId: ['', [Validators.required]],
       date: ['', [Validators.required]],
     });
   }
@@ -159,20 +159,20 @@ export class AddEditAssignServiceComponent implements OnInit {
   //initialAssignServiceClientForm
   initializeassignServiceClientForm() {
     this.assignServiceClientForm = this.fb.group({
-      phone: [''],
-      clientId: [''],
+      phone: ['', [Validators.required]],
+      clientId: ['', [Validators.required]],
       address: ['', [Validators.required]],
-      serviceId: ['',],
-      opType: [''],
-      typeOfTreatment: [''],
-      otherBranchAddress: [''],
-      otherBranchId: [''],
+      serviceId: ['', [Validators.required]],
+      opType: ['', [Validators.required]],
+      typeOfTreatment: ['', [Validators.required]],
+      otherBranchAddress: ['', [Validators.required]],
+      otherBranchId: ['', [Validators.required]],
       onlineLink: [''],
-      duration: [''],
-      branchId: [''],
-      branchAddress: [''],
-      branchType: [''],
-      slot: [''],
+      duration: ['', [Validators.required]],
+      branchId: ['', [Validators.required]],
+      branchAddress: ['', [Validators.required]],
+      branchType: ['', [Validators.required]],
+      slot: ['', [Validators.required]],
     });
   }
 
@@ -541,50 +541,75 @@ export class AddEditAssignServiceComponent implements OnInit {
     this.slotSelectedIndex = index
   }
 
+  //to clear a value in form after closing //
+  clearValidator(control, form) {
+    form.get(control).clearValidators();
+    form.get(control).updateValueAndValidity();
+  }
+
+  /* Set Validator */
+  setValidator(control, form) {
+    form.get(control).setValidators([Validators.required]);
+    form.get(control).updateValueAndValidity();
+  }
+
   //saveAssignService
   saveAssignService() {
-    var formattedDates = this.formattedDate(this.assignServiceForm.value.date)
-    var data = {
-      staffId: this.assignServiceForm.value.staffId,
-      date: formattedDates,
-      clientId: this.assignServiceClientForm.value.clientId[0]._id,
-      address: this.assignServiceClientForm.value.address,
-      phone: this.assignServiceClientForm.value.phone,
-      serviceId: this.assignServiceClientForm.value.serviceId,
-      opType: this.assignServiceClientForm.value.opType,
-      typeOfTreatment: this.assignServiceClientForm.value.typeOfTreatment,
-      otherBranchAddress: this.assignServiceClientForm.value.otherBranchAddress,
-      otherBranchId: this.assignServiceClientForm.value.otherBranchId,
-      onlineLink: this.assignServiceClientForm.value.onlineLink,
-      duration: this.assignServiceClientForm.value.duration,
-      branchId: this.assignServiceClientForm.value.branchId,
-      branchAddress: this.assignServiceClientForm.value.branchAddress,
-      branchType: this.assignServiceClientForm.value.branchType,
-      slot: this.assignServiceClientForm.value.slot,
-      longitude: this.clientAddressLongitude,
-      latitude: this.clientAddressLatitude,
-      startTime: this.slotStartTime,
-      endTime: this.slotEndTime
+    if (this.assignServiceClientForm.value.typeOfTreatment != 1) {
+      this.clearValidator('opType', this.assignServiceClientForm);
     }
-    this.AssignService.createAssignServiceClient(data).subscribe(res => {
-      if (res.status) {
-        if (this.serviceRequestId != undefined) {
-          var data = {
-            "isAssigned": 1
-          }
-          this.ServiceRequestService.updateServiceRequest(data,this.serviceRequestId).subscribe(res =>{
-            if(res.status){
-              console.log(res.data,"oooo")
-            }
-          })
+    if (this.assignServiceClientForm.value.opType != 1) {
+      this.clearValidator('otherBranchAddress', this.assignServiceClientForm);
+      this.clearValidator('otherBranchId', this.assignServiceClientForm);
+    }
+    this.isassignServiceFormSubmitted = true;
+    this.isassignServiceClientFormSubmitted = true
+    if (this.assignServiceForm.valid) {
+      if (this.assignServiceClientForm.valid) {
+        var formattedDates = this.formattedDate(this.assignServiceForm.value.date)
+        var data = {
+          staffId: this.assignServiceForm.value.staffId,
+          date: formattedDates,
+          clientId: this.assignServiceClientForm.value.clientId[0]._id,
+          address: this.assignServiceClientForm.value.address,
+          phone: this.assignServiceClientForm.value.phone,
+          serviceId: this.assignServiceClientForm.value.serviceId,
+          opType: this.assignServiceClientForm.value.opType,
+          typeOfTreatment: this.assignServiceClientForm.value.typeOfTreatment,
+          otherBranchAddress: this.assignServiceClientForm.value.otherBranchAddress,
+          otherBranchId: this.assignServiceClientForm.value.otherBranchId,
+          onlineLink: this.assignServiceClientForm.value.onlineLink,
+          duration: this.assignServiceClientForm.value.duration,
+          branchId: this.assignServiceClientForm.value.branchId,
+          branchAddress: this.assignServiceClientForm.value.branchAddress,
+          branchType: this.assignServiceClientForm.value.branchType,
+          slot: this.assignServiceClientForm.value.slot,
+          longitude: this.clientAddressLongitude,
+          latitude: this.clientAddressLatitude,
+          startTime: this.slotStartTime,
+          endTime: this.slotEndTime
         }
-        this.FlashMessageService.successMessage("Assign service Client Created Successfully", 2);
-        this.router.navigateByUrl("admin/assignService")
+        this.AssignService.createAssignServiceClient(data).subscribe(res => {
+          if (res.status) {
+            if (this.serviceRequestId != undefined) {
+              var data = {
+                "isAssigned": 1
+              }
+              this.ServiceRequestService.updateServiceRequest(data, this.serviceRequestId).subscribe(res => {
+                if (res.status) {
+                  console.log(res.data, "oooo")
+                }
+              })
+            }
+            this.FlashMessageService.successMessage("Assign service Client Created Successfully", 2);
+            this.router.navigateByUrl("admin/assignService")
+          }
+          else {
+            this.FlashMessageService.errorMessage("Assign service Client Created Failed", 2);
+          }
+        })
       }
-      else {
-        this.FlashMessageService.errorMessage("Assign service Client Created Failed", 2);
-      }
-    })
+    }
   }
 
   //editAssignServiceClient by Id
@@ -783,48 +808,61 @@ export class AddEditAssignServiceComponent implements OnInit {
   //updateassignService
   updateassignService() {
     var assignId = this.assignId
-    var formattedDates = this.formattedDate(this.assignServiceForm.value.date)
-    var data = {
-      staffId: this.assignServiceForm.value.staffId,
-      date: formattedDates,
-      clientId: this.assignServiceClientForm.value.clientId[0]._id,
-      address: this.assignServiceClientForm.value.address,
-      phone: this.assignServiceClientForm.value.phone,
-      serviceId: this.assignServiceClientForm.value.serviceId,
-      opType: this.assignServiceClientForm.value.opType,
-      typeOfTreatment: this.assignServiceClientForm.value.typeOfTreatment,
-      otherBranchAddress: this.assignServiceClientForm.value.otherBranchAddress,
-      otherBranchId: this.assignServiceClientForm.value.otherBranchId,
-      onlineLink: this.assignServiceClientForm.value.onlineLink,
-      duration: this.assignServiceClientForm.value.duration,
-      branchId: this.assignServiceClientForm.value.branchId,
-      branchAddress: this.assignServiceClientForm.value.branchAddress,
-      branchType: this.assignServiceClientForm.value.branchType,
-      slot: this.assignServiceClientForm.value.slot,
-      longitude: this.clientAddressLongitude,
-      latitude: this.clientAddressLatitude,
-      startTime: this.slotStartTime,
-      endTime: this.slotEndTime
+    if (this.assignServiceClientForm.value.typeOfTreatment != 1) {
+      this.clearValidator('opType', this.assignServiceClientForm);
     }
-    this.AssignService.updateAssignService(data, assignId).subscribe(res => {
-      if (res.status) {
-        if (this.serviceRequestId != undefined) {
-          var data = {
-            "isAssigned": 1
-          }
-          this.ServiceRequestService.updateServiceRequest(data,this.serviceRequestId).subscribe(res =>{
-            if(res.status){
-              console.log(res.data,"gggg")
-            }
-          })
+    if (this.assignServiceClientForm.value.opType != 1) {
+      this.clearValidator('otherBranchAddress', this.assignServiceClientForm);
+      this.clearValidator('otherBranchId', this.assignServiceClientForm);
+    }
+    this.isassignServiceFormSubmitted = true;
+    this.isassignServiceClientFormSubmitted = true
+    if (this.assignServiceForm.valid) {
+      if (this.assignServiceClientForm.valid) {
+        var formattedDates = this.formattedDate(this.assignServiceForm.value.date)
+        var data = {
+          staffId: this.assignServiceForm.value.staffId,
+          date: formattedDates,
+          clientId: this.assignServiceClientForm.value.clientId[0]._id,
+          address: this.assignServiceClientForm.value.address,
+          phone: this.assignServiceClientForm.value.phone,
+          serviceId: this.assignServiceClientForm.value.serviceId,
+          opType: this.assignServiceClientForm.value.opType,
+          typeOfTreatment: this.assignServiceClientForm.value.typeOfTreatment,
+          otherBranchAddress: this.assignServiceClientForm.value.otherBranchAddress,
+          otherBranchId: this.assignServiceClientForm.value.otherBranchId,
+          onlineLink: this.assignServiceClientForm.value.onlineLink,
+          duration: this.assignServiceClientForm.value.duration,
+          branchId: this.assignServiceClientForm.value.branchId,
+          branchAddress: this.assignServiceClientForm.value.branchAddress,
+          branchType: this.assignServiceClientForm.value.branchType,
+          slot: this.assignServiceClientForm.value.slot,
+          longitude: this.clientAddressLongitude,
+          latitude: this.clientAddressLatitude,
+          startTime: this.slotStartTime,
+          endTime: this.slotEndTime
         }
-        this.FlashMessageService.successMessage("Assign service Client updated Successfully", 2);
-        this.router.navigateByUrl("admin/assignService")
+        this.AssignService.updateAssignService(data, assignId).subscribe(res => {
+          if (res.status) {
+            if (this.serviceRequestId != undefined) {
+              var data = {
+                "isAssigned": 1
+              }
+              this.ServiceRequestService.updateServiceRequest(data, this.serviceRequestId).subscribe(res => {
+                if (res.status) {
+                  console.log(res.data, "gggg")
+                }
+              })
+            }
+            this.FlashMessageService.successMessage("Assign service Client updated Successfully", 2);
+            this.router.navigateByUrl("admin/assignService")
+          }
+          else {
+            this.FlashMessageService.errorMessage("Assign service Client Updated Failed", 2);
+          }
+        })
       }
-      else {
-        this.FlashMessageService.errorMessage("Assign service Client Updated Failed", 2);
-      }
-    })
+    }
   }
 
   //getServiceRequestById
@@ -859,7 +897,7 @@ export class AddEditAssignServiceComponent implements OnInit {
             if (res.status) {
               this.assignSercieDataArr = res.data;
               console.log(this.assignSercieDataArr, "assignSercieDataArr")
-             
+
               if (this.assignSercieDataArr.branchType == 0) {
                 this.branchList = []
                 this.BranchService.getBranchbyId(this.assignSercieDataArr.branchId).subscribe(res => {
@@ -930,7 +968,7 @@ export class AddEditAssignServiceComponent implements OnInit {
             }
           })
         }
-        else{
+        else {
           this.assignServiceForm.patchValue({
             staffId: this.serviceData.staffId,
             date: this.formatDate(this.serviceData.date),
