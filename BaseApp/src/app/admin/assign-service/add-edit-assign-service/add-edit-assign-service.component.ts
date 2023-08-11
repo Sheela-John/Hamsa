@@ -85,7 +85,7 @@ export class AddEditAssignServiceComponent implements OnInit {
   public slotName: any = [];
   public serviceRequestId: any;
   public assignServiceId: any;
-  public assignServiceArray: any;
+  public assignServiceArray: any =[];
   public clientData: any;
   public clientList: any[];
   public addressLatitude: any;
@@ -238,9 +238,23 @@ export class AddEditAssignServiceComponent implements OnInit {
     }
     this.AssignService.getAssignServiceDataByStaffIdAndDate(data).subscribe(res => {
       if (res.status) {
-        this.assignServiceArray = res.data;
+        var assignServiceArray = res.data;
+        assignServiceArray.forEach(element =>{
+          var datas = {
+            _id:element._id,
+            clientName: element.clientName,
+            phone: element.phone,
+            address: element.address,
+            staffName: element.staffName,
+            startTime: element.startTime,
+            endTime:element.endTime,
+            status:element.status,
+            date: this.formatDate(element.date),
+            serviceName: element.serviceName
+          }
+          this.assignServiceArray.push(datas)
+        })   
       }
-
     })
   }
 

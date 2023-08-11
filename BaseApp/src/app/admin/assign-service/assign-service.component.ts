@@ -71,7 +71,7 @@ export class AssignServiceComponent implements OnInit {
               startTime: element.startTime,
               endTime:element.endTime,
               Status:element.status,
-            Date: this.formatDate(element.date),
+              Date: this.formatDate(element.date),
               status: element.status,
               Service: element.serviceName
             }
