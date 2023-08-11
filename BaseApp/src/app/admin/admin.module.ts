@@ -31,7 +31,6 @@ import { BranchTranferDataComponent } from './staffs/branch-tranfer-data/branch-
 import { BsDatepickerModule, BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { TransportExpenseComponent } from './transport-expense/transport-expense.component'
-import { NgSelectModule } from '@ng-select/ng-select';;
 import { AddEditTransportExpenseComponent } from './transport-expense/add-edit-transport-expense/add-edit-transport-expense.component';
 @NgModule({
     declarations: [
@@ -69,7 +68,6 @@ import { AddEditTransportExpenseComponent } from './transport-expense/add-edit-t
         DataTablesModule,
         GooglePlaceModule,
         RoundProgressModule,
-        NgSelectModule,
         NgMultiSelectDropDownModule.forRoot(),
         BsDatepickerModule.forRoot()
     ],

@@ -4,7 +4,6 @@ import { Subject } from 'rxjs';
 import { ReportService } from 'src/app/services/report.service';
 import { StaffService } from 'src/app/services/staff.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 // $('select').selectpicker();
 // import {$} from 'jquery';
 
