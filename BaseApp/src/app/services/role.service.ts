@@ -24,13 +24,17 @@ export class RoleService {
     }
 
     //Update Role By Id 
-    public updateRoleById(updateRoleDataId) {
-        console.log(updateRoleDataId, "updatefromclinician")
-        return this.RoleDataService.updateRoleById(updateRoleDataId);
+    public updateRoleById(updateRoleDataId,id) {
+        return this.RoleDataService.updateRoleById(updateRoleDataId,id);
     }
 
     //Enable or Disable Role
     public enableDisableRole(id) {
         return this.RoleDataService.enableDisableRole(id);
+    }
+
+    //delete role 
+    public deleteSlot(id,data){
+        return this.RoleDataService.deleteSlot(id,data);
     }
 }

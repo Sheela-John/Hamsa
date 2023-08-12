@@ -31,7 +31,6 @@ export class RoleComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.roleList)
     this.dtOptions = {
       pagingType: 'simple_numbers',
       searching: true,
@@ -47,6 +46,7 @@ export class RoleComponent implements OnInit {
     this.roleService.getAllRole().subscribe(res => {
       if (res.status) {
         this.roleList = res.data;
+        console.log(" this.roleList", this.roleList)
         this.dtTrigger.next(null);
         console.log(this.roleList ,"this.roleList ")
       }

@@ -32,6 +32,13 @@ export class AddEditRoleComponent implements OnInit {
   public showError: boolean;
   public slotarr: FormArray;
   public role: any;
+  public isdeleted: any = [];
+  public slotId: any;
+  public slotdata: any = [];
+  public roleData: any;
+  public isAddSlot: boolean = false;
+  public showdelete: boolean = false;
+  showDuplicatesError: any;
 
 
   constructor(private fb: FormBuilder, private router: Router, public RoleService: RoleService, private flashMessageService: FlashMessageService, private route: ActivatedRoute,) {
@@ -48,25 +55,32 @@ export class AddEditRoleComponent implements OnInit {
       this.getRolebyId(this.routerData);
       this.showAddEdit = true;
     } else {
-      this.showAddEdit = false;}
+      this.showAddEdit = false;
+    }
   }
 
   //initializeRoleForm
   initializeroleForm() {
     this.roleForm = this.fb.group({
-       name: ['', [Validators.required]],
+      name: ['', [Validators.required]],
       slots: this.fb.array([]),
     });
     this.slotarr = this.roleForm.get('slots') as FormArray
+    if (this.slotarr.length == 0) {
+
+      this.showdelete = true
+    }
+    console.log(this.slotarr.length)
   }
 
-//initializeAddSlotForm
+  //initializeAddSlotForm
   initializeAddSlotForm() {
     return this.fb.group({
       startTime: ['', [Validators.required]],
       endTime: ['', [Validators.required]],
-      slotName: ['', [Validators.required]]
+      slotName: ['', [Validators.required]],
     });
+    
   }
   ngOnDestroy() {
     if (this.startpickerOpened && this.ngxMaterialStartTimepicker)
@@ -80,16 +94,16 @@ export class AddEditRoleComponent implements OnInit {
   //save Role
   saveRole() {
     this.isroleFormSubmitted = true;
-    if (this.roleForm.valid) {
-      
-      var data =this.roleForm.value;
+    const slotData = this.roleForm.value.slots
+    if (this.roleForm.valid  && !this.checkForDuplicateItems(slotData)) {
+      var data = this.roleForm.value;
       this.RoleService.createRole(data).subscribe((res) => {
         if (res.status) {
           this.flashMessageService.successMessage("Role Created Successfully", 2);
           this.router.navigateByUrl("admin/role");
         }
         else {
-          this.flashMessageService.errorMessage("Role Created failed!", 2);
+          this.flashMessageService.errorMessage(res.message, 2);
         }
       })
     }
@@ -97,8 +111,8 @@ export class AddEditRoleComponent implements OnInit {
 
   //save slot
   saveSlot() {
+    this.isAddSlot = true;
     this.slotarr.push(this.initializeAddSlotForm());
-    this.isroleFormSubmitted = true;
   }
 
   //get-patch Role by Id
@@ -106,15 +120,18 @@ export class AddEditRoleComponent implements OnInit {
     this.RoleService.getRolebyId(id).pipe(takeUntil(this.destroy$)).subscribe(res => {
       if (res.status) {
         this.roleDatavalue = res.data
+        console.log("this.roleDatavalue",this.roleDatavalue)
         this.roleForm.controls['name'].patchValue(this.roleDatavalue.name);
-        this.roleDatavalue.slots.forEach(element => {
-        });
-        for (let i = 1; i < this.roleDatavalue.slots.length; i++){
+        for (let i = 1; i < this.roleDatavalue.slots.length; i++) {
           this.slotarr.push(this.initializeAddSlotForm());
-         }
-         for (let j = 0; j < this.roleDatavalue.slots.length; j++){
+          console.log(this.slotarr.length,"slotsss")
+          if (this.slotarr.length != 1) {
+            this.showdelete = false
+          }
+        }
+        for (let j = 0; j < this.roleDatavalue.slots.length; j++) {
           this.roleForm.controls['slots'].patchValue(this.roleDatavalue.slots);
-         }
+        }
       }
     })
   }
@@ -126,32 +143,114 @@ export class AddEditRoleComponent implements OnInit {
 
   //Update Role
   updateRole() {
+    
     this.isroleFormSubmitted = true;
     this.showError = false;
     this.roleForm.value._id = this.routerData;
-    var data = {
-      _id: this.routerData,
-      name: this.roleForm.controls['name'].value,
-       slots: this.roleForm.controls['slots'].value,
-    }
-    if (this.roleForm.valid) {
-      this.RoleService.updateRoleById(data).pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
-        if (res.status) {
-          this.flashMessageService.successMessage('Role Updated Sucessfully', 2);
-          this.router.navigateByUrl("admin/role");
+    var data;
+    this.RoleService.getRolebyId(this.routerData).pipe(takeUntil(this.destroy$)).subscribe(res => {
+      if (res.status) {
+        this.roleData = res.data;
+        // this.slotdata = [];
+        for (let i = 0; i < this.roleForm.controls['slots'].value.length; i++) {
+          // this.roleForm.controls['slots'].value.forEach(data => {
+            this.slotdata.push({
+              slotName: this.roleForm.controls['slots'].value[i].slotName,
+              startTime: this.roleForm.controls['slots'].value[i].startTime,
+              endTime: this.roleForm.controls['slots'].value[i].endTime,
+              isDeleted: 0,
+              slotId: (this.roleData.slots[i] != undefined) ? this.roleData.slots[i]._id : ""
+            })
+          // })
         }
-        else this.flashMessageService.errorMessage(res.err.message, 2);
-      },
-        error => {
-          this.flashMessageService.errorMessage('Role Updation failed!', 2);
-        })
-    }
+        console.log(" this.slotdata:",  this.slotdata);
+        data = {
+          name: this.roleForm.controls['name'].value,
+          slots: this.slotdata,
+        }
+        const slotData = this.roleForm.value.slots
+        if (this.roleForm.valid  && !this.checkForDuplicateItems(slotData)) {
+          console.log("data", data)
+          this.RoleService.updateRoleById(data, this.routerData).pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
+            if (res.status) {
+              this.flashMessageService.successMessage('Role Updated Sucessfully', 2);
+              this.router.navigateByUrl("admin/role");
+            }
+            else this.flashMessageService.errorMessage(res.message, 2);
+          },
+            error => {
+              this.flashMessageService.errorMessage('Role Updation failed!', 2);
+            })
+        }
+      }
+    })
+   
+   
   }
 
   //RemoveSlot
   RemoveSlot(i) {
-    const control = <FormArray>this.roleForm.controls['slots'];
-    control.removeAt(i);
+    if (this.routerData != undefined) {
+      const control = <FormArray>this.roleForm.controls['slots'];
+      var id = this.routerData;
+      var slotname = this.roleForm.controls['slots'].value[i].slotName.toUpperCase()
+      console.log("slotname:", slotname);
+      this.roleDatavalue.slots.forEach(element => {
+        var eleSlotName = element.slotName.toUpperCase()
+        console.log("sdfs:", slotname, eleSlotName)
+        if (slotname == eleSlotName) {
+          console.log("yes")
+          // this.slotId = element._id
+          var data = {
+            slotId: element._id
+          }
+          this.RoleService.deleteSlot(id, data).subscribe(res => {
+            if (res.status) {
+              control.removeAt(i);
+              console.log("control.length",control.length)
+              if (control.length == 1) {
+                this.showdelete = true
+              }
+              this.flashMessageService.successMessage("Slot deleted successfully", 2);
+              // if (control.length == 1) {
+              //   this.showdelete = true
+              // }
+              // this.getRolebyId(this.routerData)
+            }
+          })
+        }
+       
+      });
+      if(this.isAddSlot && this.roleForm.controls['slots'].value[i].endTime == '' || 
+        this.roleForm.controls['slots'].value[i].slotName == '' ||
+       this.roleForm.controls['slots'].value[i].startTime == '' ) {
+        control.removeAt(i);
+        console.log("control.length",control.length)
+        if (control.length == 1) {
+          this.showdelete = true
+        }
+      }
+    }
+    else {
+      const control = <FormArray>this.roleForm.controls['slots'];
+      control.removeAt(i);
+      console.log("control.length",control.length)
+      if (control.length == 1) {
+        this.showdelete = true
+      }
+    }
+  }
+
+   //to detect duplicate
+   checkForDuplicateItems(array) {
+    var hash = Object.create(null);
+    this.showDuplicatesError = array.some(function (a) {
+      return a.slotName.toUpperCase() && (hash[a.slotName.toUpperCase()] || !(hash[a.slotName.toUpperCase()] = true));
+    });
+    if (this.showDuplicatesError) {
+      this.flashMessageService.errorMessage('slot Name should not contain duplicate!', 2);
+    }
+    return this.showDuplicatesError;
   }
 
   //-----------------------------------CLIENT API INTEGRATION - END -------------------------------------------//
@@ -159,7 +258,7 @@ export class AddEditRoleComponent implements OnInit {
   //back Route
   addeditForm() {
     this.router.navigateByUrl('admin/role')
-  }  
+  }
 
   //-----------------------------------ROLE API INTEGRATION - END -------------------------------------------// 
 }

@@ -34,8 +34,8 @@ export class RoleDataService {
   }
 
   //Update Role By Id 
-  public updateRoleById(updateRoleDataId): Observable<any> {
-    return this.httpClient.put('role/' + updateRoleDataId._id, updateRoleDataId).pipe(tap(res => {
+  public updateRoleById(updateRoleDataId,id): Observable<any> {
+    return this.httpClient.put('role/' + id, updateRoleDataId).pipe(tap(res => {
       console.log(res, "iam res in data services")
       return res;
     }), catchError(error => throwError(error)));
@@ -47,4 +47,12 @@ export class RoleDataService {
       return res;
     }), catchError(error => throwError(error)));
   }
+
+  //deleteSlot
+  public deleteSlot(id,data): Observable<any> {
+    return this.httpClient.put('role/deleteSlot/' + id,data).pipe(tap(res => {
+      return res;
+    }), catchError(error => throwError(error)));
+  }
+
 }

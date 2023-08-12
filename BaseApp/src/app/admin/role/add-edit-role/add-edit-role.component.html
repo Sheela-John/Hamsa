@@ -58,7 +58,7 @@
                             <div>
                                 <label for="twitter" class="block mb-2 font-bold text-gray-600 mt-4">Start Time<span
                                         class="required">*</span></label>
-                                <input class="border border-gray-300 shadow p-2 w-full rounded " type="text"
+                                <input class="border border-gray-300  p-2 w-full rounded " type="text"
                                     placeholder="Select Start Time" formControlName="startTime" name="startTime"
                                     [ngxTimepicker]="startrange" [format]="24">
                                 <ngx-material-timepicker #startrange (opened)="startpickerOpened = true;"
@@ -77,7 +77,7 @@
                             <div>
                                 <label for="name" class="block mb-2 font-bold text-gray-600 mt-4">End Time<span
                                         class="required">*</span></label>
-                                <input class="border border-gray-300 shadow p-2 w-full rounded " type="text"
+                                <input class="border border-gray-300  p-2 w-full rounded " type="text"
                                     placeholder="Select End Time" formControlName="endTime" name="endTime"
                                     [ngxTimepicker]="Endrange" [format]="24">
                                 <ngx-material-timepicker #Endrange (opened)="endpickerOpened = true;"

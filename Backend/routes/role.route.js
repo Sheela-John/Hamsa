@@ -70,7 +70,7 @@ router.post('/', async (req, res, next) => {
         else return res.status(200).json({ status: true, "data": enableDisableData });
     })
 
-    .delete('/deleteSlot/:_id', async (req, res, next) => {
+    .put('/deleteSlot/:_id', async (req, res, next) => {
         log.debug(COMPONENT, 'Delete slot '); log.close();
         req.body.id=req.params._id
         let [err, mentorData] = await handle(RoleAPI.deleteSlot(req.body));

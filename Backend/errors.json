@@ -262,5 +262,10 @@
     {
         "code": 162,
         "message": "Please update your package duration"
+    },
+    "ROLE_EXISTS":
+    {
+        "code" : 164,
+        "message" : "Role Already Exists!"
     }
 }
