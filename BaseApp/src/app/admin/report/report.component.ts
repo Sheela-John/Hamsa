@@ -257,16 +257,16 @@ export class ReportComponent implements OnInit {
   submitTherapistReport() {
     this.isTherapistReportSubmitted = true;
 
-    this.reportService.getTherapistReport(this.therapistReportForm.value).subscribe(res => {
-      console.log(res, "resresres");
-      if (res.status) {
-        this.therapistReportData = res.data;
-        console.log(this.therapistReportData, "therapistReportData");
-      }
-      else {
-        this.flashMessageService.errorMessage("err")
-      }
-    })
+    // this.reportService.getTherapistReport(this.therapistReportForm.value).subscribe(res => {
+    //   console.log(res, "resresres");
+    //   if (res.status) {
+    //     this.therapistReportData = res.data;
+    //     console.log(this.therapistReportData, "therapistReportData");
+    //   }
+    //   else {
+    //     this.flashMessageService.errorMessage("err")
+    //   }
+    // })
   }
 
   //Format Date to display dd-mm-yyyy format in table
