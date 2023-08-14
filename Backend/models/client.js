@@ -14,7 +14,7 @@ const clientSchema = new mongoose.Schema({
     clientHomeBranchLattitude: { type: String },
     clientHomeBranchLongitude: { type: String },
 
-    packageId: { type: String },
+    packageId: { type: Array },
     noOfSession: { type: String },
     onWeekDay: { type: Array },
     amount: { type: String },

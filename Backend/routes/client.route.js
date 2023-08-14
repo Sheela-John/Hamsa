@@ -97,5 +97,10 @@ router.post('/saveRecurringSession', async (req, res, next) => {
         if (enableDisableErr) return res.status(200).json(lodash.merge({ status: false }, enableDisableErr));
         else return res.status(200).json({ status: true, "data": enableDisableData });
     })
+    .post('/getClientDetailsByPackageId', async (req, res, next) => {
+        let [enableDisableErr, enableDisableData] = await handle(ClientAPI.getClientDetailsByPackageId(req.body));
+        if (enableDisableErr) return res.status(200).json(lodash.merge({ status: false }, enableDisableErr));
+        else return res.status(200).json({ status: true, "data": enableDisableData });
+    })
 
 module.exports = router;
