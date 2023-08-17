@@ -47,6 +47,7 @@ const handle = (promise) => {
 }
 
 const entryAttendence = async (attendenceData) => {
+    attendenceData.date = new Date(attendenceData.date);
     var saveModel = new Attendence(attendenceData);
     let [err, attendenceDataSaved] = await handle(saveModel.save())
     if (err) return Promise.reject(err);
@@ -83,7 +84,6 @@ const getAttendenceofStaffByDateRange = async (data) => {
                 'date': { '$gte': new Date(data.startDate), '$lte': new Date(data.endDate) },
             }
         },
-
         {
             $addFields: {
                 'staffObjId': { $toObjectId: '$staffId' }
@@ -100,6 +100,7 @@ const getAttendenceofStaffByDateRange = async (data) => {
         {
             $unwind: '$staffDetails'
         },
+
         {
             $project: {
                 staffId: "$staffDetails._id",
@@ -111,11 +112,7 @@ const getAttendenceofStaffByDateRange = async (data) => {
                 date: "$date"
             }
         },
-        {
-            $sort: {
-                date: 1
-            }
-        },
+
         {
             $group: {
                 "_id": "$staffId",
@@ -123,9 +120,15 @@ const getAttendenceofStaffByDateRange = async (data) => {
             }
         },
 
+
     ]
     let [err, attendenceData] = await handle(Attendence.aggregate(query));
+
+
+
+
     for (var i = 0; i < attendenceData.length; i++) {
+        console.log("attendenceData", attendenceData[i])
         for (var j = 0; j < attendenceData[i].doc.length; j++) {
             if (attendenceData[i].doc[j].outTime == undefined) {
 
@@ -197,6 +200,7 @@ const getAttendenceofStaffByDateRange = async (data) => {
             let [Err1, travelCountData] = await handle(TravelCount.find({ 'staffId': attendenceData[i].doc[j].staffId, date: attendenceData[i].doc[j].date }).sort({ count: 1 }).lean());
             console.log("travelCountData", travelCountData)
             var totalDistance = [];
+            var totalDuration = [];
             for (var l = 0; l < travelCountData.length; l++) {
                 let [Err, assignServiceData] = await handle(AssignService.findOne({ '_id': travelCountData[l].assignServiceId }).lean());
                 console.log("assignServiceData", assignServiceData)
@@ -213,6 +217,10 @@ const getAttendenceofStaffByDateRange = async (data) => {
                     var [err3, val] = await handle(travelDistance(temp));
                     console.log("val", val)
                     totalDistance.push(val.distance);
+                    console.log()
+                    totalDuration.push(Number((val.duration).split('s')[0]))
+
+
                 }
                 else {
                     let [Err, assignServiceData1] = await handle(AssignService.findOne({ '_id': travelCountData[l - 1].assignServiceId }).lean());
@@ -226,19 +234,29 @@ const getAttendenceofStaffByDateRange = async (data) => {
                     var [err3, val] = await handle(travelDistance(temp));
                     console.log("val1", val)
                     totalDistance.push(val.distance);
+                    totalDuration.push(Number((val.duration).split('s')[0]))
                 }
-        
-                
+
+
             }
-            console.log("totalDistance", totalDistance)
+            console.log("totalDistance", totalDuration)
             console.log(
-                totalDistance.reduce((a, b) => a + b, 0)
+                totalDuration.reduce((a, b) => a + b, 0)
             )
             distance = totalDistance.reduce((a, b) => a + b, 0);
+            duration = totalDuration.reduce((a, b) => a + b, 0);
             attendenceData[i].doc[j].travelDistance = distance;
-            attendenceData[i].doc[j].travelDuration = duration;
+            attendenceData[i].doc[j].travelDuration = duration / 60;
         }
     }
+    for (var i = 0; i < attendenceData.length; i++) {
+        attendenceData[i].doc.sort(GFG_sortFunction);
+        function GFG_sortFunction(a, b) {
+            return a.date > b.date ? 1 : -1;
+        }
+
+    };
+
     if (err) return Promise.reject(err);
     else return Promise.resolve(attendenceData);
 }
