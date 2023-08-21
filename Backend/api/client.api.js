@@ -17,7 +17,6 @@ const lodash = require('lodash');
 const ERR = require('../errors.json');
 const uuid = require('../util/misc');
 const security = require('../util/security');
-const AWS = require('aws-sdk');
 const config = require('config');
 const async = require('async');
 const emailTemplateAPI = require('../api/emailTemplate.api');
@@ -38,13 +37,6 @@ const otpGenerator = require('otp-generator')
 const bcrypt = require('bcrypt');
 const fast2sms = require('fast-two-sms');
 const { RRule } = require("rrule");
-
-const s3 = new AWS.S3({
-    accessKeyId: config.AWSCredentails.AWS_ACCESS_KEY,
-    secretAccessKey: config.AWSCredentails.AWS_SECRET_ACCESS_KEY,
-    region: config.AWSCredentails.REGION
-});
-
 const log = require('../util/logger').log(component, __filename);
 
 /* For error handling in async await function */
@@ -53,15 +45,6 @@ const handle = (promise) => {
         .then(data => ([undefined, data]))
         .catch(error => Promise.resolve([error, undefined]));
 }
-
-// /* Create Client */
-// async function create(clientData) {
-//     log.debug(component, 'Creating a Client', { 'attach': clientData }); log.close();
-//     var saveModel = new Client(clientData);
-//     let [err, clientDataSaved] = await handle(saveModel.save())
-//     if (err) return Promise.reject(err);
-//     else return Promise.resolve(clientDataSaved)
-// }
 
 /* Create Client */
 async function create(clientData) {
@@ -86,7 +69,6 @@ async function create(clientData) {
             async.waterfall([
                 saveClient,
                 createLoginCredentials
-
             ], function (err, result) {
                 if (err) return reject(err);
                 return resolve(result);
@@ -105,6 +87,7 @@ async function create(clientData) {
                         "typeOfTreatment": clientData.typeOfTreatment,
                         "serviceId": clientData.serviceId,
                         "onWeekDay": clientData.onWeekDay,
+                        "addSession": clientData.addSession,
                         "amount": clientData.amount,
                         "slot": clientData.slot,
                         "duration": clientData.duration,
@@ -124,7 +107,6 @@ async function create(clientData) {
                         let [assignErr, assignServiceValue] = await handle(AssignService.find({}).lean());
                         console.log("assignServiceData", assignServiceValue)
                         for (var j = 0; j < assignServiceValue.length; j++) {
-
                             if (assignServiceValue[j].date == new Date(client.addSession[i].date)) {
                                 console.log("check", slotCheck(assignServiceValue[j].startTime))
                                 if (slotCheck(assignServiceValue[j].startTime) >= slotCheck(client.addSession[i].slotStartTime) && slotCheck(assignServiceValue[j].endTime) <= slotCheck(client.addSession[i].slotEndTime)) {
@@ -138,7 +120,6 @@ async function create(clientData) {
                                     }
                                 }
                             }
-
                         }
 
                         var assignData = {
@@ -248,7 +229,6 @@ async function checkForExistingUser(loginCred) {
             }
             if (client.length > 0) {
                 return resolve(client);
-
             }
             return resolve([]);
         })
@@ -305,122 +285,130 @@ async function getAllClientDetails() {
         clientData[i].staffName = staffData.staffName;
         clientData[i].serviceName = serviceData.serviceName;
     }
-
     if (err) return Promise.reject(err);
     if (lodash.isEmpty(clientData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(clientData);
 }
 
-/* To Update Client - API */
-const UpdateClient = async function (datatoupdate) {
-    log.debug(component, 'Updating a Client', { 'attach': datatoupdate }); log.close();
-    let clientId = datatoupdate._id;
-    console.log("64d4801b08da060737ba4987", clientId)
-    delete datatoupdate._id
-    let [Clienterr, client] = await handle(Client.findOne({ "_id": clientId }))
+async function updateClient(datatoupdate, clientId) {
+    console.log("Data to update:", datatoupdate, datatoupdate.packageId[0].onWeekDay, datatoupdate.packageId[0].addSession);
+    // log.debug(component, 'Updating a Client', { 'attach': datatoupdate });
+    log.close();
+    let [ClientErr, client] = await handle(Client.findOne({ "_id": clientId }));
+    if (ClientErr) {
+        return Promise.reject(ClientErr);
+    }
+    console.log("client:", client);
     let clientData;
-    var packId = datatoupdate.packageId;
-    delete datatoupdate.packageId;
-    console.log("clientData", client)
-    var temp = {
-        "packageId": packId,
-        "startDate": datatoupdate.startDate,
-        "endDate": datatoupdate.endDate,
-        "noOfSession": datatoupdate.noOfSession,
-        "staffId": datatoupdate.staffId,
-        "typeOfTreatment": datatoupdate.typeOfTreatment,
-        "serviceId": datatoupdate.serviceId,
-        "onWeekDay": datatoupdate.onWeekDay,
-        "amount": datatoupdate.amount,
-        "slot": datatoupdate.slotId,
-        "duration": datatoupdate.duration,
-        "startTime": datatoupdate.startTime,
-        "endTime": datatoupdate.endTime
-    }
-    datatoupdate['packageId'] = temp;
-
-    for (var z = 0; z < client.packageId.length; z++) {
-        console.log("inside")
-        if (client.packageId[z].packageId == (packId)) {
-            clientData = await handle(Client.findOneAndUpdate({ "_id": clientId }, datatoupdate, { new: true, useFindAndModify: false }))
-        }
-        else {
-
-            clientData = await handle(Client.findOneAndUpdate({ _id: clientId, }, { $push: { packageId: { $each: [datatoupdate.packageId], $sort: -1 } } }, { new: true, useFindAndModify: false }).lean());
-        }
-    }
-    let [err2, assignData1] = await handle(AssignService.find({ 'packageId': packId }))
-
-    if (!(assignData1.length <= datatoupdate.addSession.length)) {
-        return Promise.reject(ERR.NO_OF_SESSION_LESSTHAN_ASSIGNSERVICE_ENTRY)
-    }
-    for (var i = 0; i < assignData1.length; i++) {
-        let [err2, assignData2] = await handle(AssignService.deleteMany({ 'packageId': assignData1[i].packageId, "status": 0 }))
-        console.log("assignData2", assignData2)
-    }
-    let [err3, assignData3] = await handle(AssignService.find({ 'packageId': packId }))
-    console.log("assignData3", assignData3)
-    var temp = [];
-    var dateArr = [];
-    for (var k = 0; k < assignData3.length; k++) {
-        dateArr.push(assignData3[k].date);
-    }
-    for (var j = 0; j < datatoupdate.addSession.length; j++) {
-        console.log("j", j)
-        if (assignData3.length != 0) {
-            for (var k = 0; k < dateArr.length; k++) {
-                if (new Date(datatoupdate.addSession[j].date).toString() == dateArr[k]) { 
-                    k=dateArr.length+1;
+    for (let x = 0; x < client.packageId.length; x++) {
+        console.log("inside");
+        var packageData = datatoupdate.packageId;
+        delete datatoupdate.packageId;
+        console.log("package:", packageData);
+        clientData = await handle(Client.findOneAndUpdate({ _id: clientId }, datatoupdate, { new: true, useFindAndModify: false }));
+        console.log("dcds:", client.packageId[x].id, packageData[0].id);
+        var count = 1;
+        var typeArray = [1, 3, 4];
+        console.log("ndjkd:", packageData);
+        console.log("packageData[0].addSession.length:", packageData[0].addSession.length);
+        for (let i = 0; i < packageData[0].addSession.length; i++) {
+            let [assignErr, assignServiceValue] = await handle(AssignService.find({}).lean());
+            for (var j = 0; j < assignServiceValue.length; j++) {
+                if (assignServiceValue[j].date == new Date(packageData[0].addSession[i].date)) {
+                    console.log("check", slotCheck(assignServiceValue[j].startTime))
+                    if (slotCheck(assignServiceValue[j].startTime) >= slotCheck(packageData[0].addSession[i].slotStartTime) && slotCheck(assignServiceValue[j].endTime) <= slotCheck(packageData[0].addSession[i].slotEndTime)) {
+                        console.log(true, packageData[0].typeOfTreatment)
+                        if (typeArray.includes(assignServiceValue[j].typeOfTreatment) && typeArray.includes(packageData[0].typeOfTreatment)) {
+                            console.log("packageData[0].typeOfTreatment", assignServiceValue[j].bookedCount)
+                            count = assignServiceValue[j].bookedCount + 1;
+                            console.log("count", count)
+                            let [assignErr, assignServiceValue1] = await handle(AssignService.findOneAndUpdate({ _id: assignServiceValue[j]._id }, { $set: { bookedCount: count } }, { new: true, useFindAndModify: false }))
+                            console.log("assignServiceValue1", assignServiceValue1)
+                        }
+                    }
                 }
-                else {
-                    temp.push(datatoupdate.addSession[j])
+            }
+
+            var assignServiceData = {
+                staffId: packageData[0].staffId,
+                date: new Date(packageData[0].addSession[i].date),
+                clientId: clientId,
+                phone: datatoupdate.phoneNumber,
+                address: datatoupdate.address,
+                lattitude: datatoupdate.clientAddressLatitude,
+                longitute: datatoupdate.clientAddressLongitude,
+                typeOfTreatment: packageData[0].typeOfTreatment,
+                branchType: 0,
+                serviceId: packageData[0].serviceId,
+                branchId: datatoupdate.homeBranchId,
+                branchAddress: datatoupdate.homeBranchAddress,
+                slot: packageData[0].slot,
+                duration: packageData[0].duration,
+                startTime: packageData[0].addSession[i].slotStartTime,
+                endTime: packageData[0].addSession[i].slotEndTime,
+                status: 0,
+                bookedCount: count,
+                packageId: packageData[0].id
+            }
+        }
+        let updatePackage;
+        if (client.packageId[x].id == packageData[0].id) {
+            console.log("Inside If");
+            updatePackage = await handle(Client.findOneAndUpdate(
+                {
+                    "_id": mongoose.Types.ObjectId(clientId),
+                    "packageId.id": packageData[0].id
+                }, {
+                '$set': {
+                    'packageId.$.id': packageData[0].id,
+                    'packageId.$.noOfSession': packageData[0].noOfSession,
+                    'packageId.$.onWeekDay': packageData[0].onWeekDay,
+                    'packageId.$.amount': packageData[0].amount,
+                    'packageId.$.staffId': packageData[0].staffId,
+                    'packageId.$.startDate': packageData[0].startDate,
+                    'packageId.$.endDate': packageData[0].endDate,
+                    'packageId.$.serviceId': packageData[0].serviceId,
+                    'packageId.$.typeOfTreatment': packageData[0].typeOfTreatment,
+                    'packageId.$.slot': packageData[0].slot,
+                    'packageId.$.duration': packageData[0].duration,
+                    'packageId.$.startTime': packageData[0].startTime,
+                    'packageId.$.endTime': packageData[0].endTime
                 }
+            }, {
+                new: true, useFindAndModify: false
+            }
+            ));
+            console.log("updatePackage:", updatePackage);
+            let [err, assignData] = await handle(AssignService.find({ packageId: packageData[0].id }))
+            console.log("assign:", assignData);
+            if (err) {
+                return Promise.reject(err);
+            }
+            for (var i = 0; i < assignData.length; i++) {
+                console.log("assignData");
+                let [err2, assignData2] = await handle(AssignService.deleteMany({ packageId: packageData[0].id }));
+                console.log("assignData2", assignData2);
+                if (err2) {
+                    return Promise.reject(err2);
+                }
+            }
+            console.log("ndjkd:", packageData);
+            console.log("assignServiceData:", assignServiceData);
+            console.log("packageData[0].addSession.length:", packageData[0].addSession.length);
+            for (let i = 0; i < packageData[0].addSession.length; i++) {
+                var saveAssignData = new AssignService(assignServiceData);
+                let [err3, assignData3] = await handle(saveAssignData.save());
             }
         }
         else {
-            temp.push(datatoupdate.addSession[j])
+            updatePackage = await handle(Client.findOneAndUpdate({ _id: clientId }, { $push: { packageId: { $each: [packageData[0]], $sort: -1 } } }, { new: true, useFindAndModify: false }).lean());
+            for (let i = 0; i < packageData[0].addSession.length; i++) {
+                var saveAssignData = new AssignService(assignServiceData);
+                let [err3, assignData3] = await handle(saveAssignData.save());
+            }
         }
     }
-    console.log("tmep", temp)
-    for (var x = 0; x < temp.length; x++) {
-        console.log("final")
-        var assign = {
-
-            "clientId": clientId,
-            "clientName": datatoupdate.clientName,
-            "staffId": datatoupdate.staffId,
-            "phone": datatoupdate.phoneNumber,
-            "date": new Date(temp[x].date),
-            "status": 0,
-            "packageId": packId,
-            "address": datatoupdate.address,
-            "serviceId": datatoupdate.serviceId,
-            "endTime": temp[x].slotEndTime,
-            "startTime": temp[x].slotStartTime,
-            "duration": temp[x].duration,
-            "slot": temp[x].slot,
-            "typeOfTreatment": datatoupdate.typeOfTreatment,
-            "latitude": datatoupdate.clientAddressLatitude,
-            "longitude": datatoupdate.clientAddressLongitude,
-            "bookedCount": 1,
-            "branchId": client.homeBranchId,
-            "branchType": 0
-        }
-        console.log("assign", assign)
-        var saveAssignData = new AssignService(assign);
-        let [err2, assignServiceData] = await handle(saveAssignData.save())
-        console.log("assignServiceData", assignServiceData)
-    }
-    // }
-    // console.log("assignServiceData",assignServiceData)
-    // }
-    //}
-    return Promise.resolve(clientData);
-
-    // else{
-    //     return Promise.reject(ERR.NO_OF_SESSION_LESSTHAN_ASSIGNSERVICE_ENTRY)
-    //}
-
+    return Promise.resolve(clientData[1]);
 }
 
 const sendOTP = async function (data) {
@@ -608,16 +596,13 @@ async function generatePackageId(id) {
     console.log("clientData", clientData)
 
 }
-async function getClientDetailsByPackageId(data)
-{
-    let [err2, clientData] = await handle(Client.findOne({"_id":data._id }).lean());
+async function getClientDetailsByPackageId(data) {
+    let [err2, clientData] = await handle(Client.findOne({ "_id": data._id }).lean());
     var details;
-    for(var i=0;i<clientData.packageId.length;i++)
-    {
-        if(clientData.packageId[i].id==data.packageId)
-        {
-            details=clientData.packageId[i];
-           // console.log(err2,"clientData",clientData.packageId[i])
+    for (var i = 0; i < clientData.packageId.length; i++) {
+        if (clientData.packageId[i].id == data.packageId) {
+            details = clientData.packageId[i];
+            // console.log(err2,"clientData",clientData.packageId[i])
         }
     }
     if (err2) return Promise.reject(err2);
@@ -633,12 +618,11 @@ module.exports = {
     create: create,
     getClientDatabyId: getClientDatabyId,
     getAllClientDetails: getAllClientDetails,
-    UpdateClient: UpdateClient,
+    updateClient: updateClient,
     sendOTP: sendOTP,
     requestAdditionalService: requestAdditionalService,
     saveRecurringSession: saveRecurringSession,
     enableDisableClient: enableDisableClient,
     generatePackageId: generatePackageId,
-    getClientDetailsByPackageId:getClientDetailsByPackageId
-    
+    getClientDetailsByPackageId: getClientDetailsByPackageId
 }

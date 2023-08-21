@@ -11,7 +11,6 @@ const lodash = require('lodash');
 const ERR = require('../errors.json');
 const uuid = require('../util/misc');
 const security = require('../util/security');
-const AWS = require('aws-sdk');
 const config = require('config');
 const async = require('async');
 const emailTemplateAPI = require('../api/emailTemplate.api');
@@ -28,15 +27,7 @@ const momentTz = require('moment-timezone');
 const generateRandomPassword = require('../util/generateCode').randomString;
 const genrateDefaultImage = require('../util/generateCode').genrateDefaultImage;
 const NodeGeocoder = require('node-geocoder');
-
 const request = require('request');
-
-const s3 = new AWS.S3({
-    accessKeyId: config.AWSCredentails.AWS_ACCESS_KEY,
-    secretAccessKey: config.AWSCredentails.AWS_SECRET_ACCESS_KEY,
-    region: config.AWSCredentails.REGION
-});
-
 const log = require('../util/logger').log(component, __filename);
 
 /* For error handling in async await function */
@@ -71,10 +62,8 @@ const getAttendenceofStaff = async (staffId) => {
 }
 
 const getAttendenceofStaffByDateRange = async (data) => {
-
     var value = new Date(data.endDate).getTime() - new Date(data.startDate).getTime()
     let differentDays = Math.ceil(value / (1000 * 3600 * 24));
-
     if ((differentDays + 1) > 31) {
         return Promise.reject(ERR.NUMBER_OF_DAYS)
     }
@@ -100,7 +89,6 @@ const getAttendenceofStaffByDateRange = async (data) => {
         {
             $unwind: '$staffDetails'
         },
-
         {
             $project: {
                 staffId: "$staffDetails._id",
@@ -112,30 +100,20 @@ const getAttendenceofStaffByDateRange = async (data) => {
                 date: "$date"
             }
         },
-
         {
             $group: {
                 "_id": "$staffId",
                 "doc": { "$addToSet": "$$ROOT" }
             }
         },
-
-
     ]
     let [err, attendenceData] = await handle(Attendence.aggregate(query));
-
-
-
-
     for (var i = 0; i < attendenceData.length; i++) {
         console.log("attendenceData", attendenceData[i])
         for (var j = 0; j < attendenceData[i].doc.length; j++) {
             if (attendenceData[i].doc[j].outTime == undefined) {
-
                 let [err, assign] = await handle(AssignService.find({ "staffId": (attendenceData[i]._id).toString(), "date": attendenceData[i].doc[j].date }))
-
                 var out;
-
                 if (assign.length != 0) {
                     var val = Number(assign[0].endTime.split(':')[0] + assign[0].endTime.split(':')[1])
                     console.log("inside")
@@ -146,7 +124,6 @@ const getAttendenceofStaffByDateRange = async (data) => {
                             //  console.log("out",out)
                         }
                     }
-
                     attendenceData[i].doc[j].outTime = out;
                 }
                 else {
@@ -161,7 +138,6 @@ const getAttendenceofStaffByDateRange = async (data) => {
             var endHr = parseInt(endTime[0], 10);
             var endMin = parseInt(endTime[1], 10);
             var lateBy, ot;
-
             if (startHr == endHr) {
                 lateBy = (endMin - startMin);
             }
@@ -176,9 +152,7 @@ const getAttendenceofStaffByDateRange = async (data) => {
                 attendenceData[i].doc[j].earlyBy = 0
                 attendenceData[i].doc[j].lateBy = lateBy;
             }
-
             attendenceData[i].doc[j].totalOT = ot;
-
             var tempDate = attendenceData[i].doc[j].date.toLocaleDateString().split('/')[2] + "-" + attendenceData[i].doc[j].date.toLocaleDateString().split('/')[1] + "-" + attendenceData[i].doc[j].date.toLocaleDateString().split('/')[0]
             var tempdate = new Date(tempDate + " " + attendenceData[i].doc[j].inTime).getTime();
             var tempdate1 = new Date(tempDate + " " + attendenceData[i].doc[j].outTime).getTime();
@@ -190,11 +164,9 @@ const getAttendenceofStaffByDateRange = async (data) => {
             var othours = Math.floor(otData / 60);
             var otminutes = data1 % 60;
             attendenceData[i].doc[j].totalOT = othours + ":" + otminutes;;
-
             if (data1 == 480 || data1 < 480) {
                 attendenceData[i].doc[j].totalOT = "0:0";
             }
-
             var distance = 0;
             var duration = 0;
             let [Err1, travelCountData] = await handle(TravelCount.find({ 'staffId': attendenceData[i].doc[j].staffId, date: attendenceData[i].doc[j].date }).sort({ count: 1 }).lean());
@@ -219,8 +191,6 @@ const getAttendenceofStaffByDateRange = async (data) => {
                     totalDistance.push(val.distance);
                     console.log()
                     totalDuration.push(Number((val.duration).split('s')[0]))
-
-
                 }
                 else {
                     let [Err, assignServiceData1] = await handle(AssignService.findOne({ '_id': travelCountData[l - 1].assignServiceId }).lean());
@@ -236,8 +206,6 @@ const getAttendenceofStaffByDateRange = async (data) => {
                     totalDistance.push(val.distance);
                     totalDuration.push(Number((val.duration).split('s')[0]))
                 }
-
-
             }
             console.log("totalDistance", totalDuration)
             console.log(
@@ -257,12 +225,11 @@ const getAttendenceofStaffByDateRange = async (data) => {
         function GFG_sortFunction(a, b) {
             return a.date > b.date ? 1 : -1;
         }
-
     };
-
     if (err) return Promise.reject(err);
     else return Promise.resolve(attendenceData);
 }
+
 const travelDistance = async (data) => {
     return new Promise((resolve, reject) => {
         const options = {
@@ -308,6 +275,7 @@ const travelDistance = async (data) => {
         });
     });
 }
+
 const getAttendenceofToday = async (data) => {
     var query = [
         {
@@ -345,14 +313,14 @@ async function tosaveCount(data) {
     let [err, attendenceDataSaved] = await handle(saveModel.save())
     if (err) return Promise.reject(err);
     else return Promise.resolve(attendenceDataSaved)
-
 }
+
 async function togetPreviouseCount(data) {
     let [Err, countData] = await handle(TravelCount.find({ 'staffId': data.staffId, 'date': new Date(data.date) }));
     if (Err) return Promise.reject(Err);
     else return Promise.resolve(countData)
-
 }
+
 module.exports = {
     entryAttendence: entryAttendence,
     UpdateAttendence: UpdateAttendence,
