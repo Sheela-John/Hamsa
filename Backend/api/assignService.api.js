@@ -66,7 +66,7 @@ const assignServiceClient = async (assignServiceData) => {
     console.log(someDate, "someDate")
     let copiedAppointmentDate = new Date(someDate.getTime());
     console.log(copiedAppointmentDate, "copiedA")
-    assignServiceData['date'] = someDate;
+    assignServiceData['date'] = copiedAppointmentDate;
     console.log(assignServiceData.date)
     delete assignServiceData._id;
 
