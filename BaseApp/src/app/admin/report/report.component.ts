@@ -374,8 +374,8 @@ export class ReportComponent implements OnInit {
     // console.log(this.TravelHours.value,"val")
     var value1 = this.startDate
     var data = {
-      startDate: this.ReverseformatDate(this.startDate),
-      endDate: this.ReverseformatDate(this.endDate)
+      startDate: this.ReverseformatDate(this.TravelHours.value.startDate),
+      endDate: this.ReverseformatDate(this.TravelHours.value.endDate)
     }
     var sDate = this.TravelHours.value.startDate;
     var eDate = this.TravelHours.value.endDate;
@@ -384,97 +384,90 @@ export class ReportComponent implements OnInit {
     console.log(eDate, "eDate");
     console.log(data, "datak");
     this.dateArray = [];
+    var count = 0;
     while (sDate <= eDate) {
       this.dateArray.push(this.Reverse1formatDate(sDate));
       sDate.setDate(sDate.getDate() + 1);
+      count = count + 1;
       console.log(sDate, "ball")
     }
+    this.TravelHours.value.startDate = new Date(sDate.setDate(sDate.getDate() - count));
     console.log("this.dateArray:", this.dateArray);
+    this.AllData = [];
+    for (let i = 0; i < this.dateArray.length; i++) {
+      console.log("ascftr", i);
+      
+      this.AllData.push({
+        duration: "-",
+        earlyBy: "-",
+        endTime: "-",
+        inTime: "-",
+        lateBy: "-",
+        outTime: "-",
+        staffId: "-",
+        staffName: "-",
+        startTime: "-",
+        totalOT: "-",
+        travelDistance: "-",
+        travelDuration: "-",
+        _id: "-",
+        date: this.dateArray[i]
+      })
+    }
+    console.log("this.AllData:", this.AllData);
+
     this.reportService.getAttendenace(data).subscribe(res => {
       console.log("res:", res);
       if (res.status) {
         console.log(res, "err")
         this.data = res.data;
-        this.AllData = [];
-        // console.log(res.data)
+        console.log(res.data, "Ashok")
         if (this.data.length != 0) {
+          // this.data._id=this.TravelHours.value.staffId
           this.data.forEach(ele => {
             // this.dates=ele.doc.sort()
-            ele.doc.forEach(item => {
-              // console.log(this.dateArray,"dateArray")
-              this.AllData = [];
-              this.dateArray.forEach(data => {
-                // console.log(data,"dss")
-                // console.log("dss")
-                //  console.log(this.Reverse1formatDate(item.date),data,"data")
-                console.log(data, "data");
-                console.log(this.Reverse1formatDate(item.date), data == this.Reverse1formatDate(item.date))
-                if (data == this.Reverse1formatDate(item.date)) {
-                  console.log("hello")
-                  this.AllData.push({
-                    duration: item.duration,
-                    earlyBy: item.earlyBy,
-                    endTime: item.endTime,
-                    inTime: item.inTime,
-                    lateBy: item.lateBy,
-                    outTime: item.outTime,
-                    staffId: item.staffId,
-                    staffName: item.staffName,
-                    startTime: item.startTime,
-                    totalOT: item.totalOT,
-                    travelDistance: item.travelDistance,
-                    travelDuration: item.travelDuration,
-                    _id: item._id,
-                    date: this.Reverse1formatDate(item.date)
-                  })
-                  this.AllData2 = this.AllData.sort();
-                  console.log(this.AllData2, "All")
-                }
-                // console.log(data,"data")
-                else {
-                  console.log("else")
-                  this.AllData.push({
-                    duration: "-",
-                    earlyBy: "-",
-                    endTime: "-",
-                    inTime: "-",
-                    lateBy: "-",
-                    outTime: "-",
-                    staffId: "-",
-                    staffName: "-",
-                    startTime: "-",
-                    totalOT: "-",
-                    travelDistance: "-",
-                    travelDuration: "-",
-                    _id: "-",
-                    date: data
-                  })
-                }
-              })
-            })
-            console.log(this.AllData, "data hours");
+            var datess = ele.doc
+            // console.log(ele.date)
+            if (ele._id == this.TravelHours.value.staffId) {
+              // this.view=datess.sort((a, b) => a.date - b.date);
+              // console.log(this.view, "datess1")
+              datess.forEach((item) => {
+                // console.log(this.dateArray,"dateArray")
+                this.dateArray.forEach((data, index) => {
+                  // console.log(data,"dss")
+                  // console.log("dss")
+                  console.log(this.Reverse1formatDate("2023-08-02T00:00:00.000Z"))
+                  // console.log(data, "data");
+                  console.log(this.Reverse1formatDate(item.date))
 
-          })
-        }
-        else {
-          console.log("hfh");
-          this.dateArray.forEach(data => {
-            this.AllData.push({
-              duration: "-",
-              earlyBy: "-",
-              endTime: "-",
-              inTime: "-",
-              lateBy: "-",
-              outTime: "-",
-              staffId: "-",
-              staffName: "-",
-              startTime: "-",
-              totalOT: "-",
-              travelDistance: "-",
-              travelDuration: "-",
-              _id: "-",
-              date: data
-            })
+                  if (data == this.Reverse1formatDate(item.date)) {
+                    console.log("hello")
+                    this.AllData.splice(index, 1, {
+                      duration: item.duration,
+                      earlyBy: item.earlyBy,
+                      endTime: item.endTime,
+                      inTime: item.inTime,
+                      lateBy: item.lateBy,
+                      outTime: item.outTime,
+                      staffId: item.staffId,
+                      staffName: item.staffName,
+                      startTime: item.startTime,
+                      totalOT: item.totalOT,
+                      travelDistance: item.travelDistance,
+                      travelDuration: item.travelDuration,
+                      _id: item._id,
+                      date: this.Reverse1formatDate(item.date)
+                    })
+                    this.AllData2 = this.AllData.sort();
+                    console.log(this.AllData, "All")
+                  }
+                })
+              })
+            }
+            else {
+              console.log("hrr")
+            }
+            console.log(this.AllData, "data hours");
           })
         }
       }

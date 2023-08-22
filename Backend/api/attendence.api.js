@@ -217,7 +217,7 @@ const getAttendenceofStaffByDateRange = async (data) => {
             attendenceData[i].doc[j].travelDuration = duration / 60;
             // console.log("attendenceData[i].doc[j].date.toLocaleDateString().split('/')[2]",attendenceData[i].doc[j].date.toLocaleDateString())
             // var tempDate = attendenceData[i].doc[j].date.toLocaleDateString().split('/')[2] + "-" + attendenceData[i].doc[j].date.toLocaleDateString().split('/')[1] + "-" + attendenceData[i].doc[j].date.toLocaleDateString().split('/')[0]
-            attendenceData[i].doc[j].date=attendenceData[i].doc[j].date.toLocaleDateString();
+            // attendenceData[i].doc[j].date=attendenceData[i].doc[j].date.toLocaleDateString();
         }
     }
     for (var i = 0; i < attendenceData.length; i++) {

@@ -166,7 +166,7 @@
                                 <input type="text" class="form-control data-picker-color user-font"
                                     formControlName="endDate" bsDatepicker
                                     [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
-                                    (bsValueChange)="onDateChangeEnd($event)" (input)="inputdobValidator($event)"
+                                    (bsValueChange)="onDateChangeEnd($event)" (input)="inputdobValidator($event)" [minDate]="minDate"
                                     maxlength="10" placeholder="DD-MM-YYYY">
                             </div>
                             <div class="error-msg-area">
