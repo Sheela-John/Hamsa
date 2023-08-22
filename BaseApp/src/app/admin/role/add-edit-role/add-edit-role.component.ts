@@ -38,8 +38,8 @@ export class AddEditRoleComponent implements OnInit {
   public roleData: any;
   public isAddSlot: boolean = false;
   public showdelete: boolean = false;
-  showDuplicatesError: any;
-
+  public showDuplicatesError: any;
+  
 
   constructor(private fb: FormBuilder, private router: Router, public RoleService: RoleService, private flashMessageService: FlashMessageService, private route: ActivatedRoute,) {
     this.route.params.subscribe((param) => {
@@ -67,10 +67,8 @@ export class AddEditRoleComponent implements OnInit {
     });
     this.slotarr = this.roleForm.get('slots') as FormArray
     if (this.slotarr.length == 0) {
-
       this.showdelete = true
     }
-    console.log(this.slotarr.length)
   }
 
   //initializeAddSlotForm
@@ -113,6 +111,8 @@ export class AddEditRoleComponent implements OnInit {
   saveSlot() {
     this.isAddSlot = true;
     this.slotarr.push(this.initializeAddSlotForm());
+    this.isroleFormSubmitted = true;
+    this.showdelete=false;
   }
 
   //get-patch Role by Id
@@ -120,11 +120,9 @@ export class AddEditRoleComponent implements OnInit {
     this.RoleService.getRolebyId(id).pipe(takeUntil(this.destroy$)).subscribe(res => {
       if (res.status) {
         this.roleDatavalue = res.data
-        console.log("this.roleDatavalue",this.roleDatavalue)
         this.roleForm.controls['name'].patchValue(this.roleDatavalue.name);
         for (let i = 1; i < this.roleDatavalue.slots.length; i++) {
           this.slotarr.push(this.initializeAddSlotForm());
-          console.log(this.slotarr.length,"slotsss")
           if (this.slotarr.length != 1) {
             this.showdelete = false
           }
@@ -163,14 +161,12 @@ export class AddEditRoleComponent implements OnInit {
             })
           // })
         }
-        console.log(" this.slotdata:",  this.slotdata);
         data = {
           name: this.roleForm.controls['name'].value,
           slots: this.slotdata,
         }
         const slotData = this.roleForm.value.slots
         if (this.roleForm.valid  && !this.checkForDuplicateItems(slotData)) {
-          console.log("data", data)
           this.RoleService.updateRoleById(data, this.routerData).pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
             if (res.status) {
               this.flashMessageService.successMessage('Role Updated Sucessfully', 2);
@@ -194,12 +190,9 @@ export class AddEditRoleComponent implements OnInit {
       const control = <FormArray>this.roleForm.controls['slots'];
       var id = this.routerData;
       var slotname = this.roleForm.controls['slots'].value[i].slotName.toUpperCase()
-      console.log("slotname:", slotname);
       this.roleDatavalue.slots.forEach(element => {
         var eleSlotName = element.slotName.toUpperCase()
-        console.log("sdfs:", slotname, eleSlotName)
         if (slotname == eleSlotName) {
-          console.log("yes")
           // this.slotId = element._id
           var data = {
             slotId: element._id
@@ -207,7 +200,6 @@ export class AddEditRoleComponent implements OnInit {
           this.RoleService.deleteSlot(id, data).subscribe(res => {
             if (res.status) {
               control.removeAt(i);
-              console.log("control.length",control.length)
               if (control.length == 1) {
                 this.showdelete = true
               }
@@ -225,7 +217,6 @@ export class AddEditRoleComponent implements OnInit {
         this.roleForm.controls['slots'].value[i].slotName == '' ||
        this.roleForm.controls['slots'].value[i].startTime == '' ) {
         control.removeAt(i);
-        console.log("control.length",control.length)
         if (control.length == 1) {
           this.showdelete = true
         }
@@ -234,7 +225,6 @@ export class AddEditRoleComponent implements OnInit {
     else {
       const control = <FormArray>this.roleForm.controls['slots'];
       control.removeAt(i);
-      console.log("control.length",control.length)
       if (control.length == 1) {
         this.showdelete = true
       }
@@ -253,12 +243,12 @@ export class AddEditRoleComponent implements OnInit {
     return this.showDuplicatesError;
   }
 
+  
   //-----------------------------------CLIENT API INTEGRATION - END -------------------------------------------//
 
   //back Route
   addeditForm() {
     this.router.navigateByUrl('admin/role')
   }
-
   //-----------------------------------ROLE API INTEGRATION - END -------------------------------------------// 
 }
