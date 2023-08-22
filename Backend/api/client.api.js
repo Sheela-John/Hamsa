@@ -240,13 +240,13 @@ async function getClientDatabyId(clientId) {
     log.debug(component, 'Getting Client Data by Id');
     log.close();
     let [clientErr, clientData] = await handle(Client.findOne({ '_id': clientId }).lean());
-    console.log(clientData.packageId)
+    console.log(clientData.packageId.length)
+    var len=clientData.packageId.length;
     clientData.startDate = new Date(clientData.startDate).toDateString();
     clientData.endDate = new Date(clientData.endDate).toDateString();
     var sessionArray = [];
-    for (var j = 0; j < clientData.packageId.length; j++) {
-        let [Err, assignServiceData] = await handle(AssignService.find({ 'packageId': clientData.packageId[j] }).sort({ "date": 1 }).lean());
-
+    for (var j = 0; j < len; j++) {
+        let [Err, assignServiceData] = await handle(AssignService.find({ 'packageId': clientData.packageId[j].id }).sort({ "date": 1 }).lean());
         for (var i = 0; i < assignServiceData.length; i++) {
             var temp = {
                 date: assignServiceData[i].date,

@@ -88,7 +88,13 @@ export class AddEditClientComponent implements OnInit {
   public clientData: any;
   public allDate: any = [];
   public editClientData: boolean = false;
-
+  public showAddPackage: boolean = false;
+  public showPackage: boolean = false;
+  public packageData: any = [];
+  public type: any;
+  public showEditPackage: boolean = false;
+  public hidebutton: boolean = true;
+  packageIds: any;
   constructor(private fb: FormBuilder, private router: Router, public BranchService: BranchService,
     private flashMessageService: FlashMessageService, private assignService: AssignService,
     private route: ActivatedRoute, private staffService: StaffService, private roleService: RoleService,
@@ -109,6 +115,8 @@ export class AddEditClientComponent implements OnInit {
     this.getAllServices();
     if (this.clientId != undefined) {
       this.getClientById(this.clientId);
+      this.showAddPackage = true;
+      this.showPackage = true
     }
   }
 
@@ -284,12 +292,14 @@ export class AddEditClientComponent implements OnInit {
       staffId: this.clientForm.value.staffId,
       slotId: id
     }
-    this.assignService.getSlotByStaffIdAndSlotId(data).subscribe(res => {
-      if (res.status) {
-        this.startTime = res.data.startTime;
-        this.endTime = res.data.endTime;
-      }
-    })
+    if (this.clientForm.value.staffId != '') {
+      this.assignService.getSlotByStaffIdAndSlotId(data).subscribe(res => {
+        if (res.status) {
+          this.startTime = res.data.startTime;
+          this.endTime = res.data.endTime;
+        }
+      })
+    }
   }
 
   //Calculate End Time From start Time and Duration
@@ -336,16 +346,18 @@ export class AddEditClientComponent implements OnInit {
   }
 
   //On change duration empty the start and end time
-  onChangeDuration() { 
+  onChangeDuration() {
     this.clientForm.controls['startTime'].patchValue('');
     this.clientForm.controls['endTime'].patchValue('');
   }
 
   // When click add session button this function will work
   addClient() {
+    console.log("yes")
     this.showAddSession = true;
     this.isClientFormSubmitted = true;
-    if (this.clientForm.valid) {
+    console.log(this.clientForm.valid, "this.clientForm.valid")
+    // if (this.clientForm.valid) {
       var data = {
         startDate: (this.editClientData) ? this.reverseFormatDate(this.clientData.startDate) : this.reverseFormatDate(this.clientForm.value.startDate),
         endDate: (this.editClientData) ? this.reverseFormatDate(this.clientData.endDate) : this.reverseFormatDate(this.clientForm.value.endDate),
@@ -358,39 +370,56 @@ export class AddEditClientComponent implements OnInit {
         startTime: this.clientForm.value.startTime,
         endTime: this.clientForm.value.endTime
       }
-      this.clientService.createSession(data).subscribe(res => {
-        if (res.status) {
-          this.addSessionData = res.data;
-          this.allDate = [];
-          this.sessionDate = [];
-          this.addSessionData.forEach((value) => {
-            this.allDate.push(value.date);
-            this.sessionDate.push(this.formatDate(value.date));
-          })
-          if (this.clientId != undefined) {
-            if (this.clientData.startTime == this.clientForm.value.startTime ||
-              this.clientData.endTime == this.clientForm.value.endTime) {
-              this.clientData.addSession.forEach((ele, i) => {
-                if (this.allDate.includes(ele.date)) {
-                  var session = this.clientForm.get('addSession') as FormArray;
-                  session.at(i)['controls']['slotStartTime'].patchValue(ele.slotStartTime);
-                  session.at(i)['controls']['slotEndTime'].patchValue(ele.slotEndTime);
-                }
-                else {
-                  this.addSessionData.forEach((ele, index) => {
-                    if (ele.isAvailable == true) {
-                      var session = this.clientForm.get('addSession') as FormArray;
-                      session.at(index)['controls']['slotStartTime'].patchValue(this.clientForm.value.startTime);
-                      session.at(index)['controls']['slotEndTime'].patchValue(this.clientForm.value.endTime);
-                    }
-                    else {
-                      var session = this.clientForm.get('addSession') as FormArray;
-                      session.at(index)['controls']['slotStartTime'].patchValue('');
-                      session.at(index)['controls']['slotEndTime'].patchValue('');
-                    }
-                  })
-                }
-              })
+      console.log(data,this.clientForm.value.staffId, this.clientForm.value.typeOfTreatment,"data")
+      // if (this.clientForm.value.staffId != '' && this.clientForm.value.typeOfTreatment != '') {
+        this.clientService.createSession(data).subscribe(res => {
+          if (res.status) {
+            this.addSessionData = res.data;
+            this.allDate = [];
+            this.sessionDate = [];
+            this.addSessionData.forEach((value) => {
+              this.allDate.push(value.date);
+              this.sessionDate.push(this.formatDate(value.date));
+            })
+            if (this.clientId != undefined) {
+              if (this.clientData.startTime == this.clientForm.value.startTime ||
+                this.clientData.endTime == this.clientForm.value.endTime) {
+                this.clientData.addSession.forEach((ele, i) => {
+                  if (this.allDate.includes(ele.date)) {
+                    var session = this.clientForm.get('addSession') as FormArray;
+                    session.at(i)['controls']['slotStartTime'].patchValue(ele.slotStartTime);
+                    session.at(i)['controls']['slotEndTime'].patchValue(ele.slotEndTime);
+                  }
+                  else {
+                    this.addSessionData.forEach((ele, index) => {
+                      if (ele.isAvailable == true) {
+                        var session = this.clientForm.get('addSession') as FormArray;
+                        session.at(index)['controls']['slotStartTime'].patchValue(this.clientForm.value.startTime);
+                        session.at(index)['controls']['slotEndTime'].patchValue(this.clientForm.value.endTime);
+                      }
+                      else {
+                        var session = this.clientForm.get('addSession') as FormArray;
+                        session.at(index)['controls']['slotStartTime'].patchValue('');
+                        session.at(index)['controls']['slotEndTime'].patchValue('');
+                      }
+                    })
+                  }
+                })
+              }
+              else {
+                this.addSessionData.forEach((ele, index) => {
+                  if (ele.isAvailable == true) {
+                    var session = this.clientForm.get('addSession') as FormArray;
+                    session.at(index)['controls']['slotStartTime'].patchValue(this.clientForm.value.startTime);
+                    session.at(index)['controls']['slotEndTime'].patchValue(this.clientForm.value.endTime);
+                  }
+                  else {
+                    var session = this.clientForm.get('addSession') as FormArray;
+                    session.at(index)['controls']['slotStartTime'].patchValue('');
+                    session.at(index)['controls']['slotEndTime'].patchValue('');
+                  }
+                })
+              }
             }
             else {
               this.addSessionData.forEach((ele, index) => {
@@ -407,24 +436,14 @@ export class AddEditClientComponent implements OnInit {
               })
             }
           }
-          else {
-            this.addSessionData.forEach((ele, index) => {
-              if (ele.isAvailable == true) {
-                var session = this.clientForm.get('addSession') as FormArray;
-                session.at(index)['controls']['slotStartTime'].patchValue(this.clientForm.value.startTime);
-                session.at(index)['controls']['slotEndTime'].patchValue(this.clientForm.value.endTime);
-              }
-              else {
-                var session = this.clientForm.get('addSession') as FormArray;
-                session.at(index)['controls']['slotStartTime'].patchValue('');
-                session.at(index)['controls']['slotEndTime'].patchValue('');
-              }
-            })
-          }
-        }
-      })
+        })
+      // }
       this.Slot(this.clientForm.value.slot);
-    }
+    // }
+    // else {
+    //   this.showAddSession = false;
+    //   console.log(this.clientForm.valid, "this.clientForm.valid")
+    // }
   }
 
   // When click slot the start and end time will patch in session slot start and end time
@@ -460,14 +479,14 @@ export class AddEditClientComponent implements OnInit {
         }
       }
     })
-    if (this.clientForm.valid) {
+    //if (this.clientForm.valid) {
       this.clientService.createClient(data).subscribe(res => {
         if (res.status) {
           this.flashMessageService.successMessage("Client Added Sucessfully!!!");
           this.router.navigateByUrl('admin/client');
         }
       })
-    }
+    //}
   }
 
   // When edit client to patch the slot
@@ -505,9 +524,67 @@ export class AddEditClientComponent implements OnInit {
   getClientById(clientId) {
     this.clientService.getClientById(clientId).subscribe(res => {
       if (res.status) {
-        this.showAddSession = true;
+        console.log(res.data, "oo")
+        // this.showAddSession = true;
         this.showAddEdit = true;
         this.clientData = res.data;
+        console.log(this.clientData, "clientdata")
+        if (this.clientData.typeOfTreatment == 0) {
+          this.type = "Home"
+        }
+        if (this.clientData.typeOfTreatment == 1) {
+          this.type = "OP"
+        }
+        if (this.clientData.typeOfTreatment == 2) {
+          this.type = "Teletherapy"
+        }
+        if (this.clientData.typeOfTreatment == 3) {
+          this.type = "IP"
+        }
+        if (this.clientData.typeOfTreatment == 4) {
+          this.type = "Assessment"
+        }
+        this.packageData.push({
+          packageId: this.clientData.packageId,
+          _id: this.clientData._id,
+          startDate: this.formatDate(this.clientData.startDate),
+          endDate: this.formatDate(this.clientData.endDate),
+          noOfSession: this.clientData.noOfSession,
+          typeOfTreatment: this.type,
+          staffName: this.clientData.staffName
+        })
+        this.clientForm.patchValue({
+          uhid: this.clientData.uhid,
+          clientName: this.clientData.clientName,
+          email: this.clientData.email,
+          phoneNumber: this.clientData.phoneNumber,
+          address: this.clientData.address,
+          homeBranchId: this.clientData.homeBranchId,
+          homeBranchAddress: this.clientData.homeBranchAddress,
+          emergencyNumber: this.clientData.emergencyNumber
+        })
+      }
+    })
+  }
+
+
+  //While Click to edit package
+  editpackageId(id, packageId) {
+    this.showEditPackage = true
+    this.showPackage = true
+    this.hidebutton = true
+    packageId.forEach(element => {
+      this.packageIds = element.id
+    });
+    var data = {
+      _id: id,
+      packageId: this.packageIds
+    }
+    console.log(data, "lll")
+    this.clientService.getDetailsByPackageId(data).subscribe(res => {
+      if (res.status) {
+        console.log(res.data, "pp")
+        this.showAddSession = true
         this.packageId = res.data.packageId;
         this.clientForm.patchValue(res.data);
         this.clientForm.controls['startDate'].patchValue(this.formatDate(res.data.startDate));
@@ -519,6 +596,46 @@ export class AddEditClientComponent implements OnInit {
         this.Slot(res.data.slot);
         this.editClient();
       }
+    })
+    // this.clientService.getClientById(clientId).subscribe(res => {
+    //   if (res.status) {
+    //     this.showAddSession = true
+    //     this.packageId = res.data.packageId;
+    //     this.clientForm.patchValue(res.data);
+    //     this.clientForm.controls['startDate'].patchValue(this.formatDate(res.data.startDate));
+    //     this.clientForm.controls['endDate'].patchValue(this.formatDate(res.data.endDate));
+    //     this.clientForm.controls['clientAddressLatitude'].setValue(res.data.clientAddressLatitude);
+    //     this.clientForm.controls['clientAddressLongitude'].setValue(res.data.clientAddressLongitude);
+    //     this.addSessionBasedOnSessionCount(res.data.noOfSession);
+    //     this.getSlotbasedOnStaff(res.data.staffId);
+    //     this.Slot(res.data.slot);
+    //     this.editClient();
+    //   }
+    // })
+  }
+
+
+  //While click to add Package
+  showPackageForm() {
+    this.showPackage = false
+    this.showAddSession = false
+    this.showEditPackage = false
+    this.showAddSession = false
+    this.hidebutton = false
+    this.clientForm.patchValue({
+      packageId: '',
+      noOfSession: '',
+      onWeekDay: '',
+      amount: '',
+      staffId: '',
+      startDate: '',
+      endDate: '',
+      serviceId: '',
+      typeOfTreatment: '',
+      slot: '',
+      duration: '',
+      startTime: '',
+      endTime: ''
     })
   }
 

@@ -32,4 +32,9 @@ export class ClientService {
     public updateClient(id, data) {
         return this.clientDataService.updateClient(id, data);
     }
+
+    //get Details By PackageId
+    public getDetailsByPackageId(data){
+        return this.clientDataService.getDetailsByPackageId(data); 
+    }
 }
