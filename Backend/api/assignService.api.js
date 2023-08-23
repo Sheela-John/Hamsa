@@ -378,6 +378,151 @@ async function getAllAssignedServices() {
     if (lodash.isEmpty(assignServiceData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(assignServiceData);
 }
+
+// get all assigned services from today date to past 30 days
+async function getAllAssignedServicesforpast30days() {
+    log.debug(component, 'Get All Assign Service for past 30 days');
+    log.close();
+    console.log("getAllAssignedServicesforpast30days")
+    var todate = new Date();
+    var fromDate = new Date(new Date().setDate(todate.getDate() - 30));
+    console.log("todate", todate);
+    console.log("fromDate", fromDate);
+    let [Err, assignServiceData] = await handle(AssignService.find({}).lean());
+    var assignServiceData1 = [];
+    console.log("assignServiceData.length", assignServiceData.length)
+    for (var i = 0; i < assignServiceData.length; i++) {
+        if (new Date(assignServiceData[i].date) >= fromDate && new Date(assignServiceData[i].date) <= todate) {
+            assignServiceData1.push(assignServiceData[i])
+        }
+    }
+    console.log(" assignServiceData1", assignServiceData1)
+    if (lodash.isEmpty(assignServiceData1)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+    return Promise.resolve(assignServiceData1);
+}
+
+// get all assigned services by client and staff
+async function getAllAssignedServicesbyclientstaff(data) {
+    log.debug(component, 'Get All Assign Service by client and staff');
+    log.close();
+    console.log("getAllAssignedServicesbyclientaandstaff")
+    if (data.fromDate && !data.todate) {
+        console.log("get 1")
+        var todate = new Date(data.fromDate);
+        data.fromDate = new Date(data.fromDate);
+        console.log(data.fromDate, "data.fromDate")
+        console.log(todate, "data.todate")
+    }
+    if (data.clientId && !data.staffId && !data.fromDate && !data.todate) {
+        console.log("get 2")
+        let [err, clientData] = await handle(AssignService.find({ "clientId": data.clientId }).lean());
+        return Promise.resolve(clientData);
+    }
+    if (data.staffId && !data.clientId && !data.fromDate && !data.todate) {
+        console.log("get 3")
+        let [err1, staffData] = await handle(AssignService.find({ "staffId": data.staffId }).lean());
+        return Promise.resolve(staffData);
+    }
+    if (data.clientId && data.staffId && !data.fromDate && !data.todate) {
+        console.log("get 4")
+        let [err, clientstaffData] = await handle(AssignService.find({ "clientId": data.clientId, "staffId": data.staffId }).lean());
+        return Promise.resolve(clientstaffData);
+    }
+    if (data.fromDate && data.todate && !data.staffId && !data.clientId) {
+        console.log("get 5")
+        let [Err, assignServiceData] = await handle(AssignService.find({}).lean());
+        var assignServiceData1 = [];
+        console.log("assignServiceData", assignServiceData)
+        for (var i = 0; i < assignServiceData.length; i++) {
+            if (new Date(assignServiceData[i].date) >= new Date(data.fromDate) && new Date(assignServiceData[i].date) <= new Date(data.todate)) {
+                assignServiceData1.push(assignServiceData[i])
+            }
+        }
+        console.log("assignServiceData1", assignServiceData1)
+        if (lodash.isEmpty(assignServiceData1)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+        return Promise.resolve(assignServiceData1);
+    }
+    if (data.fromDate && !data.todate && !data.staffId && !data.clientId) {
+        console.log("get 6")
+        console.log("from")
+        let [Err, assignServiceData] = await handle(AssignService.find({}).lean());
+        var assignServiceData1 = [];
+        for (var i = 0; i < assignServiceData.length; i++) {
+            if (new Date(assignServiceData[i].date) >= new Date(data.fromDate) && new Date(assignServiceData[i].date) <= todate) {
+                assignServiceData1.push(assignServiceData[i])
+            }
+            console.log("assignServiceData1", assignServiceData1)
+        }
+        if (lodash.isEmpty(assignServiceData1)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+        return Promise.resolve(assignServiceData1);
+    }
+    if (data.fromDate && !data.todate && data.staffId && data.clientId) {
+        console.log("get 6.1")
+        let [Err, assignServiceData] = await handle(AssignService.find({}).lean());
+        var assignServiceData1 = [];
+        for (var i = 0; i < assignServiceData.length; i++) {
+            if (new Date(assignServiceData[i].date) >= new Date(data.fromDate) && new Date(assignServiceData[i].date) <= todate && assignServiceData[i].staffId == data.staffId &&
+            assignServiceData[i].clientId == data.clientId) {
+                assignServiceData1.push(assignServiceData[i])
+            }
+            console.log("assignServiceData1", assignServiceData1)
+        }
+        if (lodash.isEmpty(assignServiceData1)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+        return Promise.resolve(assignServiceData1);
+    }
+    if (data.clientId && data.staffId && data.fromDate && data.todate) {
+        console.log("get 7")
+        let [Err, assignServiceData] = await handle(AssignService.find({}).lean());
+        var assignServiceData1 = [];
+        for (var i = 0; i < assignServiceData.length; i++) {
+            console.log("assignServiceData[i].staffId", assignServiceData[i].staffId)
+            console.log("assignServiceData[i].clientId", assignServiceData[i].clientId)
+            console.log("assignServiceData[i].date", new Date(assignServiceData[i].date))
+            if ((new Date(assignServiceData[i].date) >= new Date(data.fromDate) &&
+                new Date(assignServiceData[i].date) <= new Date(data.todate)) &&
+                assignServiceData[i].staffId == data.staffId &&
+                assignServiceData[i].clientId == data.clientId) {
+                    
+                assignServiceData1.push(assignServiceData[i])
+            }
+            else {
+                console.log("else if", data.staffId, data.clientId, data.fromDate, data.todate)
+            }
+        } console.log("assignServiceData1", assignServiceData1)
+        if (lodash.isEmpty(assignServiceData1)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+        return Promise.resolve(assignServiceData1);
+    }
+    if (data.clientId && data.fromDate && data.todate && !data.staffId) {
+        console.log("get 8")
+        let [Err, assignServiceData] = await handle(AssignService.find({}).lean());
+        var assignServiceData1 = [];
+        for (var i = 0; i < assignServiceData.length; i++) {
+            if ((new Date(assignServiceData[i].date) >= new Date(data.fromDate) &&
+                new Date(assignServiceData[i].date) <= new Date(data.todate))&&
+                assignServiceData[i].clientId == data.clientId) {
+                assignServiceData1.push(assignServiceData[i])
+            }
+        } console.log("assignServiceData1", assignServiceData1)
+        if (lodash.isEmpty(assignServiceData1)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+        return Promise.resolve(assignServiceData1);
+    }
+    if (data.staffId && data.fromDate && data.todate && !data.clientId) {
+        console.log("get 9")
+        let [Err, assignServiceData] = await handle(AssignService.find({}).lean());
+        var assignServiceData1 = [];
+        for (var i = 0; i < assignServiceData.length; i++) {
+            if ((new Date(assignServiceData[i].date) >= new Date(data.fromDate) &&
+                new Date(assignServiceData[i].date) <= new Date(data.todate)) &&
+                assignServiceData[i].staffId == data.staffId) {
+                assignServiceData1.push(assignServiceData[i])
+            }
+        } console.log("assignServiceData1", assignServiceData1)
+        if (lodash.isEmpty(assignServiceData1)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+        return Promise.resolve(assignServiceData1);
+    }
+}
+
+
 const getAllAssignedServicesforStaff = async (inputData) => {
     var data = [];
 
@@ -1543,5 +1688,7 @@ module.exports = {
     travelDistance: travelDistance,
     getRoleDetailsByStaffIdAndSlotId: getRoleDetailsByStaffIdAndSlotId,
     assignServiceForClientByPhone: assignServiceForClientByPhone,
-    getAssignServiceDataByStaffIdAndDateForDashBoard:getAssignServiceDataByStaffIdAndDateForDashBoard
+    getAssignServiceDataByStaffIdAndDateForDashBoard:getAssignServiceDataByStaffIdAndDateForDashBoard,
+    getAllAssignedServicesforpast30days: getAllAssignedServicesforpast30days,
+    getAllAssignedServicesbyclientstaff: getAllAssignedServicesbyclientstaff
 }

@@ -43,6 +43,21 @@ router.post('/travelDistance', async (req, res, next) => {
     if (err) return next(err);
     else return res.status(200).json({ status: true, data: assignServiceData });
 })
+
+// get All AssignedServices forpast 30 days
+router.get('/allAssignedServicesforpast30days', async (req, res, next) => {
+    let [err, assignServiceData] = await handle(AssignServiceAPI.getAllAssignedServicesforpast30days());
+    if (err) return next(err);
+    else return res.status(200).json({ status: true, data: assignServiceData });
+})
+
+// get All AssignedServices by client and staff
+router.get('/allAssignedServicesbyclientandstaff', async (req, res, next) => {
+    let [err, assignServiceData] = await handle(AssignServiceAPI.getAllAssignedServicesbyclientstaff(req.body));
+    if (err) return next(err);
+    else return res.status(200).json({ status: true, data: assignServiceData });
+})
+
 /* Get All Assigned Services */
 router.get('/allAssignedServices', async (req, res, next) => {
     let [err, assignServiceData] = await handle(AssignServiceAPI.getAllAssignedServices());
