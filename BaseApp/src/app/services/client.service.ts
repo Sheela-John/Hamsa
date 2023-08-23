@@ -34,7 +34,12 @@ export class ClientService {
     }
 
     //get Details By PackageId
-    public getDetailsByPackageId(data){
-        return this.clientDataService.getDetailsByPackageId(data); 
+    public getDetailsByPackageId(data) {
+        return this.clientDataService.getDetailsByPackageId(data);
+    }
+
+    //Get Assign Service Data By PackageId
+    public getAssignServiceByPackageId(data) {
+        return this.clientDataService.getAssignServiceByPackageId(data);
     }
 }

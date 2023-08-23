@@ -92,7 +92,7 @@
                                 class="required">*</span></label>
                         <select class="border border-gray-300 p-2 w-full rounded" formControlName="homeBranchId"
                             (change)="getBranchbyId($event)">
-                            <option value="" disabled>--select--</option>
+                            <option value="" disabled>--Select--</option>
                             <option value="{{branch._id}}" *ngFor="let branch of branchList">
                                 {{branch.branchName}}
                             </option>
@@ -100,9 +100,8 @@
                         <div class="error-msg-area">
                             <div *ngIf="clientForm.controls['homeBranchId'].errors && (!clientForm.controls['homeBranchId'].pristine|| isClientFormSubmitted)"
                                 class="error-msg">
-                                <div [hidden]="!clientForm.controls['homeBranchId'].errors.required">Please Enter Home
-                                    Branch
-                                    Name
+                                <div [hidden]="!clientForm.controls['homeBranchId'].errors.required">
+                                    Please Enter Home Branch Name
                                 </div>
                             </div>
                         </div>
@@ -115,10 +114,8 @@
                         <div class="error-msg-area">
                             <div *ngIf="clientForm.controls['homeBranchAddress'].errors && (!clientForm.controls['homeBranchAddress'].pristine|| isClientFormSubmitted)"
                                 class="error-msg">
-                                <div [hidden]="!clientForm.controls['homeBranchAddress'].errors.required">Please Enter
-                                    Home
-                                    Branch
-                                    Name
+                                <div [hidden]="!clientForm.controls['homeBranchAddress'].errors.required">
+                                    Please Enter Home Branch Address
                                 </div>
                             </div>
                         </div>
@@ -130,7 +127,8 @@
                     </div>
                     <div class="col-4">
                         <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg"
-                            *ngIf="showAddPackage && hidebutton" (click)="showPackageForm()"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add
+                            *ngIf="showAddPackage && hideButton" (click)="showPackageForm()"><i
+                                class="fa fa-plus"></i>&nbsp;&nbsp;Add
                             Package</button>
                     </div>
                 </div>
@@ -150,7 +148,8 @@
                                 </tr>
                             </thead>
                             <tbody class="flex-1 sm:flex-none">
-                                <tr class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0"  *ngFor="let package of packageData">
+                                <tr class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0"
+                                    *ngFor="let package of packageData; let i = index">
                                     <td class="border-grey-light border hover:bg-gray-100 p-3">
                                         {{package.noOfSession}}
                                     </td>
@@ -168,18 +167,28 @@
                                     </td>
                                     <td
                                         class="border-grey-light border hover:bg-gray-100 p-3 text-red-400 hover:text-red-600 hover:font-medium cursor-pointer">
-                                        <button class="btn" (click)="editpackageId(package._id,package.packageId)"><i
-                                                class='fa fa-edit'></i></button>
+                                        <button class="btn"
+                                            (click)="editpackageId(package._id,package.packageId, i, 'edit')"
+                                            *ngIf="package.status == 0">
+                                            <i class='fa fa-edit'></i>
+                                        </button>
+                                        <button class="btn"
+                                            (click)="editpackageId(package._id,package.packageId, i, 'view')"
+                                            *ngIf="package.status == 1">
+                                            <i class='fa fa-eye'></i>
+                                        </button>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </section>
-                <div *ngIf="!showPackage">
+                <div>
                     <div class="row">
                         <div class="col-md-6">
-                            <label class="block mb-2 font-bold text-gray-600">No.of Session</label>
+                            <label class="block mb-2 font-bold text-gray-600">No.of Session
+                                <span class="required">*</span>
+                            </label>
                             <input type="text" placeholder="Enter No.of Session"
                                 class="border border-gray-300 p-2 w-full rounded" formControlName="noOfSession"
                                 (change)="addSessionBasedOnSessionCount($event)">
@@ -194,10 +203,20 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <label for="days" class="block mb-2 font-bold text-gray-600">Select Days</label>
+                            <label for="days" class="block mb-2 font-bold text-gray-600">Select Days
+                                <span class="required">*</span>
+                            </label>
                             <ng-multiselect-dropdown class="w-full mt-3" formControlName="onWeekDay"
                                 [placeholder]="'Please Select Days'" [settings]="weekArr" [data]="weekData">
                             </ng-multiselect-dropdown>
+                            <div class="error-msg-area">
+                                <div *ngIf="clientForm.controls['onWeekDay'].errors && (!clientForm.controls['onWeekDay'].pristine|| isClientFormSubmitted)"
+                                    class="error-msg">
+                                    <div [hidden]="!clientForm.controls['onWeekDay'].errors.required">
+                                        Please Select Days
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="row">
@@ -214,14 +233,23 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="block mb-2 font-bold text-gray-600">Staff</label>
+                            <label class="block mb-2 font-bold text-gray-600">Staff<span
+                                    class="required">*</span></label>
                             <select class="border border-gray-300 p-2 w-full rounded" formControlName="staffId"
                                 (change)="getSlotbasedOnStaff($event)">
-                                <option value="" disabled>--select--</option>
+                                <option value="" disabled>--Select--</option>
                                 <option value="{{staff._id}}" *ngFor="let staff of staffList">
                                     {{staff.staffName}}
                                 </option>
                             </select>
+                            <div class="error-msg-area">
+                                <div *ngIf="clientForm.controls['staffId'].errors && (!clientForm.controls['staffId'].pristine
+                                    || isClientFormSubmitted)" class="error-msg">
+                                    <div [hidden]="!clientForm.controls['staffId'].errors.required">
+                                        Please Select Staff
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="row">
@@ -232,7 +260,7 @@
                                 <input type="text" class="form-control data-picker-color user-font"
                                     formControlName="startDate" bsDatepicker
                                     [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
-                                    (bsValueChange)="onDateChangeStart()" (input)="inputdobValidator($event)"
+                                    (bsValueChange)="onDateChangeStart($event)" (input)="inputdobValidator($event)"
                                     placeholder="DD-MM-YYYY">
                             </div>
                             <div class="error-msg-area">
@@ -249,7 +277,7 @@
                                     class="required">*</span></label>
                             <div class="input-group">
                                 <input type="text" class="form-control data-picker-color user-font"
-                                    formControlName="endDate" bsDatepicker
+                                    formControlName="endDate" bsDatepicker [minDate]="minDate"
                                     [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
                                     (input)="inputdobValidator($event)" maxlength="10" placeholder="DD-MM-YYYY">
                             </div>
@@ -265,16 +293,28 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            <label for="Branch" class="block mb-2 mt-3 font-bold text-gray-600">Service</label>
+                            <label for="Branch" class="block mb-2 mt-3 font-bold text-gray-600">Service
+                                <span class="required">*</span>
+                            </label>
                             <select class="border border-gray-300 p-2 w-full rounded" formControlName="serviceId">
                                 <option value="" disabled>--select--</option>
                                 <option value="{{service._id}}" *ngFor="let service of serviceList">
                                     {{service.serviceName}}
                                 </option>
                             </select>
+                            <div class="error-msg-area">
+                                <div *ngIf="clientForm.controls['serviceId'].errors && (!clientForm.controls['serviceId'].pristine|| isClientFormSubmitted)"
+                                    class="error-msg">
+                                    <div [hidden]="!clientForm.controls['serviceId'].errors.required">
+                                        Please Select Service
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label for="type" class="block mb-1 mt-3 font-bold text-gray-600">Type</label>
+                            <label for="type" class="block mb-1 mt-3 font-bold text-gray-600">Type
+                                <span class="required">*</span>
+                            </label>
                             <div class="btn-group btn-group-toggle p-3 pl-2">
                                 <label class="btn-primary">
                                     <input class="form-check-input" type="radio" formControlName="typeOfTreatment"
@@ -297,11 +337,21 @@
                                         id="exampleRadios1" [value]=4>Assessment
                                 </label>
                             </div>
+                            <div class="error-msg-area">
+                                <div *ngIf="clientForm.controls['typeOfTreatment'].errors && (!clientForm.controls['typeOfTreatment'].pristine|| isClientFormSubmitted)"
+                                    class="error-msg">
+                                    <div [hidden]="!clientForm.controls['typeOfTreatment'].errors.required">
+                                        Please Select Type Of Treatment
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            <label class="block mb-2 font-bold text-gray-600">Slots</label>
+                            <label class="block mb-2 font-bold text-gray-600">Slots
+                                <span class="required">*</span>
+                            </label>
                             <select class="border border-gray-300 p-2 w-full rounded" formControlName="slot"
                                 (change)="Slot($event)">
                                 <option value="" disabled>--select--</option>
@@ -309,9 +359,19 @@
                                     {{slot.slotName}}
                                 </option>
                             </select>
+                            <div class="error-msg-area">
+                                <div *ngIf="clientForm.controls['slot'].errors && (!clientForm.controls['slot'].pristine|| isClientFormSubmitted)"
+                                    class="error-msg">
+                                    <div [hidden]="!clientForm.controls['slot'].errors.required">
+                                        Please Select Slot
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label for="Branch" class="block mb-2 font-bold text-gray-600">Duration</label>
+                            <label for="Branch" class="block mb-2 font-bold text-gray-600">Duration
+                                <span class="required">*</span>
+                            </label>
                             <select class="border border-gray-300 p-2 w-full rounded" formControlName="duration"
                                 (change)="onChangeDuration()">
                                 <option value="" disabled>--select--</option>
@@ -319,6 +379,14 @@
                                     {{Duration.time}}
                                 </option>
                             </select>
+                            <div class="error-msg-area">
+                                <div *ngIf="clientForm.controls['duration'].errors && (!clientForm.controls['duration'].pristine || isClientFormSubmitted)"
+                                    class="error-msg">
+                                    <div [hidden]="!clientForm.controls['duration'].errors.required">
+                                        Please Select Duration
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="row">
@@ -407,267 +475,6 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <!-- <div class="row">
-                                        <div>
-                                            <label for="Branch" class="block mb-2 font-bold text-gray-600 ">Slots</label>
-                                            <select class="border border-gray-300 shadow p-2 w-full rounded"
-                                                formControlName="slot" (change)=" sessionSlot($event,i)">
-                                                <option value="" disabled>--select--</option>
-                                                <option value="{{service.slotName}}" *ngFor="let service of addRole">
-                                                    {{service.slotName}}
-                                                </option>
-                                            </select>
-                                        </div>
-                                    </div> -->
-                                    </div>
-                                </div>
-                            </ng-container>
-                        </ng-container>
-                    </div>
-                </div>
-                <div *ngIf="showEditPackage">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label class="block mb-2 font-bold text-gray-600">No.of Session</label>
-                            <input type="text" placeholder="Enter No.of Session"
-                                class="border border-gray-300 p-2 w-full rounded" formControlName="noOfSession"
-                                (change)="addSessionBasedOnSessionCount($event)">
-                            <div class="error-msg-area">
-                                <div *ngIf="clientForm.controls['noOfSession'].errors && (!clientForm.controls['noOfSession'].pristine|| isClientFormSubmitted)"
-                                    class="error-msg">
-                                    <div [hidden]="!clientForm.controls['noOfSession'].errors.required">Please Enter
-                                        No.of
-                                        Session
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="days" class="block mb-2 font-bold text-gray-600">Select Days</label>
-                            <ng-multiselect-dropdown class="w-full mt-3" formControlName="onWeekDay"
-                                [placeholder]="'Please Select Days'" [settings]="weekArr" [data]="weekData">
-                            </ng-multiselect-dropdown>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label class="block mb-2 font-bold text-gray-600">Amount</label>
-                            <input type="text" placeholder="Enter Amount"
-                                class="border border-gray-300 p-2 w-full rounded" formControlName="amount">
-                            <div class="error-msg-area">
-                                <div *ngIf="clientForm.controls['amount'].errors && (!clientForm.controls['amount'].pristine|| isClientFormSubmitted)"
-                                    class="error-msg">
-                                    <div [hidden]="!clientForm.controls['amount'].errors.required">Please Enter Amount
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="block mb-2 font-bold text-gray-600">Staff</label>
-                            <select class="border border-gray-300 p-2 w-full rounded" formControlName="staffId"
-                                (change)="getSlotbasedOnStaff($event)">
-                                <option value="" disabled>--select--</option>
-                                <option value="{{staff._id}}" *ngFor="let staff of staffList">
-                                    {{staff.staffName}}
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label class="block mb-2 font-bold text-gray-600">Start Date<span
-                                    class="required">*</span></label>
-                            <div class="input-group">
-                                <input type="text" class="form-control data-picker-color user-font"
-                                    formControlName="startDate" bsDatepicker
-                                    [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
-                                    (bsValueChange)="onDateChangeStart()" (input)="inputdobValidator($event)"
-                                    placeholder="DD-MM-YYYY">
-                            </div>
-                            <div class="error-msg-area">
-                                <div *ngIf="clientForm.controls['startDate'].errors && (!clientForm.controls['startDate'].pristine|| isClientFormSubmitted)"
-                                    class="error-msg">
-                                    <div [hidden]="!clientForm.controls['startDate'].errors.required">Please Select
-                                        Start Date
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="block mb-2 font-bold text-gray-600">End Date<span
-                                    class="required">*</span></label>
-                            <div class="input-group">
-                                <input type="text" class="form-control data-picker-color user-font"
-                                    formControlName="endDate" bsDatepicker
-                                    [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
-                                    (input)="inputdobValidator($event)" maxlength="10" placeholder="DD-MM-YYYY">
-                            </div>
-                            <div class="error-msg-area">
-                                <div *ngIf="clientForm.controls['endDate'].errors && (!clientForm.controls['endDate'].pristine|| isClientFormSubmitted)"
-                                    class="error-msg">
-                                    <div [hidden]="!clientForm.controls['endDate'].errors.required">Please Select End
-                                        Date
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label for="Branch" class="block mb-2 mt-3 font-bold text-gray-600">Service</label>
-                            <select class="border border-gray-300 p-2 w-full rounded" formControlName="serviceId">
-                                <option value="" disabled>--select--</option>
-                                <option value="{{service._id}}" *ngFor="let service of serviceList">
-                                    {{service.serviceName}}
-                                </option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="type" class="block mb-1 mt-3 font-bold text-gray-600">Type</label>
-                            <div class="btn-group btn-group-toggle p-3 pl-2">
-                                <label class="btn-primary">
-                                    <input class="form-check-input" type="radio" formControlName="typeOfTreatment"
-                                        id="exampleRadios1" [value]=0>Home
-                                </label>
-                                <label class="btn-primary ml-5">
-                                    <input class="form-check-input" type="radio" formControlName="typeOfTreatment"
-                                        id="exampleRadios1" [value]=1>OP
-                                </label>
-                                <label class="btn-primary ml-5">
-                                    <input class="form-check-input" type="radio" formControlName="typeOfTreatment"
-                                        id="exampleRadios1" [value]=2>Teletherapy
-                                </label>
-                                <label class="btn-primary ml-5">
-                                    <input class="form-check-input" type="radio" formControlName="typeOfTreatment"
-                                        id="exampleRadios1" [value]=3>IP
-                                </label>
-                                <label class="btn-primary ml-5">
-                                    <input class="form-check-input" type="radio" formControlName="typeOfTreatment"
-                                        id="exampleRadios1" [value]=4>Assessment
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label class="block mb-2 font-bold text-gray-600">Slots</label>
-                            <select class="border border-gray-300 p-2 w-full rounded" formControlName="slot"
-                                (change)="Slot($event)">
-                                <option value="" disabled>--select--</option>
-                                <option value="{{slot._id}}" *ngFor="let slot of slots">
-                                    {{slot.slotName}}
-                                </option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="Branch" class="block mb-2 font-bold text-gray-600">Duration</label>
-                            <select class="border border-gray-300 p-2 w-full rounded" formControlName="duration"
-                                (change)="onChangeDuration()">
-                                <option value="" disabled>--select--</option>
-                                <option value="{{Duration.id}}" *ngFor="let Duration of sessionDuration">
-                                    {{Duration.time}}
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <label class="block mb-2 mt-3 font-bold text-gray-600">Start Time</label>
-                                <input class="border border-gray-300 p-2 w-full rounded" type="text"
-                                    placeholder="Select Start Time" formControlName="startTime" [format]="24"
-                                    [ngxTimepicker]="startRange" [min]=startTime [max]=endTime>
-                                <ngx-material-timepicker #startRange (opened)="startpickerOpened = true;"
-                                    [minutesGap]="5" (timeSet)="calculateEndTime($event)" [defaultTime]="startTime">
-                                </ngx-material-timepicker>
-                            </div>
-                            <div class="error-msg-area">
-                                <div *ngIf="clientForm.controls['startTime'].errors && (!clientForm.controls['startTime'].pristine|| isClientFormSubmitted)"
-                                    class="error-msg">
-                                    <div [hidden]="!clientForm.controls['startTime'].errors.required">
-                                        Please Select Start Time
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <label class="block mb-2 mt-3 font-bold text-gray-600">End Time</label>
-                                <input class="border border-gray-300 p-2 w-full rounded disabled" type="text"
-                                    placeholder="End Time" formControlName="endTime">
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <button class="block float-right bg-teal-400 text-white font-bold p-2 mt-4 rounded-lg"
-                            (click)="addClient()">Add Session</button>
-                    </div>
-                    <div class="col-12 mt-5" *ngIf="showAddSession">
-                        <h1 class="font-bold text-teal-400 mb-2 mt-4" style="font-size: x-large;">Add Session</h1>
-                        <ng-container formArrayName="addSession"
-                            *ngFor="let room of clientForm.get('addSession')['controls']; let i= index;">
-                            <ng-container [formGroupName]="i">
-                                <div class="row">
-                                    <div class="col-7">
-                                        <div class="card mb-4">
-                                            <ng-container>
-                                                <div class="card py-0">
-                                                    <div class="card-header">
-                                                        <div class="text-center">{{sessionDate[i]}}</div>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <div class="row">
-                                                            <ng-container
-                                                                *ngFor="let session of addSessionData[i]?.slots; let j = index">
-                                                                <div class="col-md-4 sessionSlots card"
-                                                                    [ngClass]="(session.bookedStatus == 1) ? 'bg-gray-300' : 'pointer'"
-                                                                    (click)="(session.bookedStatus == 1) ? '' : slotSelection(session.slot, i, j)">
-                                                                    {{session.slot}}
-                                                                    <div class="badge_position">
-                                                                        <span class="badge bg-teal-400"
-                                                                            *ngIf="(i == slotIndexForI) && (j == slotIndexForJ)">Booked</span>
-                                                                    </div>
-                                                                </div>
-                                                            </ng-container>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </ng-container>
-                                        </div>
-                                    </div>
-                                    <div class="col-5">
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <div>
-                                                    <label class="block mb-2 font-bold text-gray-600">Slot Start
-                                                        Time</label>
-                                                    <input class="border border-gray-300 p-2 w-full rounded disabled"
-                                                        type="text" placeholder="Start Time"
-                                                        formControlName="slotStartTime">
-                                                </div>
-                                            </div>
-                                            <div class="col-6">
-                                                <div>
-                                                    <label class="block mb-2 font-bold text-gray-600">Slot End
-                                                        Time</label>
-                                                    <input class="border border-gray-300 p-2 w-full rounded disabled"
-                                                        type="text" placeholder="End Time"
-                                                        formControlName="slotEndTime">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!-- <div class="row">
-                                        <div>
-                                            <label for="Branch" class="block mb-2 font-bold text-gray-600 ">Slots</label>
-                                            <select class="border border-gray-300 shadow p-2 w-full rounded"
-                                                formControlName="slot" (change)=" sessionSlot($event,i)">
-                                                <option value="" disabled>--select--</option>
-                                                <option value="{{service.slotName}}" *ngFor="let service of addRole">
-                                                    {{service.slotName}}
-                                                </option>
-                                            </select>
-                                        </div>
-                                    </div> -->
                                     </div>
                                 </div>
                             </ng-container>
@@ -677,7 +484,7 @@
                 <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg"
                     *ngIf="!showAddEdit && showAddSession" (click)="saveClient()">Submit</button>
                 <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg mt-3"
-                    *ngIf="showAddEdit && showAddSession" (click)="updateClient()">Update</button>
+                    *ngIf="showAddEdit && showAddSession && !hideUpdateButton" (click)="updateClient()">Update</button>
             </form>
         </div>
     </section>

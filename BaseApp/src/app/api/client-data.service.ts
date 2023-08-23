@@ -49,9 +49,16 @@ export class ClientDataService {
         }), catchError(error => throwError(error)));
     }
 
-     //get Details By PackageId
-     public getDetailsByPackageId(data): Observable<any> {
-        return this.httpClient.post('client/getClientDetailsByPackageId',data).pipe(tap(res => {
+    //get Details By PackageId
+    public getDetailsByPackageId(data): Observable<any> {
+        return this.httpClient.post('client/getClientDetailsByPackageId', data).pipe(tap(res => {
+            return res;
+        }), catchError(error => throwError(error)));
+    }
+
+    // Get Assign Service Data By PackageId
+    public getAssignServiceByPackageId(data): Observable<any> {
+        return this.httpClient.post('client/getAssignServiceByPackageId', data).pipe(tap(res => {
             return res;
         }), catchError(error => throwError(error)));
     }

@@ -10,13 +10,8 @@ import { FlashMessageService } from "../../../shared/flash-message/flash-message
 import { AssignService } from 'src/app/services/assign.service';
 import { Subject, takeUntil } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { environment } from 'src/environments/environment';
-import * as Parse from 'parse';
-import { Observable } from 'rxjs';
-import { map, filter } from 'rxjs/operators'
 import { ServiceRequestService } from 'src/app/services/serviceRequest.service';
 import { RoleService } from 'src/app/services/role.service';
-
 
 @Component({
   selector: 'app-add-edit-assign-service',
@@ -64,9 +59,7 @@ export class AddEditAssignServiceComponent implements OnInit {
   }, {
     'id': 60,
     'time': "60 mins"
-  }
-
-  ]
+  }]
   public opTypes = [{
     'id': 0,
     'Name': 'Same Branch'
@@ -74,8 +67,7 @@ export class AddEditAssignServiceComponent implements OnInit {
   {
     'id': 1,
     'Name': 'Other Branch'
-  },
-  ]
+  }]
   public clientId: {
     enableCheckAll: boolean; singleSelection: boolean; idField: string; textField: string;
     allowSearchFilter: boolean;
@@ -85,7 +77,7 @@ export class AddEditAssignServiceComponent implements OnInit {
   public slotName: any = [];
   public serviceRequestId: any;
   public assignServiceId: any;
-  public assignServiceArray: any =[];
+  public assignServiceArray: any = [];
   public clientData: any;
   public clientList: any[];
   public addressLatitude: any;
@@ -110,10 +102,10 @@ export class AddEditAssignServiceComponent implements OnInit {
   public slotStartTime: any;
   public slotEndTime: any;
   public showAppointmentTable: boolean = false;
-  assignSercieDataArr: any;
-  duration: any;
-  slotId: any;
-  assignId: any;
+  public assignSercieDataArr: any;
+  public duration: any;
+  public slotId: any;
+  public assignId: any;
 
   constructor(private fb: FormBuilder, public StaffService: StaffService, public ClientService: ClientService, private route: ActivatedRoute, public ServiceService: ServiceService, public BranchService: BranchService, public AssignService: AssignService, public ServiceRequestService: ServiceRequestService, private FlashMessageService: FlashMessageService, private router: Router, private RoleService: RoleService) {
     this.route.params.subscribe((param) => {
@@ -144,9 +136,7 @@ export class AddEditAssignServiceComponent implements OnInit {
     if (this.serviceRequestId != undefined) {
       this.getServiceRequestById(this.serviceRequestId)
     }
-
   }
-
 
   //initialAssignServiceForm
   initializeassignServiceForm() {
@@ -175,8 +165,6 @@ export class AddEditAssignServiceComponent implements OnInit {
       slot: ['', [Validators.required]],
     });
   }
-
-
 
   //addEdit-Back Route
   addeditForm() {
@@ -211,7 +199,6 @@ export class AddEditAssignServiceComponent implements OnInit {
       month = '0' + month;
     if (day.length < 2)
       day = '0' + day;
-
     return [day, month, year].join('-');
   }
 
@@ -239,21 +226,21 @@ export class AddEditAssignServiceComponent implements OnInit {
     this.AssignService.getAssignServiceDataByStaffIdAndDate(data).subscribe(res => {
       if (res.status) {
         var assignServiceArray = res.data;
-        assignServiceArray.forEach(element =>{
+        assignServiceArray.forEach(element => {
           var datas = {
-            _id:element._id,
+            _id: element._id,
             clientName: element.clientName,
             phone: element.phone,
             address: element.address,
             staffName: element.staffName,
             startTime: element.startTime,
-            endTime:element.endTime,
-            status:element.status,
+            endTime: element.endTime,
+            status: element.status,
             date: this.formatDate(element.date),
             serviceName: element.serviceName
           }
           this.assignServiceArray.push(datas)
-        })   
+        })
       }
     })
   }
@@ -264,7 +251,6 @@ export class AddEditAssignServiceComponent implements OnInit {
     this.ClientService.getAllClients().subscribe(res => {
       if (res.status) {
         this.clientData = res.data;
-        console.log(this.clientData, "this.clientData")
         this.clientData.forEach(clientValue => {
           this.clientList.push({
             _id: clientValue._id,
@@ -320,7 +306,6 @@ export class AddEditAssignServiceComponent implements OnInit {
             _id: res.data._id,
             branchName: res.data.branchName
           });
-
         }
       })
     }
@@ -414,7 +399,6 @@ export class AddEditAssignServiceComponent implements OnInit {
         this.assignServiceClientForm.patchValue({
           branchAddress: branchAddress
         })
-
       }
     })
   }
@@ -545,7 +529,6 @@ export class AddEditAssignServiceComponent implements OnInit {
     this.isShowSlotTime = true
   }
 
-
   //slotSelection
   slotSelection(e, index) {
     this.slotTime = e
@@ -646,7 +629,6 @@ export class AddEditAssignServiceComponent implements OnInit {
           })
           this.Slot(this.assignSercieDataArr.slot)
         }
-
         if (this.assignSercieDataArr.duration != '') {
           var formattedDates = this.formattedDate(this.assignSercieDataArr.date)
           var data = {
@@ -694,7 +676,6 @@ export class AddEditAssignServiceComponent implements OnInit {
                 _id: res.data._id,
                 branchName: res.data.branchName
               });
-
             }
             this.assignServiceClientForm.patchValue({
               branchId: this.assignSercieDataArr.branchId
@@ -715,9 +696,7 @@ export class AddEditAssignServiceComponent implements OnInit {
           serviceId: this.assignSercieDataArr.serviceId,
           typeOfTreatment: this.assignSercieDataArr.typeOfTreatment,
           opType: this.assignSercieDataArr.opType,
-
         })
-
       }
     })
   }
@@ -743,7 +722,6 @@ export class AddEditAssignServiceComponent implements OnInit {
           })
           this.Slot(this.assignSercieDataArr.slot)
         }
-
         if (this.assignSercieDataArr.duration != '') {
           var formattedDates = this.formattedDate(this.assignSercieDataArr.date)
           var data = {
@@ -791,7 +769,6 @@ export class AddEditAssignServiceComponent implements OnInit {
                 _id: res.data._id,
                 branchName: res.data.branchName
               });
-
             }
             this.assignServiceClientForm.patchValue({
               branchId: this.assignSercieDataArr.branchId
@@ -812,16 +789,14 @@ export class AddEditAssignServiceComponent implements OnInit {
           serviceId: this.assignSercieDataArr.serviceId,
           typeOfTreatment: this.assignSercieDataArr.typeOfTreatment,
           opType: this.assignSercieDataArr.opType,
-
         })
-
       }
     })
   }
 
   //updateassignService
   updateassignService() {
-    var assignId = this.assignId
+    // var assignId = this.assignId
     if (this.assignServiceClientForm.value.typeOfTreatment != 1) {
       this.clearValidator('opType', this.assignServiceClientForm);
     }
@@ -856,7 +831,7 @@ export class AddEditAssignServiceComponent implements OnInit {
           startTime: this.slotStartTime,
           endTime: this.slotEndTime
         }
-        this.AssignService.updateAssignService(data, assignId).subscribe(res => {
+        this.AssignService.updateAssignService(data, this.assignServiceId).subscribe(res => {
           if (res.status) {
             if (this.serviceRequestId != undefined) {
               var data = {
@@ -883,7 +858,6 @@ export class AddEditAssignServiceComponent implements OnInit {
   getServiceRequestById(id) {
     this.ServiceRequestService.getServiceRequestById(id).subscribe(res => {
       if (res.status) {
-        console.log(res.data, "bbb")
         this.serviceData = res.data
         if (this.serviceData.status != 0) {
           this.showAddEdit = true
@@ -910,8 +884,6 @@ export class AddEditAssignServiceComponent implements OnInit {
           this.AssignService.getAssignServiceById(this.serviceData.assignServiceId).subscribe(res => {
             if (res.status) {
               this.assignSercieDataArr = res.data;
-              console.log(this.assignSercieDataArr, "assignSercieDataArr")
-
               if (this.assignSercieDataArr.branchType == 0) {
                 this.branchList = []
                 this.BranchService.getBranchbyId(this.assignSercieDataArr.branchId).subscribe(res => {
@@ -920,7 +892,6 @@ export class AddEditAssignServiceComponent implements OnInit {
                       _id: res.data._id,
                       branchName: res.data.branchName
                     });
-
                   }
                   this.assignServiceClientForm.patchValue({
                     branchId: this.assignSercieDataArr.branchId
@@ -947,7 +918,6 @@ export class AddEditAssignServiceComponent implements OnInit {
                 })
                 this.Slot(this.assignSercieDataArr.slot)
               }
-
               if (this.assignSercieDataArr.duration != '') {
                 var data = {
                   staffId: this.serviceData.staffId,
@@ -1008,6 +978,4 @@ export class AddEditAssignServiceComponent implements OnInit {
       }
     })
   }
-
-
 }
