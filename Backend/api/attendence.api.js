@@ -97,7 +97,9 @@ const getAttendenceofStaffByDateRange = async (data) => {
                 endTime: "$endTime",
                 inTime: "$inTime",
                 outTime: "$outTime",
-                date: "$date"
+                date: "$date",
+                inTimeArray: "$inTimeArray",
+                outTimeArray: "$outTimeArray"
             }
         },
         {
@@ -218,6 +220,26 @@ const getAttendenceofStaffByDateRange = async (data) => {
             // console.log("attendenceData[i].doc[j].date.toLocaleDateString().split('/')[2]",attendenceData[i].doc[j].date.toLocaleDateString())
             // var tempDate = attendenceData[i].doc[j].date.toLocaleDateString().split('/')[2] + "-" + attendenceData[i].doc[j].date.toLocaleDateString().split('/')[1] + "-" + attendenceData[i].doc[j].date.toLocaleDateString().split('/')[0]
             // attendenceData[i].doc[j].date=attendenceData[i].doc[j].date.toLocaleDateString();
+
+                // Calculate totalDuration
+        attendenceData[i].doc[j].totalDuration = 0;  // Initialize totalDuration
+        
+        for (var k = 0; k < attendenceData[i].doc[j].inTimeArray.length; k++) {
+            var startTime = attendenceData[i].doc[j].inTimeArray[k].split(':');
+            var endTime = attendenceData[i].doc[j].outTimeArray[k].split(':');
+            var startHr = parseInt(startTime[0], 10);
+            var startMin = parseInt(startTime[1], 10);
+            var endHr = parseInt(endTime[0], 10);
+            var endMin = parseInt(endTime[1], 10);
+            var duration = ((endHr - startHr) * 60) + (endMin - startMin);
+            attendenceData[i].doc[j].totalDuration += duration;
+        }
+
+        // Convert totalDuration to hours:minutes format
+        var totalDurationHours = Math.floor(attendenceData[i].doc[j].totalDuration / 60);
+        var totalDurationMinutes = attendenceData[i].doc[j].totalDuration % 60;
+        attendenceData[i].doc[j].totalDurationFormatted = totalDurationHours + ":" + totalDurationMinutes;
+               
         }
     }
     for (var i = 0; i < attendenceData.length; i++) {
