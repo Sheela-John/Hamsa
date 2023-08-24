@@ -432,7 +432,8 @@ async function createAdmin(adminData) {
                     let [err, adminSave] = await handle(saveModel.save())
                     if (err) cb(err, null);
                     else {
-                        adminSave.password = adminData.password;
+                        console.log("adminSave",adminSave)
+                        adminSave.password = adminData.empId;
                         adminSave.savepassword = adminData.password;
                         cb(null, adminSave);
                     }
@@ -447,7 +448,7 @@ async function createAdmin(adminData) {
                     staffDataModel['email'] = adminDatafromFunction.email;
                     staffDataModel['role'] = "PORTAL_ADMIN";
                     staffDataModel['staffRole'] = adminDatafromFunction.staffRole;
-                    staffDataModel['password'] = Security.hash(adminDatafromFunction.createdAt, adminDatafromFunction.password);
+                    staffDataModel['password'] = Security.hash(adminDatafromFunction.createdAt, adminDatafromFunction.empId);
                     staffDataModel['phone'] = adminDatafromFunction.phone;
                     staffDataModel['user'] = adminDatafromFunction._id;
                     staffDataModel['createdAt'] = adminDatafromFunction.createdAt;
