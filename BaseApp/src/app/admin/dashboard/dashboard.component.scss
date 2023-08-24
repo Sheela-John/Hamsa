@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: row;
     margin: 15px;
-    column-gap: 170px;
+    column-gap: 110px;
 }
 
 .progressBar-heading {
@@ -82,4 +82,12 @@
     background: #fff;
     color: #000;
     border-top: 3px solid rgb(45 212 191);
+}
+svg:not(:root) {
+    overflow: hidden;
+    height: 161px;
+}
+
+::ng-deep circle-progress {
+    height: 161px !important;
 }

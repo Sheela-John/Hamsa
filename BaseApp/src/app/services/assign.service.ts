@@ -66,4 +66,8 @@ export class AssignService {
     public updateAssignService(data,id){
         return this.AssignDataService.updateAssignService(data,id)
     }
+    //getDashboardData
+    public getDashboardData(data){
+        return this.AssignDataService.getDashboardData(data)
+    }
 }

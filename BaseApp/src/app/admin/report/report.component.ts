@@ -4,6 +4,7 @@ import { Subject } from 'rxjs';
 import { ReportService } from 'src/app/services/report.service';
 import { StaffService } from 'src/app/services/staff.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ngxCsv } from 'ngx-csv/ngx-csv';
 // $('select').selectpicker();
 // import {$} from 'jquery';
 
@@ -65,6 +66,7 @@ export class ReportComponent implements OnInit {
   dates: any;
   staffList1: any = [];
   staffLists: any = [];
+  finalData: any=[];
 
   constructor(private route: ActivatedRoute, private router: Router, private flashMessageService: FlashMessageService, private fb: FormBuilder, public staffService: StaffService, public reportService: ReportService) {
 
@@ -398,6 +400,7 @@ export class ReportComponent implements OnInit {
       console.log("ascftr", i);
       
       this.AllData.push({
+        date: this.dateArray[i],
         duration: "-",
         earlyBy: "-",
         endTime: "-",
@@ -410,8 +413,7 @@ export class ReportComponent implements OnInit {
         totalOT: "-",
         travelDistance: "-",
         travelDuration: "-",
-        _id: "-",
-        date: this.dateArray[i]
+        // _id: "-",        
       })
     }
     console.log("this.AllData:", this.AllData);
@@ -443,6 +445,7 @@ export class ReportComponent implements OnInit {
                   if (data == this.Reverse1formatDate(item.date)) {
                     console.log("hello")
                     this.AllData.splice(index, 1, {
+                      date: this.Reverse1formatDate(item.date),
                       duration: item.duration,
                       earlyBy: item.earlyBy,
                       endTime: item.endTime,
@@ -455,8 +458,8 @@ export class ReportComponent implements OnInit {
                       totalOT: item.totalOT,
                       travelDistance: item.travelDistance,
                       travelDuration: item.travelDuration,
-                      _id: item._id,
-                      date: this.Reverse1formatDate(item.date)
+                      // _id: item._id,
+                     
                     })
                     this.AllData2 = this.AllData.sort();
                     console.log(this.AllData, "All")
@@ -464,10 +467,11 @@ export class ReportComponent implements OnInit {
                 })
               })
             }
+            
             else {
               console.log("hrr")
             }
-            console.log(this.AllData, "data hours");
+            console.log(this.AllData, "data hours");this.finalData=this.AllData
           })
         }
       }
@@ -477,6 +481,21 @@ export class ReportComponent implements OnInit {
       }
     })
     // this.reportService.getAttendenace()
+  }
+
+  //Export
+  export() {
+    var options = {
+      fieldSeparator: ',',
+      quoteStrings: '"',
+      decimalseparator: '.',
+      showLabels: true,
+      showTitle: true,
+      title: 'Attendance Report',
+      useBom: true,
+      headers: ["Date","Travel Duration","EarlyBy","End Time","In Time","LateBy","Out Time","Staff Name","Start Time","TotalIOT","Travel Distance","Travel Duration"]
+    };
+    new ngxCsv(this.finalData, "Report", options);
   }
 
 

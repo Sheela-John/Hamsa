@@ -92,4 +92,10 @@ export class AssignDataService {
             return res;
         }), catchError(error => throwError(error)));
     }
+        //getDashboardData
+        public getDashboardData(data): Observable<any> {
+            return this.httpClient.post('assignService/getAssignServiceDataByStaffIdAndDateForDashBoard', data).pipe(tap(res => {
+                return res;
+            }), catchError(error => throwError(error)));
+        }
 }

@@ -19,7 +19,6 @@ import { DataTablesModule } from 'angular-datatables';
 import { AddEditBranchComponent } from './branch/add-edit-branch/add-edit-branch.component';
 import { GooglePlaceModule } from "ngx-google-places-autocomplete";
 import { AddEditAssignServiceComponent } from './assign-service/add-edit-assign-service/add-edit-assign-service.component';
-import { RoundProgressModule, ROUND_PROGRESS_DEFAULTS } from 'angular-svg-round-progressbar';
 import { ClientComponent } from './client/client.component';
 import { AddEditClientComponent } from './client/add-edit-client/add-edit-client.component';
 import { LeaveRequestComponent } from './leave-request/leave-request.component';
@@ -32,6 +31,8 @@ import { BsDatepickerModule, BsDatepickerConfig } from 'ngx-bootstrap/datepicker
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { TransportExpenseComponent } from './transport-expense/transport-expense.component'
 import { AddEditTransportExpenseComponent } from './transport-expense/add-edit-transport-expense/add-edit-transport-expense.component';
+import { NgCircleProgressModule } from 'ng-circle-progress';
+
 @NgModule({
     declarations: [
         DashboardComponent,
@@ -67,17 +68,18 @@ import { AddEditTransportExpenseComponent } from './transport-expense/add-edit-t
         FlashMessageModule,
         DataTablesModule,
         GooglePlaceModule,
-        RoundProgressModule,
         NgMultiSelectDropDownModule.forRoot(),
-        BsDatepickerModule.forRoot()
+        BsDatepickerModule.forRoot(),
+        NgCircleProgressModule.forRoot({
+            radius: 100,
+            outerStrokeWidth: 16,
+            innerStrokeWidth: 8,
+            outerStrokeColor: "#78C000",
+            innerStrokeColor: "#C7E596",
+            animationDuration: 300
+        })
     ],
-    providers: [{
-        provide: ROUND_PROGRESS_DEFAULTS,
-        useValue: {
-            color: '#f00',
-            background: '#0f0'
-        }
-    }]
+    providers: []
 })
 
 export class AdminModule { }

@@ -38,4 +38,10 @@ export class ReportDataService {
             return res;
         }), catchError(error => throwError(error)));
     }
+    //TravelExpense Report
+    public getTravelExpense(data): Observable<any> {
+        return this.httpClient.post('attendence/', data).pipe(tap(res => {
+            return res;
+        }), catchError(error => throwError(error)));
+    }
 }

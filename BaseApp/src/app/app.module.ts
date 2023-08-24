@@ -13,7 +13,6 @@ import { AppHttpInterceptor } from './util/httpInterceptor/app-http-interceptor'
 import { FlashMessageModule } from './shared/flash-message/flash-message.module';
 import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { RoundProgressModule } from 'angular-svg-round-progressbar';
 import { ToastrModule } from "ngx-toastr";
 const APP_CONTAINERS = [
   DefaultLayoutComponent,
@@ -37,7 +36,6 @@ const APP_CONTAINERS = [
     AdminModule,
     NgxMaterialTimepickerModule,
     BrowserAnimationsModule,
-    RoundProgressModule,
     ToastrModule.forRoot()
   ],
   providers:  [{

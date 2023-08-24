@@ -429,8 +429,12 @@
                                 </div>                                        
                             </tbody>
                         </table>
+                        <button type="button" (click)="export()" class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg"  *ngIf="finalData.length!=0" >Export</button>
                     </div>
+                    <!-- <button type="button" (click)="export()" style="width:5rem;margin-left: 70vw;"
+                class="btn btn-primary mr-3 mt-3 on"  *ngIf="finalData.length!=0" >Export</button> -->
                 </section>
+                
             </div>
         </div>
     </div>
