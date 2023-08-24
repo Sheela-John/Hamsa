@@ -809,6 +809,7 @@ export class AddEditAssignServiceComponent implements OnInit {
     if (this.assignServiceForm.valid) {
       if (this.assignServiceClientForm.valid) {
         var formattedDates = this.formattedDate(this.assignServiceForm.value.date)
+        console.log(formattedDates,this.assignServiceForm.value.date,"formattedDates")
         var data = {
           staffId: this.assignServiceForm.value.staffId,
           date: formattedDates,

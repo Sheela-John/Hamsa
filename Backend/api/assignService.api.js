@@ -1281,8 +1281,11 @@ const updateAssignService = async function (datatoupdate) {
     for (var l = 0; l < travelCountData.length; l++) {
         if (travelCountData[l].assignServiceId == assignService) {
             let [Err, assignServiceData] = await handle(AssignService.findOne({ '_id': travelCountData[l].assignServiceId }).lean());
+            
             console.log("assignServiceData", assignServiceData)
             if (travelCountData[l].count == 1) {
+                if(assignServiceData.slatitude && assignServiceData.slongitude)
+                {
                 let [err, branchData] = await handle(Branch.findOne({ "_id": assignServiceData.branchId }))
                 console.log("branchData", branchData)
                 var temp = {
@@ -1294,8 +1297,10 @@ const updateAssignService = async function (datatoupdate) {
                 console.log(temp)
                 var [err3, val1] = await handle(travelDistance(temp));
             }
+            }
             else {
-
+                if(assignServiceData1.elatitude && assignServiceData1.elongitude && assignServiceData.slatitude && assignServiceData.slongitude)
+                {
                 let [Err, assignServiceData1] = await handle(AssignService.findOne({ '_id': travelCountData[l - 1].assignServiceId }).lean());
                 var temp = {
                     "latitude": assignServiceData1.elatitude,
@@ -1307,10 +1312,16 @@ const updateAssignService = async function (datatoupdate) {
                 var [err3, val1] = await handle(travelDistance(temp));
                 console.log("val1", val1)
             }
+            }
             break;
         }
     }
-
+    if (val1) {
+        datatoupdate.travelDistanceinKM = (val1.distance) / 1000;
+        datatoupdate.travelDurationinMinutes = val1.duration;
+    }
+if(assign.latitude && assign.longitude && assign.slatitude &&assign.slongitude &&assign.elatitude &&  assign.elongitude  )
+{
     var temp = {
         "latitude": assign.latitude,
         "longitude": assign.longitude,
@@ -1328,16 +1339,13 @@ const updateAssignService = async function (datatoupdate) {
     }
     var [err3, endDistance] = await handle(travelDistance(temp));
     console.log("Distance2", endDistance)
-    if (val1) {
-        datatoupdate.travelDistanceinKM = (val1.distance) / 1000;
-        datatoupdate.travelDurationinMinutes = val1.duration;
-    }
+    
     datatoupdate.startDistance = startDistance.distance;
     datatoupdate.endDistance = endDistance.distance;
-    if (datatoupdate.transport) {
-        let [Err4, travelAllowance] = await handle(TravelAllowance.findOne({ '_id': datatoupdate.transport }).lean());
+}
+    if (assign.transport) {
+        let [Err4, travelAllowance] = await handle(TravelAllowance.findOne({ '_id': assign.transport }).lean());
         console.log("travelAllowance", travelAllowance.newPerKmCost, datatoupdate.travelDistanceinKM * travelAllowance.newPerKmCost);
-
         datatoupdate.travelAmount = datatoupdate.travelDistanceinKM * travelAllowance.newPerKmCost;
     }
     let [Err4, Distance] = await handle(Settings.find({}).lean());
