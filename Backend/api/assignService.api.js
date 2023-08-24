@@ -383,20 +383,23 @@ async function getAllAssignedServices() {
 async function getAllAssignedServicesforpast30days() {
     log.debug(component, 'Get All Assign Service for past 30 days');
     log.close();
-    console.log("getAllAssignedServicesforpast30days")
     var todate = new Date();
     var fromDate = new Date(new Date().setDate(todate.getDate() - 30));
-    console.log("todate", todate);
-    console.log("fromDate", fromDate);
     let [Err, assignServiceData] = await handle(AssignService.find({}).lean());
     var assignServiceData1 = [];
-    console.log("assignServiceData.length", assignServiceData.length)
     for (var i = 0; i < assignServiceData.length; i++) {
         if (new Date(assignServiceData[i].date) >= fromDate && new Date(assignServiceData[i].date) <= todate) {
             assignServiceData1.push(assignServiceData[i])
         }
     }
-    console.log(" assignServiceData1", assignServiceData1)
+    for (var i = 0; i < assignServiceData1.length; i++) {
+        let [err, clientData] = await handle(Client.findOne({ '_id': assignServiceData1[i].clientId }).lean());
+        let [err1, staffData] = await handle(Staff.findOne({ '_id': assignServiceData1[i].staffId }).lean());
+        let [err2, serviceData] = await handle(Service.findOne({ '_id': assignServiceData1[i].serviceId }).lean());
+        assignServiceData1[i].clientName = clientData.clientName;
+        assignServiceData1[i].staffName = staffData.staffName;
+        assignServiceData1[i].serviceName = serviceData.serviceName;
+    }
     if (lodash.isEmpty(assignServiceData1)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(assignServiceData1);
 }
@@ -405,109 +408,192 @@ async function getAllAssignedServicesforpast30days() {
 async function getAllAssignedServicesbyclientstaff(data) {
     log.debug(component, 'Get All Assign Service by client and staff');
     log.close();
-    console.log("getAllAssignedServicesbyclientaandstaff")
     if (data.fromDate && !data.todate) {
-        console.log("get 1")
         var todate = new Date(data.fromDate);
         data.fromDate = new Date(data.fromDate);
-        console.log(data.fromDate, "data.fromDate")
-        console.log(todate, "data.todate")
     }
     if (data.clientId && !data.staffId && !data.fromDate && !data.todate) {
-        console.log("get 2")
         let [err, clientData] = await handle(AssignService.find({ "clientId": data.clientId }).lean());
+        for(var i = 0; i < clientData.length; i++){
+        let [error, clientData1] = await handle(Client.findOne({ '_id': clientData[i].clientId }).lean());
+        let [err1, staffData] = await handle(Staff.findOne({ '_id': clientData[i].staffId }).lean());
+        let [err2, serviceData] = await handle(Service.findOne({ '_id': clientData[i].serviceId }).lean());
+        clientData[i].clientName = clientData1.clientName;
+        clientData[i].staffName = staffData.staffName;
+        clientData[i].serviceName = serviceData.serviceName;
+        }
+        if (lodash.isEmpty(clientData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
         return Promise.resolve(clientData);
     }
+
     if (data.staffId && !data.clientId && !data.fromDate && !data.todate) {
-        console.log("get 3")
         let [err1, staffData] = await handle(AssignService.find({ "staffId": data.staffId }).lean());
+        for (var i = 0; i < staffData.length; i++) {
+            let [error, clientData] = await handle(Client.findOne({ '_id': staffData[i].clientId }).lean());
+            let [err, staffDetail] = await handle(Staff.findOne({ '_id': staffData[i].staffId }).lean());
+            let [err2, serviceData] = await handle(Service.findOne({ '_id': staffData[i].serviceId }).lean());
+            staffData[i].clientName = clientData.clientName;
+            staffData[i].staffName = staffDetail.staffName;
+            staffData[i].serviceName = serviceData.serviceName;
+        }
+        if (lodash.isEmpty(staffData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
         return Promise.resolve(staffData);
     }
     if (data.clientId && data.staffId && !data.fromDate && !data.todate) {
-        console.log("get 4")
         let [err, clientstaffData] = await handle(AssignService.find({ "clientId": data.clientId, "staffId": data.staffId }).lean());
+        for (var i = 0; i < clientstaffData.length; i++) {
+        let [err1, staffData1] = await handle(Staff.findOne({ '_id': clientstaffData[i].staffId }).lean());
+        let [err2, serviceData] = await handle(Service.findOne({ '_id': clientstaffData[i].serviceId }).lean());
+        let [error, clientData1] = await handle(Client.findOne({ '_id': clientstaffData[i].clientId }).lean());
+        clientstaffData[i].staffName = staffData1.staffName;
+        clientstaffData[i].clientName = clientData1.clientName;
+        clientstaffData[i].serviceName = serviceData.serviceName;
+        }
+        if (lodash.isEmpty(clientstaffData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
         return Promise.resolve(clientstaffData);
     }
     if (data.fromDate && data.todate && !data.staffId && !data.clientId) {
-        console.log("get 5")
         let [Err, assignServiceData] = await handle(AssignService.find({}).lean());
         var assignServiceData1 = [];
-        console.log("assignServiceData", assignServiceData)
         for (var i = 0; i < assignServiceData.length; i++) {
             if (new Date(assignServiceData[i].date) >= new Date(data.fromDate) && new Date(assignServiceData[i].date) <= new Date(data.todate)) {
                 assignServiceData1.push(assignServiceData[i])
             }
         }
-        console.log("assignServiceData1", assignServiceData1)
+        for (var i = 0; i < assignServiceData1.length; i++) {
+            let [err, clientData] = await handle(Client.findOne({ '_id': assignServiceData1[i].clientId }).lean());
+            let [err1, staffData] = await handle(Staff.findOne({ '_id': assignServiceData1[i].staffId }).lean());
+            let [err2, serviceData] = await handle(Service.findOne({ '_id': assignServiceData1[i].serviceId }).lean());
+            assignServiceData1[i].clientName = clientData.clientName;
+            assignServiceData1[i].staffName = staffData.staffName;
+            assignServiceData1[i].serviceName = serviceData.serviceName;
+        }
         if (lodash.isEmpty(assignServiceData1)) return Promise.reject(ERR.NO_RECORDS_FOUND);
         return Promise.resolve(assignServiceData1);
     }
     if (data.fromDate && !data.todate && !data.staffId && !data.clientId) {
-        console.log("get 6")
-        console.log("from")
         let [Err, assignServiceData] = await handle(AssignService.find({}).lean());
         var assignServiceData1 = [];
         for (var i = 0; i < assignServiceData.length; i++) {
             if (new Date(assignServiceData[i].date) >= new Date(data.fromDate) && new Date(assignServiceData[i].date) <= todate) {
                 assignServiceData1.push(assignServiceData[i])
             }
-            console.log("assignServiceData1", assignServiceData1)
+        }
+        for (var i = 0; i < assignServiceData1.length; i++) {
+            let [err, clientData] = await handle(Client.findOne({ '_id': assignServiceData1[i].clientId }).lean());
+            let [err1, staffData] = await handle(Staff.findOne({ '_id': assignServiceData1[i].staffId }).lean());
+            let [err2, serviceData] = await handle(Service.findOne({ '_id': assignServiceData1[i].serviceId }).lean());
+            assignServiceData1[i].clientName = clientData.clientName;
+            assignServiceData1[i].staffName = staffData.staffName;
+            assignServiceData1[i].serviceName = serviceData.serviceName;
         }
         if (lodash.isEmpty(assignServiceData1)) return Promise.reject(ERR.NO_RECORDS_FOUND);
         return Promise.resolve(assignServiceData1);
     }
     if (data.fromDate && !data.todate && data.staffId && data.clientId) {
-        console.log("get 6.1")
         let [Err, assignServiceData] = await handle(AssignService.find({}).lean());
         var assignServiceData1 = [];
         for (var i = 0; i < assignServiceData.length; i++) {
             if (new Date(assignServiceData[i].date) >= new Date(data.fromDate) && new Date(assignServiceData[i].date) <= todate && assignServiceData[i].staffId == data.staffId &&
-            assignServiceData[i].clientId == data.clientId) {
+                assignServiceData[i].clientId == data.clientId) {
                 assignServiceData1.push(assignServiceData[i])
             }
-            console.log("assignServiceData1", assignServiceData1)
+        }
+        for (var i = 0; i < assignServiceData1.length; i++) {
+            let [err, clientData] = await handle(Client.findOne({ '_id': assignServiceData1[i].clientId }).lean());
+            let [err1, staffData] = await handle(Staff.findOne({ '_id': assignServiceData1[i].staffId }).lean());
+            let [err2, serviceData] = await handle(Service.findOne({ '_id': assignServiceData1[i].serviceId }).lean());
+            assignServiceData1[i].clientName = clientData.clientName;
+            assignServiceData1[i].staffName = staffData.staffName;
+            assignServiceData1[i].serviceName = serviceData.serviceName;
+        }
+        if (lodash.isEmpty(assignServiceData1)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+        return Promise.resolve(assignServiceData1);
+    }
+    if (data.fromDate && !data.todate && !data.staffId && data.clientId) {
+        let [Err, assignServiceData] = await handle(AssignService.find({}).lean());
+        var assignServiceData1 = [];
+        for (var i = 0; i < assignServiceData.length; i++) {
+            if (new Date(assignServiceData[i].date) >= new Date(data.fromDate) && new Date(assignServiceData[i].date) <= todate && assignServiceData[i].staffId == data.staffId &&
+                assignServiceData[i].clientId == data.clientId) {
+                assignServiceData1.push(assignServiceData[i])
+            }
+        }
+        for (var i = 0; i < assignServiceData1.length; i++) {
+            let [err, clientData] = await handle(Client.findOne({ '_id': assignServiceData1[i].clientId }).lean());
+            let [err1, staffData] = await handle(Staff.findOne({ '_id': assignServiceData1[i].staffId }).lean());
+            let [err2, serviceData] = await handle(Service.findOne({ '_id': assignServiceData1[i].serviceId }).lean());
+            assignServiceData1[i].clientName = clientData.clientName;
+            assignServiceData1[i].staffName = staffData.staffName;
+            assignServiceData1[i].serviceName = serviceData.serviceName;
+        }
+        if (lodash.isEmpty(assignServiceData1)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+        return Promise.resolve(assignServiceData1);
+    }
+    if (data.fromDate && !data.todate && data.staffId && !data.clientId) {
+        let [Err, assignServiceData] = await handle(AssignService.find({}).lean());
+        var assignServiceData1 = [];
+        for (var i = 0; i < assignServiceData.length; i++) {
+            if (new Date(assignServiceData[i].date) >= new Date(data.fromDate) && new Date(assignServiceData[i].date) <= todate && assignServiceData[i].staffId == data.staffId) {
+                assignServiceData1.push(assignServiceData[i])
+            }
+        }
+        for (var i = 0; i < assignServiceData1.length; i++) {
+            let [err, clientData] = await handle(Client.findOne({ '_id': assignServiceData1[i].clientId }).lean());
+            let [err1, staffData] = await handle(Staff.findOne({ '_id': assignServiceData1[i].staffId }).lean());
+            let [err2, serviceData] = await handle(Service.findOne({ '_id': assignServiceData1[i].serviceId }).lean());
+            assignServiceData1[i].clientName = clientData.clientName;
+            assignServiceData1[i].staffName = staffData.staffName;
+            assignServiceData1[i].serviceName = serviceData.serviceName;
         }
         if (lodash.isEmpty(assignServiceData1)) return Promise.reject(ERR.NO_RECORDS_FOUND);
         return Promise.resolve(assignServiceData1);
     }
     if (data.clientId && data.staffId && data.fromDate && data.todate) {
-        console.log("get 7")
         let [Err, assignServiceData] = await handle(AssignService.find({}).lean());
         var assignServiceData1 = [];
         for (var i = 0; i < assignServiceData.length; i++) {
-            console.log("assignServiceData[i].staffId", assignServiceData[i].staffId)
-            console.log("assignServiceData[i].clientId", assignServiceData[i].clientId)
-            console.log("assignServiceData[i].date", new Date(assignServiceData[i].date))
             if ((new Date(assignServiceData[i].date) >= new Date(data.fromDate) &&
                 new Date(assignServiceData[i].date) <= new Date(data.todate)) &&
                 assignServiceData[i].staffId == data.staffId &&
                 assignServiceData[i].clientId == data.clientId) {
-                    
+
                 assignServiceData1.push(assignServiceData[i])
             }
-            else {
-                console.log("else if", data.staffId, data.clientId, data.fromDate, data.todate)
-            }
-        } console.log("assignServiceData1", assignServiceData1)
+        }
+        for (var i = 0; i < assignServiceData1.length; i++) {
+            let [err, clientData] = await handle(Client.findOne({ '_id': assignServiceData1[i].clientId }).lean());
+            let [err1, staffData] = await handle(Staff.findOne({ '_id': assignServiceData1[i].staffId }).lean());
+            let [err2, serviceData] = await handle(Service.findOne({ '_id': assignServiceData1[i].serviceId }).lean());
+            assignServiceData1[i].clientName = clientData.clientName;
+            assignServiceData1[i].staffName = staffData.staffName;
+            assignServiceData1[i].serviceName = serviceData.serviceName;
+        }
         if (lodash.isEmpty(assignServiceData1)) return Promise.reject(ERR.NO_RECORDS_FOUND);
         return Promise.resolve(assignServiceData1);
     }
     if (data.clientId && data.fromDate && data.todate && !data.staffId) {
-        console.log("get 8")
         let [Err, assignServiceData] = await handle(AssignService.find({}).lean());
         var assignServiceData1 = [];
         for (var i = 0; i < assignServiceData.length; i++) {
             if ((new Date(assignServiceData[i].date) >= new Date(data.fromDate) &&
-                new Date(assignServiceData[i].date) <= new Date(data.todate))&&
+                new Date(assignServiceData[i].date) <= new Date(data.todate)) &&
                 assignServiceData[i].clientId == data.clientId) {
                 assignServiceData1.push(assignServiceData[i])
             }
-        } console.log("assignServiceData1", assignServiceData1)
-        if (lodash.isEmpty(assignServiceData1)) return Promise.reject(ERR.NO_RECORDS_FOUND);
-        return Promise.resolve(assignServiceData1);
+            for (var i = 0; i < assignServiceData1.length; i++) {
+                let [err, clientData] = await handle(Client.findOne({ '_id': assignServiceData1[i].clientId }).lean());
+                let [err1, staffData] = await handle(Staff.findOne({ '_id': assignServiceData1[i].staffId }).lean());
+                let [err2, serviceData] = await handle(Service.findOne({ '_id': assignServiceData1[i].serviceId }).lean());
+                assignServiceData1[i].clientName = clientData.clientName;
+                assignServiceData1[i].staffName = staffData.staffName;
+                assignServiceData1[i].serviceName = serviceData.serviceName;
+            }
+            if (lodash.isEmpty(assignServiceData1)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+            return Promise.resolve(assignServiceData1);
+        }
     }
     if (data.staffId && data.fromDate && data.todate && !data.clientId) {
-        console.log("get 9")
         let [Err, assignServiceData] = await handle(AssignService.find({}).lean());
         var assignServiceData1 = [];
         for (var i = 0; i < assignServiceData.length; i++) {
@@ -516,7 +602,15 @@ async function getAllAssignedServicesbyclientstaff(data) {
                 assignServiceData[i].staffId == data.staffId) {
                 assignServiceData1.push(assignServiceData[i])
             }
-        } console.log("assignServiceData1", assignServiceData1)
+        }
+        for (var i = 0; i < assignServiceData1.length; i++) {
+            let [err, clientData] = await handle(Client.findOne({ '_id': assignServiceData1[i].clientId }).lean());
+            let [err1, staffData] = await handle(Staff.findOne({ '_id': assignServiceData1[i].staffId }).lean());
+            let [err2, serviceData] = await handle(Service.findOne({ '_id': assignServiceData1[i].serviceId }).lean());
+            assignServiceData1[i].clientName = clientData.clientName;
+            assignServiceData1[i].staffName = staffData.staffName;
+            assignServiceData1[i].serviceName = serviceData.serviceName;
+        }
         if (lodash.isEmpty(assignServiceData1)) return Promise.reject(ERR.NO_RECORDS_FOUND);
         return Promise.resolve(assignServiceData1);
     }
@@ -1232,7 +1326,7 @@ async function getAssignServiceDataByStaffIdAndDateForDashBoard(data) {
         }
     }
     var totalCount, assigned = 0, completed = 0, rescheduled = 0, notAvailable = 0;
-    var op=0,ip=0,teletherapy=0,home=0;
+    var op = 0, ip = 0, teletherapy = 0, home = 0;
     if (assignServiceData1.length != 0) {
         for (var i = 0; i < assignServiceData1.length; i++) {
             if (assignServiceData1[i].status == 0) {
@@ -1277,36 +1371,35 @@ async function getAssignServiceDataByStaffIdAndDateForDashBoard(data) {
     console.log("value", value);
     var newValue = [];
     for (var i = 0; i < value.length; i++) {
-        console.log((value[i]._id.toString()),"dddddddd",data.staffId)
+        console.log((value[i]._id.toString()), "dddddddd", data.staffId)
         if ((value[i]._id.toString()) == data.staffId) {
-            newValue=(value[i].doc)
+            newValue = (value[i].doc)
         }
     }
-   
-    var total=0,productiveDuration=0;
-    var value=0;
-    for(var i=0;i<newValue.length;i++)
-    {
-        console.log(typeof(newValue[i].travelDuration))
-        var hour=Number(newValue[i].duration.split(':')[0])
-        var minutes=Number(newValue[i].duration.split(':')[1])
-        total=((hour*60)+minutes)+total;
-        console.log("total-newValue[i].travelDuration",total-newValue[i].travelDuration)
-       value=(newValue[i].travelDuration)+value
+
+    var total = 0, productiveDuration = 0;
+    var value = 0;
+    for (var i = 0; i < newValue.length; i++) {
+        console.log(typeof (newValue[i].travelDuration))
+        var hour = Number(newValue[i].duration.split(':')[0])
+        var minutes = Number(newValue[i].duration.split(':')[1])
+        total = ((hour * 60) + minutes) + total;
+        console.log("total-newValue[i].travelDuration", total - newValue[i].travelDuration)
+        value = (newValue[i].travelDuration) + value
     }
     console.log("temp", total)
-    console.log("productiveDuration",total-value)
+    console.log("productiveDuration", total - value)
     var output = {
         "Assigned": (assigned / totalCount) * 100,
         "Completed": (completed / totalCount) * 100,
         "Rescheduled": (rescheduled / totalCount) * 100,
-        "TotalTimeTracked":Math.floor(total / 60).toString()+":"+(total%60).toString(),
-        "ProductiveTime":Math.floor((total-value) / 60).toString()+":"+(((total-value) % 60).toString()).split('.')[0],
-        "TotalCount":totalCount,
-        "Home":home,
-        "OP":op,
-        "TeleTherapy":teletherapy,
-        "IP":ip
+        "TotalTimeTracked": Math.floor(total / 60).toString() + ":" + (total % 60).toString(),
+        "ProductiveTime": Math.floor((total - value) / 60).toString() + ":" + (((total - value) % 60).toString()).split('.')[0],
+        "TotalCount": totalCount,
+        "Home": home,
+        "OP": op,
+        "TeleTherapy": teletherapy,
+        "IP": ip
     }
 
     if (Err) return Promise.reject(Err);
@@ -1623,6 +1716,7 @@ const travelDistance = async (data) => {
         });
     });
 }
+
 async function getRoleDetailsByStaffIdAndSlotId(data) {
     let [staffErr, staffData] = await handle(Staff.findOne({ '_id': data.staffId }).lean());
     let [err2, roleData] = await handle(Role.findOne({ _id: staffData.staffRole, "slots": { "$elemMatch": { "_id": (data.slotId) } } }).lean());
@@ -1664,6 +1758,7 @@ async function assignServiceForClientByPhone(data) {
     if (lodash.isEmpty(assignServiceData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(assignServiceData);
 }
+
 module.exports = {
     assignServiceClient: assignServiceClient,
     assignServiceBranch: assignServiceBranch,
@@ -1688,7 +1783,7 @@ module.exports = {
     travelDistance: travelDistance,
     getRoleDetailsByStaffIdAndSlotId: getRoleDetailsByStaffIdAndSlotId,
     assignServiceForClientByPhone: assignServiceForClientByPhone,
-    getAssignServiceDataByStaffIdAndDateForDashBoard:getAssignServiceDataByStaffIdAndDateForDashBoard,
+    getAssignServiceDataByStaffIdAndDateForDashBoard: getAssignServiceDataByStaffIdAndDateForDashBoard,
     getAllAssignedServicesforpast30days: getAllAssignedServicesforpast30days,
     getAllAssignedServicesbyclientstaff: getAllAssignedServicesbyclientstaff
 }
