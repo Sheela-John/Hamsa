@@ -15,7 +15,7 @@ const assignServiceSchema = new mongoose.Schema({
     phone: { type: String },
     date: { type: String },
     branchType: { type: Number }, //0- homebranch 1- branch
-    status: { type: Number, default: 0 },//0-upcoming   1-completed 2 - reschedule
+    status: { type: Number, default: 0 },//0-upcoming   1-completed 2 - reschedule  3-Distance Mismatch
     opType: { type: Number }, //0-same branch 1-other branch
     duration: { type: String },
     address: { type: String },
@@ -30,7 +30,7 @@ const assignServiceSchema = new mongoose.Schema({
     elongitude: { type: Number },
     bookedCount: { type: Number, default: 1 },
     travelDistanceinKM: { type: Number },
-    travelDuration: { type: String },
+    travelDurationinMinutes: { type: Number },
     rating: { type: Number, default: 0 },
     feedBack: { type: String },
     paymentRefNum: { type: String },
@@ -54,6 +54,18 @@ const assignServiceSchema = new mongoose.Schema({
         type: Number
     },
     travelCount:{
+        type:Number,
+        default:0
+    },
+    travelAmount:{
+        type:Number,
+        default:0
+    },
+    startDistance:{
+        type:Number,
+        default:0
+    },
+    endDistance:{
         type:Number,
         default:0
     }

@@ -258,10 +258,10 @@
         "code": 161,
         "message": "Number of Days shoud not be greater than 31 days"
     },
-    "NO_OF_SESSION_GREATER_THAN_NO_OF_SLOTS":
+    "ALREADY_HAVE_COMPLETED_SERVICE":
     {
         "code": 162,
-        "message": "Please update your package duration"
+        "message": "Already have a completed service"
     },
     "ROLE_EXISTS":
     {

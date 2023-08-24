@@ -9,7 +9,7 @@ const settingsSchema = new mongoose.Schema({
     // endDate: { type: Date },
     // status: { type: Number, default: 0 }, /* 0 - Active ,  1 - Deleted , 2 - Disabled */
     averageDistance:{
-        type:String
+        type:Number
     },
     
 

@@ -23,4 +23,5 @@ db.RolePosition = require('./rolePosition');
 db.BranchTransfer = require('./branchTransfer');
 db.QRcodeImage = require('./QRcodeImage')
 db.TravelCount=require('./travelCount')
+db.AssignServiceInvoice=require('./assignServiceInvoice');
 module.exports = db;

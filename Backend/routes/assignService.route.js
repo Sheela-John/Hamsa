@@ -167,7 +167,12 @@ router.put('/updateClient/:id', async (req, res, next) => {
     if (err) return next(err);
     else return res.status(200).json({ status: true, data: updateData });
 })
-
+router.put('/updateAssignServiceForTravel/:id', async (req, res, next) => {
+    req.body.assignServiceId = req.params.id;
+    let [err, updateData] = await handle(AssignServiceAPI.updateAssignServiceForTravel(req.body));
+    if (err) return next(err);
+    else return res.status(200).json({ status: true, data: updateData });
+})
 /* Update Branch Service */
 router.put('/updateAssignService/:id', async (req, res, next) => {
     req.body.assignServiceId = req.params.id;
@@ -176,6 +181,7 @@ router.put('/updateAssignService/:id', async (req, res, next) => {
     else return res.status(200).json({ status: true, data: updateData });
 })
 router.post('/getAssignServiceDataByStaffIdAndDate', async (req, res, next) => {
+  
     let [err, assignServiceDataData] = await handle(AssignServiceAPI.getAssignServiceDataByStaffIdAndDate(req.body));
     if (err) return next(err);
     else return res.status(200).json({ status: true, data: assignServiceDataData });
@@ -201,5 +207,28 @@ router.post('/assignServiceForClientByPhone', async (req, res, next) => {
     if (err) return next(err);
     else return res.status(200).json({ status: true, data: assignServiceData });
 })
-
+router.post('/uploadAutoInvoice',async (req, res, next) => {
+    log.debug(COMPONENT, 'uploading AutoInvoice'); log.close();
+    AssignServiceAPI.uploadAutoInvoice(req, res, function (err, data) {
+        if (!err) return res.json({ "status": true, "data": data });
+        else {
+            return next(err);
+        }
+    });
+})
+.post('/aws/getAssignServiceInvoicePresignedUrl', async (req, res, next) => {
+   
+    log.debug(COMPONENT, 'getAssignServiceInvoicePresignedUrl'); log.close();
+    let [err, videoData] = await handle(AssignServiceAPI.getAssignServiceInvoicePresignedUrl(req.body));
+    if (err) {
+        log.error(COMPONENT, 'getAssignServiceInvoicePresignedUrl', { attach: err });
+        log.close();
+        return res.json({ status: false, err: Object.assign(ERR.UNKNOWN, { message: err.message }) });
+    }
+    else {
+        log.debug(COMPONENT, 'getAssignServiceInvoicePresignedUrl');
+        log.close();
+        return res.json({ status: true, data: videoData });
+    }
+})
 module.exports = router;
