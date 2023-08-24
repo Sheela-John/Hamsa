@@ -52,7 +52,7 @@ router.get('/allAssignedServicesforpast30days', async (req, res, next) => {
 })
 
 // get All AssignedServices by client and staff
-router.get('/allAssignedServicesbyclientandstaff', async (req, res, next) => {
+router.post('/allAssignedServicesbyclientandstaff', async (req, res, next) => {
     let [err, assignServiceData] = await handle(AssignServiceAPI.getAllAssignedServicesbyclientstaff(req.body));
     if (err) return next(err);
     else return res.status(200).json({ status: true, data: assignServiceData });

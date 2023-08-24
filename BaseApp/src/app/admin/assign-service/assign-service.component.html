@@ -6,9 +6,43 @@
                     class="fa fa-plus"></i>&nbsp;&nbsp;Assign</button>
         </div>
     </div>
+
     <section class="flex items-center justify-center">
         <div class="container">
-            <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="w-full flex flex-row flex-no-wrap sm:bg-white rounded-lg overflow-hidden sm:shadow-lg my-5">
+            &nbsp;&nbsp;
+            <form [formGroup]="searchForm">
+                <table class="col-md-12">
+                    <thead>
+                        <tr class="text">
+                            <th class=" p-3 text-left ">
+                                <ng-multiselect-dropdown [placeholder]="'Client Name'" class="text-muted "
+                                    [settings]="clientId" formControlName="clientId" [data]="clientArr">
+                                </ng-multiselect-dropdown>
+                            </th>&nbsp;
+                            <th class="p-3 text-left">
+                                <ng-multiselect-dropdown [placeholder]="'Staff Name'" class="text-muted "
+                                    [settings]="staffId" formControlName="staffId" [data]="StaffArr">
+                                </ng-multiselect-dropdown>
+                            </th>&nbsp;
+                            <th> <input type="text" class=" data-picker-color " formControlName="fromDate"
+                                    (bsValueChange)="setStartDate($event)" bsDatepicker
+                                    [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
+                                    placeholder="From Date"></th>&nbsp;
+                            <th class="p-3 text-left">
+                                <input type="text" class="data-picker-color" formControlName="toDate"
+                                    (bsValueChange)="setEndDate($event)" [minDate]="minDate" bsDatepicker
+                                    [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
+                                    placeholder="To Date">
+                            </th> &nbsp;
+                            <th class="p-3 text-left"><button class="btn"
+                                    (click)="getAllByFilterSearch()">Shown</button></th>
+                        </tr>
+                    </thead>
+                </table>
+            </form>
+
+            <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger"
+                class="w-full flex flex-row flex-no-wrap sm:bg-white rounded-lg overflow-hidden sm:shadow-lg my-5">
                 <thead class="text-white">
                     <tr
                         class="bg-teal-400 flex flex-col flex-no wrap sm:table-row rounded-l-lg sm:rounded-none mb-2 sm:mb-0">
@@ -25,8 +59,9 @@
                         <!-- <th class="p-3 text-left" width="110px">Actions</th> -->
                     </tr>
                 </thead>
-                <tbody class="flex-1 sm:flex-none">
-                    <tr class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0"  *ngFor="let assignService of assignServiceList">
+                <tbody class="flex-1 sm:flex-none" *ngIf="assignServiceList.length !== 0">
+                    <tr class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0"
+                        *ngFor="let assignService of assignServiceList">
                         <td class="border-grey-light border hover:bg-gray-100 p-3">{{assignService.ClientName}}</td>
                         <td class="border-grey-light border hover:bg-gray-100 p-3">{{assignService.Phone}}</td>
                         <td class="border-grey-light border hover:bg-gray-100 p-3">{{assignService.Address}}</td>
@@ -42,20 +77,26 @@
                                 *ngIf="assignService.Status == 1">Completed</button>
                             <button class="btn" style="background-color: rgb(255, 204, 0);"
                                 *ngIf="assignService.Status == 2">Reshedule</button>
-                            <button class="btn" style="background-color: rgb(233, 19, 4);"
-                                *ngIf="assignService.Status == 3">Not Available</button>
+                            <!-- <button class="btn" style="background-color: rgb(233, 19, 4);"
+                                *ngIf="assignService.Status == 3">Not Available</button> -->
                             <button class="btn" style="background-color: rgb(18, 69, 134);"
-                                *ngIf="assignService.Status == 4">Distance Mismatch</button>
+                                *ngIf="assignService.Status == 3">Distance Mismatch</button>
                         </td>
                         <td class="border-grey-light border hover:bg-gray-100 p-3">
-                        <button class="btn" (click)="edit(assignService._id)"><i class='fa fa-edit'></i></button>
+                            <button class="btn" (click)="edit(assignService._id)"><i class='fa fa-edit'></i></button>
                         </td>
+
                         <!-- <td
                             class="border-grey-light border hover:bg-gray-100 p-3 text-red-400 hover:text-red-600 hover:font-medium cursor-pointer">
                             <button class="btn" (click)="editrole(roleList._id)"><i class='fa fa-edit'></i></button></td> -->
                     </tr>
                 </tbody>
+                <tbody *ngIf="assignServiceList.length == 0">
+                    <tr>
+                        <td class="warn" colspan="8">No Records Found</td>
+                    </tr>
             </table>
+
         </div>
     </section>
 </div>

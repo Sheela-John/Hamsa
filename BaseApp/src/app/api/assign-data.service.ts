@@ -87,15 +87,29 @@ export class AssignDataService {
     }
 
     //updateAssignService
-     public updateAssignService(data,id): Observable<any> {
-        return this.httpClient.put('assignService/updateAssignService/'+id, data).pipe(tap(res => {
+    public updateAssignService(data, id): Observable<any> {
+        return this.httpClient.put('assignService/updateAssignService/' + id, data).pipe(tap(res => {
             return res;
         }), catchError(error => throwError(error)));
     }
-        //getDashboardData
-        public getDashboardData(data): Observable<any> {
-            return this.httpClient.post('assignService/getAssignServiceDataByStaffIdAndDateForDashBoard', data).pipe(tap(res => {
-                return res;
-            }), catchError(error => throwError(error)));
-        }
+
+    //get All assign service data for past30days
+    public getAllbyPast30Days(): Observable<any> {
+        return this.httpClient.get('assignService/allAssignedServicesforpast30days').pipe(tap(res => {
+            return res;
+        }), catchError(error => throwError(error)));
+    }
+
+    //get all assign service data using clientid, staff id, fromdate, todate
+    public getAllByFilterSearch(data2): Observable<any> {
+        return this.httpClient.post('assignService/allAssignedServicesbyclientandstaff', data2).pipe(tap(res => {
+            return res;
+        }), catchError(error => throwError(error)));
+    }
+    //getDashboardData
+    public getDashboardData(data): Observable<any> {
+        return this.httpClient.post('assignService/getAssignServiceDataByStaffIdAndDateForDashBoard', data).pipe(tap(res => {
+            return res;
+        }), catchError(error => throwError(error)));
+    }
 }

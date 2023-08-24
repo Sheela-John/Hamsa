@@ -505,8 +505,7 @@ async function getAllAssignedServicesbyclientstaff(data) {
         let [Err, assignServiceData] = await handle(AssignService.find({}).lean());
         var assignServiceData1 = [];
         for (var i = 0; i < assignServiceData.length; i++) {
-            if (new Date(assignServiceData[i].date) >= new Date(data.fromDate) && new Date(assignServiceData[i].date) <= todate && assignServiceData[i].staffId == data.staffId &&
-                assignServiceData[i].clientId == data.clientId) {
+            if (new Date(assignServiceData[i].date) >= new Date(data.fromDate) && new Date(assignServiceData[i].date) <= todate && assignServiceData[i].clientId == data.clientId ) {
                 assignServiceData1.push(assignServiceData[i])
             }
         }

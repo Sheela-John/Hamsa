@@ -66,8 +66,19 @@ export class AssignService {
     public updateAssignService(data,id){
         return this.AssignDataService.updateAssignService(data,id)
     }
+
     //getDashboardData
     public getDashboardData(data){
         return this.AssignDataService.getDashboardData(data)
+    }
+
+    //get all assign service data for past 30 days
+    public getAllbyPast30Days() {
+        return this.AssignDataService.getAllbyPast30Days();
+    }
+    
+    //gell all assign service data using clientid, staffid, fromdate and todate
+    public getAllByFilterSearch(data2) {
+        return this.AssignDataService.getAllByFilterSearch(data2);
     }
 }

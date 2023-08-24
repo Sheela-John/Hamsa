@@ -1,0 +1,26 @@
+input:focus,
+input {
+  outline: none;
+  outline-style: none;
+  box-shadow: none;
+  border-color: transparent;
+  border: solid 2px transparent;
+}
+
+.warn{
+  text-align: center;
+}
+::ng-deep .multiselect-dropdown .dropdown-btn {
+  display: inline-block;
+  border: transparent !important;
+  width: 100%;
+  padding: 8px 11px !important;
+  margin-bottom: 0;
+  font-weight: 400;
+  line-height: 1.52857143;
+  text-align: left;
+  vertical-align: middle;
+  cursor: pointer;
+  background-image: none;
+  border-radius: 4px;
+}
