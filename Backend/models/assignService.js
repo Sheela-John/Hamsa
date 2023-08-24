@@ -29,7 +29,7 @@ const assignServiceSchema = new mongoose.Schema({
     elatitude: { type: Number },
     elongitude: { type: Number },
     bookedCount: { type: Number, default: 1 },
-    travelDistanceinKM: { type: Number },
+    travelDistanceinKM: { type: Number,default:0 },
     travelDurationinMinutes: { type: Number },
     rating: { type: Number, default: 0 },
     feedBack: { type: String },
@@ -67,6 +67,10 @@ const assignServiceSchema = new mongoose.Schema({
     },
     endDistance:{
         type:Number,
+        default:0
+    },
+    autoInvoiceId:{
+        type:String,
         default:0
     }
 }, {

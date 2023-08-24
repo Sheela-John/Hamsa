@@ -1158,60 +1158,12 @@ const serviceOnEnd = async (inputData) => {
     });
 }
 
-// const getAssignedServicesById = async (serviceClientId) => {
-//     var query = [
-//         { $match: { '_id': mongoose.Types.ObjectId(serviceClientId) } },
-//         {
-//             '$addFields': {
-//                 'user_id': { $toObjectId: "$staffId" },
-//                 'serviceId': { $toObjectId: "$service" },
-//                 'clientObjId': { $toObjectId: "$clientId" },
-//             }
-//         },
-//         {
-//             '$lookup': {
-//                 'from': 'staff',
-//                 'localField': 'user_id',
-//                 'foreignField': '_id',
-//                 'as': 'staffData'
-//             }
-//         },
-//         {
-//             "$unwind": "$staffData"
-//         },
-//         {
-//             '$lookup': {
-//                 'from': 'services',
-//                 'localField': 'serviceId',
-//                 'foreignField': '_id',
-//                 'as': 'servicesData'
-//             }
-//         },
-//         {
-//             "$unwind": "$servicesData"
-//         },
-//         {
-//             '$lookup': {
-//                 'from': 'client',
-//                 'localField': 'clientObjId',
-//                 'foreignField': '_id',
-//                 'as': 'clientData'
-//             }
-//         },
-//         {
-//             "$unwind": "$clientData"
-//         }
-//     ];
-//     var [clientServicesAllDataErr, clientServicesDatabyId] = await handle(AssignServiceForClient.aggregate(query));
-//     if (clientServicesAllDataErr) return Promise.reject(clientServicesAllDataErr);
-//     else return Promise.resolve(clientServicesDatabyId[0])
-// }
 
 async function getAssignedServicesById(id) {
     log.debug(component, 'Getting AssignService Data by Id');
     log.close();
     let [Err, assignServiceData] = await handle(AssignService.findOne({ '_id': id }).lean());
-    let [err, invoice] = await handle(AssignServiceInvoice.findOne({ assignServiceId: id }))
+    let [err, invoice] = await handle(AssignServiceInvoice.findOne({ assignServiceId: id,isDeleted:0 }))
     console.log(invoice, "invoice");
     let [err1, url] = await handle(getAssignServiceInvoicePresignedUrl(invoice));
     assignServiceData.url = url;
@@ -1898,7 +1850,9 @@ async function uploadAutoInvoice(req, res, cb) {
                 obj.assignServiceId = data.assignServiceId;
                 obj.documentID = data.documentID;
                 var saveData = new AssignServiceInvoice(obj);
-
+                let [Err, assignServiceData] = await handle(AssignService.findOneAndUpdate({ '_id': saveData.assignServiceId },{$set: { 'autoInvoiceId': saveData._id } }).lean());
+                console.log("assignServiceData",assignServiceData)
+                console.log()
                 saveData.save().then(user => {
                     log.debug(component, 'Saved File Url in AssignServiceInvoice DB');
                     log.close();
@@ -1919,6 +1873,41 @@ async function uploadAutoInvoice(req, res, cb) {
                         return cb(err);
                     })
             }
+        }
+    })
+}
+async function deleteAutoInvoice(data) {
+    log.debug(component, 'Delete Book Pdf'); log.close();
+ 
+    var query = [{
+        "$match": {'documentID': data.documentID}
+    },
+   ];
+    let [err, pdfData] = await handle(AssignServiceInvoice.aggregate(query));
+    
+    return new Promise((resolve, reject) => {
+        if (err)
+        {
+            return reject(err);}
+        else {
+            log.debug(component, 'Document Fetched and ready to Delete');
+            log.close();
+            const myKey = config.AWSCredentails.SUB_FOLDER + pdfData[0].image;
+            pdfData.key = myKey;
+            (async () => {
+             
+                let [deleteDocumentErr, deleteDocumentResponse] = await handle(awsConfig.deleteObject(pdfData));
+                console.log("deleteDocumentResponse",deleteDocumentResponse)
+                if (deleteDocumentErr) {
+                    return reject(deleteDocumentErr);
+                }
+                else {
+                    let [err, deleteData] = await handle(AssignServiceInvoice.findByIdAndUpdate({ '_id': pdfData[0]._id},{ "$set": { "isDeleted": 1 } }, { new: true, useFindAndModify: false }).lean());                  
+                    console.log("deleteData",deleteData)
+                    return resolve(deleteDocumentResponse)
+                   
+                }
+            })();
         }
     })
 }
@@ -1979,6 +1968,7 @@ async function getAssignServiceDataByDateForActivityReport(data) {
                 array.push(assignServiceData1[i].staffId)
             }
         }
+    }
         var arr = []
         if (assignServiceData1.length != 0) {
             for (var j = 0; j < array.length; j++) {
@@ -2009,11 +1999,27 @@ async function getAssignServiceDataByDateForActivityReport(data) {
                 arr.push(temp)
                 assigned = 0, completed = 0
             }
-        }      
+        }   
+        if(data.status==0)   
+        {
+            for(var i=0;i<assignServiceData1.length;i++)
+            {
+                let [err, clientData] = await handle(Client.findOne({ _id: assignServiceData1[i].clientId }).lean());
+                let [err1, staffData] = await handle(Staff.findOne({ _id: assignServiceData1[i].staffId }).lean());
+                let [err2, serviceData] = await handle(Service.findOne({ _id: assignServiceData1[i].serviceId }).lean());
+                let [err3 ,transportData] = await handle(TravelAllowance.findOne({ _id: assignServiceData1[i].transport }).lean());
+                assignServiceData1[i].clientName = clientData.clientName;
+                assignServiceData1[i].staffName = staffData.staffName;
+                assignServiceData1[i].empId=staffData.empId;
+                assignServiceData1[i].serviceName = serviceData.serviceName;
+                assignServiceData1[i].transportMode = transportData.travelExpenseMode;
+            }
+            return Promise.resolve(assignServiceData1); 
+        }
         // if (Err) return Promise.reject(Err);
         if (lodash.isEmpty(arr)) return Promise.reject(ERR.NO_RECORDS_FOUND);
         return Promise.resolve(arr);
-    }
+    
 }
 module.exports = {
     assignServiceClient: assignServiceClient,
@@ -2045,5 +2051,6 @@ module.exports = {
     getAllAssignedServicesbyclientstaff: getAllAssignedServicesbyclientstaff,
     uploadAutoInvoice: uploadAutoInvoice,
     getAssignServiceInvoicePresignedUrl: getAssignServiceInvoicePresignedUrl,
-    getAssignServiceDataByDateForActivityReport: getAssignServiceDataByDateForActivityReport
+    getAssignServiceDataByDateForActivityReport: getAssignServiceDataByDateForActivityReport,
+    deleteAutoInvoice:deleteAutoInvoice
 }

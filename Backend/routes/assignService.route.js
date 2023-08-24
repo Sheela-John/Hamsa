@@ -237,4 +237,18 @@ router.post('/uploadAutoInvoice',async (req, res, next) => {
         return res.json({ status: true, data: videoData });
     }
 })
+.post('/deleteAutoInvoice', async (req, res, next) => {
+    log.debug(COMPONENT, 'deleteAutoInvoice '); log.close();
+    let [err, videoData] = await handle(AssignServiceAPI.deleteAutoInvoice(req.body));
+    if (err) {
+        log.error(COMPONENT, 'Change Invoice status error', { attach: err });
+        log.close();
+        return res.json({ status: false, err: Object.assign(ERR.UNKNOWN, { message: err.message }) });
+    }
+    else {
+        log.debug(COMPONENT, 'Changing Invoice Status');
+        log.close();
+        return res.json({ "status": true, "message": "Invoice Status Changed!" })
+    }
+});
 module.exports = router;
