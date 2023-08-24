@@ -39,21 +39,67 @@ const handle = (promise) => {
 
 const entryAttendence = async (attendenceData) => {
     attendenceData.date = new Date(attendenceData.date);
+
+
+    if (!attendenceData.inTimeArray) {
+        attendenceData.inTimeArray = [];
+    }
+    attendenceData.inTimeArray.push(attendenceData.inTime);
+
     var saveModel = new Attendence(attendenceData);
-    let [err, attendenceDataSaved] = await handle(saveModel.save())
-    if (err) return Promise.reject(err);
-    else return Promise.resolve(attendenceDataSaved)
-}
+    let [err, attendenceDataSaved] = await handle(saveModel.save());
+
+    if (err) {
+        return Promise.reject(err);
+    } else {
+        return Promise.resolve(attendenceDataSaved);
+    }
+};
+
 
 // to update attendence
+
 const UpdateAttendence = async function (datatoupdate) {
-    log.debug(component, 'Updating a Branch', { 'attach': datatoupdate }); log.close();
+    log.debug(component, 'Updating an Attendence', { 'attach': datatoupdate });
+    log.close();
+
     let AttendenceId = datatoupdate._id;
-    delete datatoupdate._id
-    let [branchErr, branchData] = await handle(Attendence.findOneAndUpdate({ "_id": AttendenceId }, datatoupdate, { new: true, useFindAndModify: false }))
-    if (branchErr) return Promise.reject(branchErr);
-    else return Promise.resolve(branchData)
-}
+    delete datatoupdate._id;
+
+    // Get the existing Attendence document
+    let [attendenceErr, existingAttendenceData] = await handle(Attendence.findById(AttendenceId));
+    if (attendenceErr) return Promise.reject(attendenceErr);
+
+    // Update inTimeArray and outTimeArray based on changes in inTime and outTime
+    if (datatoupdate.inTime) {
+        if (!existingAttendenceData.inTimeArray) {
+            existingAttendenceData.inTimeArray = [];
+        }
+        existingAttendenceData.inTimeArray.push(datatoupdate.inTime);
+        existingAttendenceData.inTime = datatoupdate.inTime;
+    }
+
+    if (datatoupdate.outTime) {
+        if (!existingAttendenceData.outTimeArray) {
+            existingAttendenceData.outTimeArray = [];
+        }
+        existingAttendenceData.outTimeArray.push(datatoupdate.outTime);
+        existingAttendenceData.outTime = datatoupdate.outTime;
+    }
+
+    // Update the document
+    let [attendenceUpdateErr, updatedAttendenceData] = await handle(Attendence.findOneAndUpdate(
+        { "_id": AttendenceId },
+        { $set: existingAttendenceData },
+        { new: true, useFindAndModify: false }
+    ));
+
+    if (attendenceUpdateErr) {
+        return Promise.reject(attendenceUpdateErr);
+    } else {
+        return Promise.resolve(updatedAttendenceData);
+    }
+};
 
 const getAttendenceofStaff = async (staffId) => {
     let [findStaffErr, staffData] = await handle(Attendence.find({ 'staffId': staffId }));
@@ -221,25 +267,25 @@ const getAttendenceofStaffByDateRange = async (data) => {
             // var tempDate = attendenceData[i].doc[j].date.toLocaleDateString().split('/')[2] + "-" + attendenceData[i].doc[j].date.toLocaleDateString().split('/')[1] + "-" + attendenceData[i].doc[j].date.toLocaleDateString().split('/')[0]
             // attendenceData[i].doc[j].date=attendenceData[i].doc[j].date.toLocaleDateString();
 
-                // Calculate totalDuration
-        attendenceData[i].doc[j].totalDuration = 0;  // Initialize totalDuration
-        
-        for (var k = 0; k < attendenceData[i].doc[j].inTimeArray.length; k++) {
-            var startTime = attendenceData[i].doc[j].inTimeArray[k].split(':');
-            var endTime = attendenceData[i].doc[j].outTimeArray[k].split(':');
-            var startHr = parseInt(startTime[0], 10);
-            var startMin = parseInt(startTime[1], 10);
-            var endHr = parseInt(endTime[0], 10);
-            var endMin = parseInt(endTime[1], 10);
-            var duration = ((endHr - startHr) * 60) + (endMin - startMin);
-            attendenceData[i].doc[j].totalDuration += duration;
-        }
+            // Calculate totalDuration
+            attendenceData[i].doc[j].totalDuration = 0;  // Initialize totalDuration
 
-        // Convert totalDuration to hours:minutes format
-        var totalDurationHours = Math.floor(attendenceData[i].doc[j].totalDuration / 60);
-        var totalDurationMinutes = attendenceData[i].doc[j].totalDuration % 60;
-        attendenceData[i].doc[j].totalDurationFormatted = totalDurationHours + ":" + totalDurationMinutes;
-               
+            for (var k = 0; k < attendenceData[i].doc[j].inTimeArray.length; k++) {
+                var startTime = attendenceData[i].doc[j].inTimeArray[k].split(':');
+                var endTime = attendenceData[i].doc[j].outTimeArray[k].split(':');
+                var startHr = parseInt(startTime[0], 10);
+                var startMin = parseInt(startTime[1], 10);
+                var endHr = parseInt(endTime[0], 10);
+                var endMin = parseInt(endTime[1], 10);
+                var duration = ((endHr - startHr) * 60) + (endMin - startMin);
+                attendenceData[i].doc[j].totalDuration += duration;
+            }
+
+            // Convert totalDuration to hours:minutes format
+            var totalDurationHours = Math.floor(attendenceData[i].doc[j].totalDuration / 60);
+            var totalDurationMinutes = attendenceData[i].doc[j].totalDuration % 60;
+            attendenceData[i].doc[j].totalDurationFormatted = totalDurationHours + ":" + totalDurationMinutes;
+
         }
     }
     for (var i = 0; i < attendenceData.length; i++) {
