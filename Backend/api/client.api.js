@@ -351,6 +351,59 @@ async function updateClient(datatoupdate, clientId) {
                 new: true, useFindAndModify: false
             }
             ));
+        }
+    }
+    if(temp==0)
+    {
+   let[err, updatePackage] = await handle(Client.findOneAndUpdate({ _id: clientId }, { $push: { packageId: { $each: [packageData[0]], $sort: -1 } } }, { new: true, useFindAndModify: false }).lean());
+    }
+    else{
+        console.log("already exits")
+    }
+    console.log( client.packageId.length,"gggg")
+    for (let x = 0; x < client.packageId.length; x++) {
+        console.log("xxxxxxxxxxxxxxxx",x)
+    //    console.log(client.packageId,"client.packageId")
+       // var packageData = datatoupdate.packageId;
+        delete datatoupdate.packageId;
+        clientData = await handle(Client.findOneAndUpdate({ _id: clientId }, datatoupdate, { new: true, useFindAndModify: false }));
+        
+        var count = 1;
+        var typeArray = [1, 3, 4];
+        console.log(packageData[0].addSession.length,"gggggggggg")
+        for (let i = 0; i < packageData[0].addSession.length; i++) {
+
+             assignServiceData.push( {
+                staffId: packageData[0].staffId,
+                date: new Date(packageData[0].addSession[i].date),
+                clientId: clientId,
+                phone: datatoupdate.phoneNumber,
+                address: datatoupdate.address,
+                lattitude: datatoupdate.clientAddressLatitude,
+                longitute: datatoupdate.clientAddressLongitude,
+                typeOfTreatment: packageData[0].typeOfTreatment,
+                branchType: 0,
+                serviceId: packageData[0].serviceId,
+                branchId: datatoupdate.homeBranchId,
+                branchAddress: datatoupdate.homeBranchAddress,
+                slot: packageData[0].slot,
+                duration: packageData[0].duration,
+                startTime: packageData[0].addSession[i].slotStartTime,
+                endTime: packageData[0].addSession[i].slotEndTime,
+                status: 0,
+                latitude: client.clientAddressLatitude,
+                longitude: client.clientAddressLongitude,
+               // bookedCount: count,
+                packageId: packageData[0].id
+            }
+             )
+        }
+     console.log("assignServiceData",assignServiceData)
+        let updatePackage;
+        if (client.packageId[x].id == packageData[0].id) {
+            console.log("if")
+           
+           // console.log("updatePackage:", updatePackage);
             let [err, assignData] = await handle(AssignService.find({ packageId: packageData[0].id }))
             if (err) {
                 return Promise.reject(err);
