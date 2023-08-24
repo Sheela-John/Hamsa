@@ -1274,6 +1274,7 @@ const updateAssignService = async function (datatoupdate) {
     delete datatoupdate.assignServiceId;
 
     let [Err, assign] = await handle(AssignService.findOne({ '_id': assignService }).lean());
+    console.log("assign",assign);
     let [Err1, travelCountData] = await handle(TravelCount.find({ 'staffId': assign.staffId, date: assign.date }).sort({ count: 1 }).lean());
     console.log("travelCountData", travelCountData)
     var totalDistance = [];
@@ -1299,9 +1300,10 @@ const updateAssignService = async function (datatoupdate) {
             }
             }
             else {
+              
+                let [Err, assignServiceData1] = await handle(AssignService.findOne({ '_id': travelCountData[l - 1].assignServiceId }).lean());
                 if(assignServiceData1.elatitude && assignServiceData1.elongitude && assignServiceData.slatitude && assignServiceData.slongitude)
                 {
-                let [Err, assignServiceData1] = await handle(AssignService.findOne({ '_id': travelCountData[l - 1].assignServiceId }).lean());
                 var temp = {
                     "latitude": assignServiceData1.elatitude,
                     "longitude": assignServiceData1.elongitude,
