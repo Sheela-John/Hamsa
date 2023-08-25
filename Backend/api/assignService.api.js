@@ -1297,7 +1297,7 @@ const updateAssignService = async function (datatoupdate) {
     console.log("assign.transport",assign.transport,datatoupdate.transport!="auto")
     if (assign.transport && datatoupdate.transport!="auto") {
         let [Err4, travelAllowance] = await handle(TravelAllowance.findOne({ '_id': datatoupdate.transport }).lean());
-        console.log("travelAllowance", travelAllowance.newPerKmCost, assign.travelDistanceinKM * travelAllowance.newPerKmCost);
+       // console.log("travelAllowance", travelAllowance.newPerKmCost, assign.travelDistanceinKM * travelAllowance.newPerKmCost);
         if(travelAllowance)
         {
         datatoupdate.travelAmount = assign.travelDistanceinKM * travelAllowance.newPerKmCost;
