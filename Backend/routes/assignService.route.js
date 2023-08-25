@@ -198,6 +198,12 @@ router.post('/getAssignServiceDataByDateForActivityReport', async (req, res, nex
     if (err) return next(err);
     else return res.status(200).json({ status: true, data: assignServiceDataData });
 })
+router.post('/getAssignServiceDataByDateForTravelReport', async (req, res, next) => {
+    console.log("inside")
+    let [err, assignServiceDataData] = await handle(AssignServiceAPI.getAssignServiceDataByDateForTravelReport(req.body));
+    if (err) return next(err);
+    else return res.status(200).json({ status: true, data: assignServiceDataData });
+})
 router.post('/getSlotsForAssignService', async (req, res, next) => {
     let [err, assignServiceDataData] = await handle(AssignServiceAPI.getSlotsForAssignService(req.body));
     if (err) return next(err);

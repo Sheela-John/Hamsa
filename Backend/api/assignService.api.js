@@ -1162,7 +1162,7 @@ async function getAssignedServicesById(id) {
     log.debug(component, 'Getting AssignService Data by Id');
     log.close();
     let [Err, assignServiceData] = await handle(AssignService.findOne({ '_id': id }).lean());
-    let [err, invoice] = await handle(AssignServiceInvoice.findOne({ assignServiceId: id,isDeleted:0 }))
+    let [err, invoice] = await handle(AssignServiceInvoice.findOne({ assignServiceId: id, isDeleted: 0 }))
     console.log(invoice, "invoice");
     let [err1, url] = await handle(getAssignServiceInvoicePresignedUrl(invoice));
     assignServiceData.url = url;
@@ -1223,18 +1223,18 @@ const updateAssignService = async function (datatoupdate) {
     let assignService = datatoupdate.assignServiceId;
     console.log(datatoupdate)
     delete datatoupdate.assignServiceId;
-
     let [Err, assign] = await handle(AssignService.findOne({ '_id': assignService }).lean());
-    console.log("assign", assign);
+   // console.log("assign", assign);
+    if(datatoupdate.date)
+    {
+        datatoupdate.date=new Date(datatoupdate.date)
+    }
     let [Err1, travelCountData] = await handle(TravelCount.find({ 'staffId': assign.staffId, date: assign.date }).sort({ count: 1 }).lean());
     console.log("travelCountData", travelCountData)
-    var totalDistance = [];
-    var totalDuration = [];
     for (var l = 0; l < travelCountData.length; l++) {
         if (travelCountData[l].assignServiceId == assignService) {
             let [Err, assignServiceData] = await handle(AssignService.findOne({ '_id': travelCountData[l].assignServiceId }).lean());
-
-            console.log("assignServiceData", assignServiceData)
+          //  console.log("assignServiceData", assignServiceData)
             if (travelCountData[l].count == 1) {
                 if (assignServiceData.slatitude && assignServiceData.slongitude) {
                     let [err, branchData] = await handle(Branch.findOne({ "_id": assignServiceData.branchId }))
@@ -1293,10 +1293,15 @@ const updateAssignService = async function (datatoupdate) {
         datatoupdate.startDistance = startDistance.distance;
         datatoupdate.endDistance = endDistance.distance;
     }
-    if (assign.transport) {
-        let [Err4, travelAllowance] = await handle(TravelAllowance.findOne({ '_id': assign.transport }).lean());
-        console.log("travelAllowance", travelAllowance.newPerKmCost, datatoupdate.travelDistanceinKM * travelAllowance.newPerKmCost);
-        datatoupdate.travelAmount = datatoupdate.travelDistanceinKM * travelAllowance.newPerKmCost;
+    console.log("datatoupdate",datatoupdate)
+    console.log("assign.transport",assign.transport,datatoupdate.transport!="auto")
+    if (assign.transport && datatoupdate.transport!="auto") {
+        let [Err4, travelAllowance] = await handle(TravelAllowance.findOne({ '_id': datatoupdate.transport }).lean());
+        console.log("travelAllowance", travelAllowance.newPerKmCost, assign.travelDistanceinKM * travelAllowance.newPerKmCost);
+        if(travelAllowance)
+        {
+        datatoupdate.travelAmount = assign.travelDistanceinKM * travelAllowance.newPerKmCost;
+        }
     }
     let [Err4, Distance] = await handle(Settings.find({}).lean());
     console.log("Distance", Distance)
@@ -1399,35 +1404,50 @@ async function getAssignServiceDataByStaffIdAndDateForDashBoard(data) {
         "endDate": toDate
     }
     var [err, value] = await handle(AttendenceAPI.getAttendenceofStaffByDateRange(data1));
-    var newValue = [];
-    for (var i = 0; i < value.length; i++) {
-        if ((value[i]._id.toString()) == data.staffId) {
-            newValue = (value[i].doc)
+    if (value) {
+        var newValue = [];
+        for (var i = 0; i < value.length; i++) {
+            if ((value[i]._id.toString()) == data.staffId) {
+                newValue = (value[i].doc)
+            }
+        }
+        var total = 0, productiveDuration = 0;
+        var value = 0;
+        for (var i = 0; i < newValue.length; i++) {
+            console.log(typeof (newValue[i].travelDuration))
+            var hour = Number(newValue[i].duration.split(':')[0])
+            var minutes = Number(newValue[i].duration.split(':')[1])
+            total = ((hour * 60) + minutes) + total;
+            value = (newValue[i].travelDuration) + value
         }
     }
-    var total = 0, productiveDuration = 0;
-    var value = 0;
-    for (var i = 0; i < newValue.length; i++) {
-        console.log(typeof (newValue[i].travelDuration))
-        var hour = Number(newValue[i].duration.split(':')[0])
-        var minutes = Number(newValue[i].duration.split(':')[1])
-        total = ((hour * 60) + minutes) + total;
-        value = (newValue[i].travelDuration) + value
+    console.log("total", value, total)
+    var prod = 0, time = 0;
+    console.log("prod", prod, value == undefined, total == undefined)
+    if (value == undefined && total == undefined) {
+        console.log("if")
+        prod = 0;
+        time = 0
     }
-    console.log("output", output)
+    else {
+        console.log("else")
+        prod = Math.floor((total - value) / 60).toString() + ":" + (((total - value) % 60).toString()).split('.')[0];
+        time = Math.floor(total / 60).toString() + ":" + (total % 60).toString();
+    }
+
     var output = {
         "Assigned": assigned,
         "Completed": completed,
         "Rescheduled": rescheduled,
-        "TotalTimeTracked": Math.floor(total / 60).toString() + ":" + (total % 60).toString(),
-        "ProductiveTime": Math.floor((total - value) / 60).toString() + ":" + (((total - value) % 60).toString()).split('.')[0],
+        "TotalTimeTracked": time,
+        "ProductiveTime": prod,
         "TotalCount": totalCount,
         "Home": home,
         "OP": op,
         "TeleTherapy": teletherapy,
         "IP": ip
     }
-
+    console.log("output", output)
     // if (Err) return Promise.reject(Err);
     if (lodash.isEmpty(output)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(output);
@@ -1849,8 +1869,8 @@ async function uploadAutoInvoice(req, res, cb) {
                 obj.assignServiceId = data.assignServiceId;
                 obj.documentID = data.documentID;
                 var saveData = new AssignServiceInvoice(obj);
-                let [Err, assignServiceData] = await handle(AssignService.findOneAndUpdate({ '_id': saveData.assignServiceId },{$set: { 'autoInvoiceId': saveData._id } }).lean());
-                console.log("assignServiceData",assignServiceData)
+                let [Err, assignServiceData] = await handle(AssignService.findOneAndUpdate({ '_id': saveData.assignServiceId }, { $set: { 'autoInvoiceId': saveData.documentID } }).lean());
+                console.log("assignServiceData", assignServiceData)
                 console.log()
                 saveData.save().then(user => {
                     log.debug(component, 'Saved File Url in AssignServiceInvoice DB');
@@ -1877,34 +1897,36 @@ async function uploadAutoInvoice(req, res, cb) {
 }
 async function deleteAutoInvoice(data) {
     log.debug(component, 'Delete Book Pdf'); log.close();
- 
+
     var query = [{
-        "$match": {'documentID': data.documentID}
+        "$match": { 'documentID': data.documentID }
     },
-   ];
+    ];
     let [err, pdfData] = await handle(AssignServiceInvoice.aggregate(query));
-    
+
     return new Promise((resolve, reject) => {
-        if (err)
-        {
-            return reject(err);}
+        if (err) {
+            return reject(err);
+        }
         else {
             log.debug(component, 'Document Fetched and ready to Delete');
             log.close();
             const myKey = config.AWSCredentails.SUB_FOLDER + pdfData[0].image;
             pdfData.key = myKey;
             (async () => {
-             
+
                 let [deleteDocumentErr, deleteDocumentResponse] = await handle(awsConfig.deleteObject(pdfData));
-                console.log("deleteDocumentResponse",deleteDocumentResponse)
+                console.log("deleteDocumentResponse", deleteDocumentResponse)
                 if (deleteDocumentErr) {
                     return reject(deleteDocumentErr);
                 }
                 else {
-                    let [err, deleteData] = await handle(AssignServiceInvoice.findByIdAndUpdate({ '_id': pdfData[0]._id},{ "$set": { "isDeleted": 1 } }, { new: true, useFindAndModify: false }).lean());                  
-                    console.log("deleteData",deleteData)
+                    let [err, deleteData] = await handle(AssignServiceInvoice.findByIdAndUpdate({ '_id': pdfData[0]._id }, { "$set": { "isDeleted": 1 } }, { new: true, useFindAndModify: false }).lean());
+                    let [err1, deleteData1] = await handle(AssignService.findByIdAndUpdate({ '_id': pdfData[0].assignServiceId }, { "$set": { "autoInvoiceId": "" } }, { new: true, useFindAndModify: false }).lean());
+
+                    console.log("deleteData", deleteData)
                     return resolve(deleteDocumentResponse)
-                   
+
                 }
             })();
         }
@@ -1968,57 +1990,125 @@ async function getAssignServiceDataByDateForActivityReport(data) {
             }
         }
     }
-        var arr = []
-        if (assignServiceData1.length != 0) {
-            for (var j = 0; j < array.length; j++) {
-                let [err5, staff] = await handle(Staff.findOne({_id:array[j]}).lean());
-                for (var i = 0; i < assignServiceData1.length; i++) {
-                    if (assignServiceData1[i].staffId == array[j]) {
-                        if (assignServiceData1[i].status == 0) {
-                            assigned = assigned + 1;
+    var arr = []
+    if (assignServiceData1.length != 0) {
+        for (var j = 0; j < array.length; j++) {
+            let [err5, staff] = await handle(Staff.findOne({ _id: array[j] }).lean());
+            for (var i = 0; i < assignServiceData1.length; i++) {
+                if (assignServiceData1[i].staffId == array[j]) {
+                    if (assignServiceData1[i].status == 0) {
+                        assigned = assigned + 1;
 
-                        }
-                        if (assignServiceData1[i].status == 1 || assignServiceData1[i].status == 3) {
-                            completed = completed + 1;
+                    }
+                    if (assignServiceData1[i].status == 1 || assignServiceData1[i].status == 3) {
+                        completed = completed + 1;
 
-                        }
-                        if (assignServiceData1[i].status == 2) {
-                            rescheduled = rescheduled + 1;
-                        }
-                    } 
+                    }
+                    if (assignServiceData1[i].status == 2) {
+                        rescheduled = rescheduled + 1;
+                    }
                 }
-                console.log("assigned",assigned,completed)
-                var temp={
-                    "staff":array[j],
-                    "staffName":staff.staffName,
-                    "Assigned":assigned,
-                    "Completed":completed,
-                    "Rescheduled":rescheduled
-                }
-                arr.push(temp)
-                assigned = 0, completed = 0
             }
-        }   
-        if(data.status==0)   
-        {
-            for(var i=0;i<assignServiceData1.length;i++)
-            {
-                let [err, clientData] = await handle(Client.findOne({ _id: assignServiceData1[i].clientId }).lean());
-                let [err1, staffData] = await handle(Staff.findOne({ _id: assignServiceData1[i].staffId }).lean());
-                let [err2, serviceData] = await handle(Service.findOne({ _id: assignServiceData1[i].serviceId }).lean());
-                let [err3 ,transportData] = await handle(TravelAllowance.findOne({ _id: assignServiceData1[i].transport }).lean());
-                assignServiceData1[i].clientName = clientData.clientName;
-                assignServiceData1[i].staffName = staffData.staffName;
-                assignServiceData1[i].empId=staffData.empId;
-                assignServiceData1[i].serviceName = serviceData.serviceName;
-                assignServiceData1[i].transportMode = transportData.travelExpenseMode;
+            console.log("assigned", assigned, completed)
+            var temp = {
+                "staff": array[j],
+                "staffName": staff.staffName,
+                "Assigned": assigned,
+                "Completed": completed,
+                "Rescheduled": rescheduled
             }
-            return Promise.resolve(assignServiceData1); 
+            arr.push(temp)
+            assigned = 0, completed = 0
         }
-        // if (Err) return Promise.reject(Err);
-        if (lodash.isEmpty(arr)) return Promise.reject(ERR.NO_RECORDS_FOUND);
-        return Promise.resolve(arr);
-    
+    }
+    if (data.status == 0) {
+        for (var i = 0; i < assignServiceData1.length; i++) {
+           
+            let [err, clientData] = await handle(Client.findOne({ _id: assignServiceData1[i].clientId }).lean());
+            let [err1, staffData] = await handle(Staff.findOne({ _id: assignServiceData1[i].staffId }).lean());
+            let [err2, serviceData] = await handle(Service.findOne({ _id: assignServiceData1[i].serviceId }).lean());
+            if(assignServiceData1[i].transport)
+            {
+            let [err3, transportData] = await handle(TravelAllowance.findOne({ _id: assignServiceData1[i].transport }).lean());
+            assignServiceData1[i].transportMode = transportData.travelExpenseMode;
+            }
+            assignServiceData1[i].clientName = clientData.clientName;
+            assignServiceData1[i].staffName = staffData.staffName;
+            assignServiceData1[i].empId = staffData.empId;
+            assignServiceData1[i].serviceName = serviceData.serviceName;
+           
+        }
+        return Promise.resolve(assignServiceData1);
+    }
+    // if (Err) return Promise.reject(Err);
+    if (lodash.isEmpty(arr)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+    return Promise.resolve(arr);
+
+}
+async function getAssignServiceDataByDateForTravelReport(data) {
+    log.debug(component, 'Getting AssignService Data by StaffId And Date');
+    log.close();
+    let fromDate, toDate;
+    fromDate = new Date(data.fromDate);
+    toDate = new Date(data.toDate);
+    let [err5, assignServiceData] = await handle(AssignService.find({}).lean());
+    var assignServiceData1 = [];
+    for (var i = 0; i < assignServiceData.length; i++) {
+        if (new Date(assignServiceData[i].date) >= fromDate && new Date(assignServiceData[i].date) <= toDate) {
+            assignServiceData1.push(assignServiceData[i])
+        }
+    }
+    var output=[];
+for(var z=0;z<data.staffId.length;z++)
+{
+    var assignServiceData2=[];
+    let [err5, staff] = await handle(Staff.findOne({_id:data.staffId[z]}).lean());
+    console.log("staff",staff)
+    for (var i = 0; i < assignServiceData1.length; i++) {
+        if (assignServiceData1[i].staffId==data.staffId[z]) {
+            assignServiceData2.push(assignServiceData1[i])
+        }
+    }
+    if (assignServiceData2.length != 0) {
+        var array = [];
+
+        for (var i = 0; i < assignServiceData2.length; i++) {
+            if (!array.includes((new Date(assignServiceData2[i].date)).toString())) {
+                array.push((new Date(assignServiceData2[i].date)).toString()) 
+            }
+        }
+    }
+console.log("array",array)
+    var arr = [],distance=0,amount=0;
+    if (assignServiceData2.length != 0) {
+        for (var j = 0; j < array.length; j++) {
+            for (var i = 0; i < assignServiceData2.length; i++) {
+                if (assignServiceData2[i].date == array[j]) {
+                    distance=assignServiceData2[i].travelDistanceinKM+distance;
+                    amount=assignServiceData2[i].travelAmount+amount;
+                }
+            }
+            var temp = {
+               // "staff": data.staffId[z],
+                "Date":array[j],
+                "Distance":distance,
+                "Amount":amount
+            }
+            arr.push(temp)
+            distance = 0, amount = 0
+        }
+    }
+    var value={
+        "staffId":data.staffId[z],
+        "staffName":staff.staffName,
+        "details":arr
+    }
+ output.push(value);
+}
+    // if (Err) return Promise.reject(Err);
+    if (lodash.isEmpty(output)) return Promise.reject(ERR.NO_RECORDS_FOUND);
+    return Promise.resolve(output);
+
 }
 module.exports = {
     assignServiceClient: assignServiceClient,
@@ -2051,5 +2141,6 @@ module.exports = {
     uploadAutoInvoice: uploadAutoInvoice,
     getAssignServiceInvoicePresignedUrl: getAssignServiceInvoicePresignedUrl,
     getAssignServiceDataByDateForActivityReport: getAssignServiceDataByDateForActivityReport,
-    deleteAutoInvoice:deleteAutoInvoice
+    deleteAutoInvoice: deleteAutoInvoice,
+    getAssignServiceDataByDateForTravelReport: getAssignServiceDataByDateForTravelReport
 }

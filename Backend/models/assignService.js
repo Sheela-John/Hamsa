@@ -30,7 +30,7 @@ const assignServiceSchema = new mongoose.Schema({
     elongitude: { type: Number },
     bookedCount: { type: Number, default: 1 },
     travelDistanceinKM: { type: Number,default:0 },
-    travelDurationinMinutes: { type: Number },
+    travelDurationinMinutes: { type: Number,default:0  },
     rating: { type: Number, default: 0 },
     feedBack: { type: String },
     paymentRefNum: { type: String },
@@ -70,8 +70,7 @@ const assignServiceSchema = new mongoose.Schema({
         default:0
     },
     autoInvoiceId:{
-        type:String,
-        default:0
+        type:String
     }
 }, {
     collection: 'assignService',
