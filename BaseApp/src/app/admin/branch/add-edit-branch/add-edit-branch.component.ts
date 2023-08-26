@@ -24,7 +24,7 @@ export class AddEditBranchComponent implements OnInit {
   public showError: boolean;
   public BranchStatus: any;
   public addressLatitude: string = ''
-  public  addressLongitude: string = ''
+  public addressLongitude: string = ''
 
 
   constructor(private fb: FormBuilder, private router: Router, public BranchService: BranchService, private flashMessageService: FlashMessageService, private route: ActivatedRoute,) {
@@ -36,7 +36,7 @@ export class AddEditBranchComponent implements OnInit {
   ngOnInit(): void {
     this.initializebranchForm();
     if (this.routerData != undefined) {
-       this.getBranchbyId(this.routerData);
+      this.getBranchbyId(this.routerData);
       //this.getBranchByIdBase4App(this.routerData)
       this.showAddEdit = true;
     } else {
@@ -47,8 +47,10 @@ export class AddEditBranchComponent implements OnInit {
   //initializeBranchForm
   initializebranchForm() {
     this.branchForm = this.fb.group({
-      branchName: ['',Validators.required],
+      branchName: ['', Validators.required],
       branchAddress: ['', Validators.required],
+      latitude: [''],
+      longitude: [''],
     });
   }
 
@@ -58,12 +60,9 @@ export class AddEditBranchComponent implements OnInit {
   }
 
   handleAddressChange(address: any) {
-    console.log("Address Changed", address);
-    this.formattedAddress = address.address_components
-    this.addressLatitude = address.geometry.location.lat()
-    this.addressLongitude = address.geometry.location.lng()
-    console.log( this.addressLatitude, this.addressLongitude,"lat")
-    this.branchForm.controls['branchAddress'].setValue(address.formatted_address)
+    this.branchForm.controls['branchAddress'].setValue(address.formatted_address);
+    this.branchForm.controls['latitude'].setValue(address.geometry.location.lat())
+    this.branchForm.controls['longitude'].setValue(address.geometry.location.lng())
   }
 
   //-----------------------------------BRANCH API INTEGRATION - START -------------------------------------------//
@@ -71,14 +70,8 @@ export class AddEditBranchComponent implements OnInit {
   //save Branch
   saveBranch() {
     this.isbranchFormSubmitted = true;
-    console.log(this.branchForm.value, "value")
     if (this.branchForm.valid) {
-      var data = {
-        branchName: this.branchForm.value.branchName,
-        branchAddress: this.branchForm.value.branchAddress,
-      }
-      console.log("data", data)
-      this.BranchService.createBranch(data).subscribe((res) => {
+      this.BranchService.createBranch(this.branchForm.value).subscribe((res) => {
         if (res.status) {
           this.flashMessageService.successMessage("Branch Created Successfully", 1);
           this.router.navigateByUrl("admin/branch");
@@ -106,15 +99,10 @@ export class AddEditBranchComponent implements OnInit {
     this.isbranchFormSubmitted = true;
     this.showError = false;
     this.branchForm.value._id = this.routerData;
-    var data = {
-      _id: this.routerData,
-      branchName: this.branchForm.controls.branchName.value,
-      branchAddress: this.branchForm.controls.branchAddress.value,
-    }
     if (this.branchForm.valid) {
-      this.BranchService.updateBranchById(data).pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
-        if (res.status) {      
-         this.flashMessageService.successMessage('Branch Updated Sucessfully', 2);
+      this.BranchService.updateBranchById(this.branchForm.value).pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
+        if (res.status) {
+          this.flashMessageService.successMessage('Branch Updated Sucessfully', 2);
           this.router.navigateByUrl("admin/branch");
         }
         else this.flashMessageService.errorMessage('Branch Updation sucessfully', 2);

@@ -477,12 +477,7 @@ export class AddEditAssignServiceComponent implements OnInit {
       this.slotId = event
     }
     this.isShowSlotTime = true
-    if (this.showAddEdit == true) {
-      this.AssignServiceDate = this.assignServiceForm.value.date
-    }
-    else {
-      this.AssignServiceDate = this.formatDate(this.assignServiceForm.value.date)
-    }
+    this.AssignServiceDate = this.formatDate(this.assignServiceForm.value.date);
     var data = {
       staffId: this.StaffId,
       slotId: this.slotId
@@ -708,7 +703,7 @@ export class AddEditAssignServiceComponent implements OnInit {
         this.assignSercieDataArr = res.data;
         this.assignServiceForm.patchValue({
           staffId: this.assignSercieDataArr.staffId,
-          date: this.formatDate(this.assignSercieDataArr.date),
+          date: new Date(this.assignSercieDataArr.date),
         })
         if (this.assignSercieDataArr.staffId != '') {
           this.onChangeStaff(this.assignSercieDataArr.staffId)
@@ -809,7 +804,6 @@ export class AddEditAssignServiceComponent implements OnInit {
     if (this.assignServiceForm.valid) {
       if (this.assignServiceClientForm.valid) {
         var formattedDates = this.formattedDate(this.assignServiceForm.value.date)
-        console.log(formattedDates,this.assignServiceForm.value.date,"formattedDates")
         var data = {
           staffId: this.assignServiceForm.value.staffId,
           date: formattedDates,
