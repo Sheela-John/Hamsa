@@ -88,6 +88,10 @@ const UpdateAttendence = async function (datatoupdate) {
     }
 
     // Update the document
+    if(datatoupdate.switchStatus)
+    {
+        existingAttendenceData.switchStatus=datatoupdate.switchStatus
+    }
     let [attendenceUpdateErr, updatedAttendenceData] = await handle(Attendence.findOneAndUpdate(
         { "_id": AttendenceId },
         { $set: existingAttendenceData },
