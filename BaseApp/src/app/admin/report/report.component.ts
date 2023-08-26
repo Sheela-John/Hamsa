@@ -67,6 +67,15 @@ export class ReportComponent implements OnInit {
   staffList1: any = [];
   staffLists: any = [];
   finalData: any=[];
+  travelData: any;
+  theraphistData: any;
+  public istherapistReportForm: boolean = false;
+  public idData: any=[];
+  public activityData: any=[];
+  public travelExpense: any=[];
+  travelMinDate: any;
+  activityMinDate: any;
+  theraphistMinDate: any;
 
   constructor(private route: ActivatedRoute, private router: Router, private flashMessageService: FlashMessageService, private fb: FormBuilder, public staffService: StaffService, public reportService: ReportService) {
 
@@ -89,12 +98,12 @@ export class ReportComponent implements OnInit {
     this.initializeTravelExpenseReport();
     this.initializeTravelHours();
     this.getAllStaffs();
+    console.log()
   }
 
   //Initialize Activity Report
   initializeActivityReport() {
     this.activityReportForm = this.fb.group({
-      staffId: ['', Validators.required],
       startDate: ['', Validators.required],
       endDate: ['', Validators.required]
     })
@@ -129,25 +138,49 @@ export class ReportComponent implements OnInit {
   //Submit Activity Report
   submitActivityReport() {
     this.isActivityReportSubmitted = true;
-    this.reportService.getActivityReport(this.activityReportForm.value).subscribe(res => {
+    var data={
+      fromDate:this.ReverseformatDate(this.activityReportForm.value.startDate),
+      toDate:this.ReverseformatDate(this.activityReportForm.value.endDate),
+      status:0
+    }
+    this.reportService.getActivity(data).subscribe(res => {
       if (res.status) {
+        this.activityData=[]
         this.activityReportList = res.data;
-        this.activityReportList.forEach(therapistData => {
-          var data = {
-            date: this.formatDate(therapistData.date),
-            empId: therapistData.staffDetails.empId,
-            clientName: therapistData.clientDetails.clientName,
-            phone: therapistData.phone,
-            address: therapistData.address,
-            startDistance: therapistData.clientDistanceDetails.startDistance,
-            endDistance: therapistData.clientDistanceDetails.endDistance,
-            staffName: therapistData.staffDetails.staffName,
-            serviceName: therapistData.servicesDetails.serviceName,
-            time: therapistData.time.slice(11, 16),
-            paymentReferenceId: therapistData.paymentReferenceId
-          }
-          this.activityReportData.push(data);
+        this.activityReportList.forEach(ele =>{
+          this.activityData.push({
+                date: this.formatDate(ele.date),
+                // empId: therapistData.staffDetails.empId,
+                clientName: ele.clientName,
+                phone: ele.phone,
+                address: ele.address,
+                startDistance: ele.startDistance,
+                endDistance: ele.endDistance,
+                staffName: ele.staffName,
+                serviceName: ele.serviceName,
+                time: ele.startTime,
+                transportMode: ele.transportMode,
+                start:ele.startTime
+          })
+          // var date=this.formatDate(ele.date)
         })
+        console.log(this.activityReportList,"this.activityReportList");
+        // this.activityReportList.forEach(therapistData => {
+        //   var data = {
+        //     date: this.formatDate(therapistData.date),
+        //     empId: therapistData.staffDetails.empId,
+        //     clientName: therapistData.clientDetails.clientName,
+        //     phone: therapistData.phone,
+        //     address: therapistData.address,
+        //     startDistance: therapistData.clientDistanceDetails.startDistance,
+        //     endDistance: therapistData.clientDistanceDetails.endDistance,
+        //     staffName: therapistData.staffDetails.staffName,
+        //     serviceName: therapistData.servicesDetails.serviceName,
+        //     time: therapistData.time.slice(11, 16),
+        //     paymentReferenceId: therapistData.paymentReferenceId
+        //   }
+        //   this.activityReportData.push(data);
+        // })
         // console.log(res.data);
       }
     })
@@ -235,6 +268,9 @@ export class ReportComponent implements OnInit {
     // console.log(maxDate,"start")
     this.tt = value.toLocaleDateString("en-US")
     this.startDateData = this.tt.split("/");
+    this.TravelHours.patchValue({
+      endDate: ""
+    })
   }
 
   onDateChangeEnd(value) {
@@ -254,22 +290,40 @@ export class ReportComponent implements OnInit {
 
 
   }
-
-  //Submit Therapist Report
-  submitTherapistReport() {
-    this.isTherapistReportSubmitted = true;
-
-    // this.reportService.getTherapistReport(this.therapistReportForm.value).subscribe(res => {
-    //   console.log(res, "resresres");
-    //   if (res.status) {
-    //     this.therapistReportData = res.data;
-    //     console.log(this.therapistReportData, "therapistReportData");
-    //   }
-    //   else {
-    //     this.flashMessageService.errorMessage("err")
-    //   }
-    // })
+  onDateChangeStartTravel(value){
+    this.travelMinDate = value;
+    this.travelExpenseReportForm.patchValue({
+      endDate: ""
+    })
   }
+  onDateChangeStartActivity(value){
+    this.activityMinDate = value;
+    this.activityReportForm.patchValue({
+      endDate: ""
+    })
+  }
+  onDateChangeStartTheraphist(value){
+    this.theraphistMinDate = value;
+    this.therapistReportForm.patchValue({
+      endDate: ""
+    })
+  }
+
+  // //Submit Therapist Report
+  // submitTherapistReport() {
+  //   this.isTherapistReportSubmitted = true;
+
+  //   // this.reportService.getTherapistReport(this.therapistReportForm.value).subscribe(res => {
+  //   //   console.log(res, "resresres");
+  //   //   if (res.status) {
+  //   //     this.therapistReportData = res.data;
+  //   //     console.log(this.therapistReportData, "therapistReportData");
+  //   //   }
+  //   //   else {
+  //   //     this.flashMessageService.errorMessage("err")
+  //   //   }
+  //   // })
+  // }
 
   //Format Date to display dd-mm-yyyy format in table
   formatDate(date) {
@@ -341,11 +395,9 @@ export class ReportComponent implements OnInit {
           }
         });
         console.log(this.staffList, "staffList");
+        console.log(this.StaffId, "StaffId");
       }
-
     })
-
-
   }
 
   // //onChangeClient
@@ -361,10 +413,33 @@ export class ReportComponent implements OnInit {
     //   startDate: this.ReverseformatDate(this.travelExpenseReportForm.value.startDate),
     //   endDate: this.ReverseformatDate(this.travelExpenseReportForm.value.endDate)
     // }
-    console.log(this.travelExpenseReportForm.value, 'gh')
-    this.reportService.getTravelExpenseReport(this.travelExpenseReportForm.value).subscribe(res => {
+    console.log(this.travelExpenseReportForm.value.staffId1, 'gh')
+    this.idData=[]
+    this.travelExpenseReportForm.value.staffId1.forEach(fn=>{
+      this.idData.push(fn._id)
+    })
+    console.log(this.idData,"isd")
+    var data={
+      staffId:this.idData,
+      fromDate:this.ReverseformatDate(this.travelExpenseReportForm.value.startDate),
+      toDate:this.ReverseformatDate(this.travelExpenseReportForm.value.endDate)
+    }
+    console.log(data,"datasoftravel")
+    this.reportService.getTravelExpenseReport(data).subscribe(res => {
       if (res.status) {
         this.TravelExpenseData = res.data;
+        this.travelExpense=[]
+        this.TravelExpenseData.forEach(ele=>{
+          ele.details.forEach(item=>{
+            this.travelExpense.push({
+              Date:this.formatDate(item.Date),
+              staffName:ele.staffName,
+              Amount:item.Amount,
+              Distance:item.Distance
+            })
+          })
+        })
+        console.log("travelExpense:",this.travelExpense);
         // console.log(this.TravelExpenseData);
       }
     })
@@ -482,6 +557,53 @@ export class ReportComponent implements OnInit {
     })
     // this.reportService.getAttendenace()
   }
+
+  //TravelExpense report
+  // saveTravelExpense(){
+  //   this.travelExpenseReportForm=true
+  //   console.log(this.travelExpenseReportForm.value.staffId1,"Travel")
+  //   var data={
+
+  //   }
+  //   this.reportService.getTravelExpense(data).subscribe(res=>{
+  //     this.travelData=res.data
+  //     this.travelData.forEach(expense=>{
+  //       staffName:""
+  //       date:""
+  //       travelDistance:""
+  //       Amount:""
+  //     })
+  //   })
+  // }
+
+  //Theraphist report
+  submitTherapistReport(){
+    this.istherapistReportForm=true
+    console.log("start:",this.therapistReportForm)
+    var data={
+      fromDate:this.therapistReportForm.value.startDate,
+      toDate:this.therapistReportForm.value.endDate
+    }
+    console.log(data,"data")
+    this.theraphistData=[]
+    this.reportService.getTheraphist(data).subscribe(res=>{
+      if(res.status){
+        console.log(res.data,"response")
+        // this.theraphistData=[]
+        this.theraphistData=res.data
+        
+        console.log(this.theraphistData,"this.theraphistData");
+        
+        // this.theraphistData.forEach(theraphist=>{
+        //   staffName:""
+        //   completed:""
+        //   Assigned:""
+        // })
+      }
+      
+    })
+  }
+
 
   //Export
   export() {

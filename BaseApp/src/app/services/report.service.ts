@@ -9,8 +9,8 @@ export class ReportService {
     constructor(private reportDataService: ReportDataService) { }
 
     //Get Activity Report Data
-    public getActivityReport(data) {
-        return this.reportDataService.getActivityReport(data);
+    public getActivity(data) {
+        return this.reportDataService.getActivity(data);
     }
 
     //Get Therapist Report Data
@@ -25,8 +25,13 @@ export class ReportService {
     public  getAttendenace(data) {
         return this.reportDataService. getAttendenace(data);
     }
-    //TravelExpense Report
-    public  getTravelExpense(data) {
-        return this.reportDataService. getTravelExpense(data);
+    // //TravelExpense Report
+    // public  getTravelExpense(data) {
+    //     return this.reportDataService. getTravelExpense(data);
+    // }
+     //Theraphist Report
+     public  getTheraphist(data) {
+        return this.reportDataService. getTheraphist(data);
     }
+    //Activity Report
 }

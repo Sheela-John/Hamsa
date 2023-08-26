@@ -24,34 +24,8 @@
         <div class="panels">
             <div class="panel" id="one-panel">
                 <!-- <div class="panel-title">Activity Report</div> -->
-                <form class="form" novalidate="" [formGroup]="TravelHours">
-                    <div class="grid sm:grid-cols-1 md:grid-cols-3 md:gap-3">
-                        <!-- <div>
-                            <label for="staffId" class="block mb-2 font-bold text-gray-600">Staff Name</label>
-                        <select class="border border-gray-300 shadow p-2 w-full rounded" 
-                            formControlName="staffId">
-                            <option value="">--select--</option>
-                            <option value="{{staff._id}}" *ngFor="let staff of staffList">{{staff.staffName}}</option>
-                        </select>
-                            <div class="error-msg-area">
-                                <div *ngIf="activityReportForm.controls['staffId'].errors && (!activityReportForm.controls['staffId'].pristine|| isActivityReportSubmitted)"
-                                    class="error-msg">
-                                    <div [hidden]="!activityReportForm.controls['staffId'].errors.required">Please Select Staff Name
-                                    </div>
-                                </div>
-                            </div>
-                        </div> -->
-                        <!-- <div>
-                            <div>
-                                <label for="staffRole" class="block mb-2 font-bold text-gray-600">Staff Name</label>
-                                <select class="form-control data-picker-color user-font" formControlName="staffId">
-                                    <option>--select--</option>
-                                    <option  value="{{staff._id}}" *ngFor="let staff of staffList">
-                                        {{staff.staffName}}
-                                    </option>
-                                </select>
-                            </div>        
-                        </div> -->
+                <form class="form" novalidate="" [formGroup]="activityReportForm">
+                    <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
                         <div>
                             <label for="startDate" class="block mb-2 font-bold text-gray-600">Start Date</label>
                             <div class="input-group">
@@ -60,7 +34,7 @@
                                 <input type="text" class="form-control data-picker-color user-font"
                                     formControlName="startDate" bsDatepicker 
                                     [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
-                                    (bsValueChange)="onDateChangeStart($event)"  (input)="inputdobValidator($event)"
+                                    (bsValueChange)="onDateChangeStartActivity($event)"  (input)="inputdobValidator($event)"
                                      placeholder="DD-MM-YYYY">
                             </div>
                             <div class="error-msg-area">
@@ -77,7 +51,7 @@
                                 <div class="input-group-prepend">
                                 </div>
                                 <input type="text" class="form-control data-picker-color user-font"
-                                    formControlName="endDate" bsDatepicker
+                                    formControlName="endDate" bsDatepicker [minDate]="activityMinDate"
                                     [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
                                     (bsValueChange)="onDateChangeEnd($event)" (input)="inputdobValidator($event)"
                                     maxlength="10" placeholder="DD-MM-YYYY">
@@ -92,33 +66,36 @@
                             <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg"
                         (click)="submitActivityReport()">Submit</button>
                         </div>
+                        <!-- <div class="submitActivity">
+                            <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg"
+                        (click)="submitActivityReport()">Submit</button>
+                        </div> -->
                     </div>
                 </form>
                 <section class="flex items-center justify-center">
                     <div class="container">
-                        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" *ngIf="isActivityReportSubmitted"
-                            class="flex sm:bg-white rounded-lg overflow-hidden sm:shadow-lg my-5">
-                            <thead class="text-white">
-                                <tr
-                                    class="bg-teal-400 flex flex-col flex-no wrap sm:table-row rounded-l-lg sm:rounded-none mb-2 sm:mb-0">
-                                    <th class="p-3 text-left">Date</th>
-                                    <th class="p-3 text-left">Emp ID</th>
-                                    <th class="p-3 text-left">Client Name</th>
-                                    <th class="p-3 text-left">Phone Number</th>
-                                    <th class="p-3 text-left">Address</th>
-                                    <th class="p-3 text-left">Start Distance</th>
-                                    <th class="p-3 text-left">End Distance</th>
-                                    <th class="p-3 text-left">Staff Name</th>
-                                    <th class="p-3 text-left">Service</th>
-                                    <th class="p-3 text-left">Start Time</th>
-                                    <!-- <th class="p-3 text-left">End Time</th> -->
-                                    <th class="p-3 text-left">Trans Ref</th>
-                                </tr>
+                        <table  style="display: block !important;overflow-x: auto;" datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" *ngIf="isActivityReportSubmitted"
+                            class="flex sm:bg-white rounded-lg  sm:shadow-lg my-5">
+                            <thead class="text-white scrollmenu">
+                                <tr class="bg-teal-400 flex flex-col flex-no wrap sm:table-row rounded-l-lg sm:rounded-none mb-2 sm:mb-0">
+                                    <th class="p-3 text-center">Date</th>
+                                    <!-- <th class="p-3 text-left">Emp ID</th> -->
+                                    <th class="p-3 text-center">Client Name</th>
+                                    <th class="p-3 text-center">Phone Number</th>
+                                    <th class="p-3 text-center">Address</th>
+                                    <th class="p-3 text-center">Start Distance</th>
+                                    <th class="p-3 text-center">End Distance</th>
+                                    <th class="p-3 text-center">Staff Name</th>
+                                    <th class="p-3 text-center">Service</th>
+                                    <th class="p-3 text-center">Start Time</th>
+                                    <!-- <th class="p-3 text-center">End Time</th> -->
+                                    <th class="p-3 text-center">Transport Mode</th>
+                                </tr> 
                             </thead>
-                            <tbody class="flex-1 sm:flex-none">
-                                <tr class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0" *ngFor="let data of activityReportData">
+                            <tbody class="flex-1 sm:flex-none scrollmenu">
+                                <tr class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0" *ngFor="let data of activityData">
                                     <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.date}}</td>
-                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.empId}}</td>
+                                    <!-- <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.empId}}</td> -->
                                     <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.clientName}}</td>
                                     <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.phone}}</td>
                                     <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.address}}</td>
@@ -126,12 +103,12 @@
                                     <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.endDistance}}</td>
                                     <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.staffName}}</td>
                                     <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.serviceName}}</td>
-                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.time}}</td>
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.start}}</td>
                                     <!-- <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.staffRole}}</td> -->
-                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.paymentReferenceId}}</td>
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.transportMode}}</td>
                                 </tr>
                             </tbody>
-                            <h4 class="text-center" *ngIf="activityReportData.length == 0">No Data Available</h4>
+                            <h4 class="text-center" *ngIf="activityData.length == 0">No Data Available</h4>
                         </table>
                     </div>
                 </section>
@@ -147,7 +124,7 @@
                                 <input type="text" class="form-control data-picker-color user-font"
                                     formControlName="startDate" bsDatepicker
                                     [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
-                                    (bsValueChange)="onDateChangeStart($event)"  (input)="inputdobValidator($event)"
+                                    (bsValueChange)="onDateChangeStartTheraphist($event)"  (input)="inputdobValidator($event)"
                                      placeholder="DD-MM-YYYY">
                             </div>
                             <div class="error-msg-area">
@@ -166,7 +143,7 @@
                                 <input type="text" class="form-control data-picker-color user-font"
                                     formControlName="endDate" bsDatepicker
                                     [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
-                                    (bsValueChange)="onDateChangeEnd($event)" (input)="inputdobValidator($event)" [minDate]="minDate"
+                                    (bsValueChange)="onDateChangeEnd($event)" (input)="inputdobValidator($event)" [minDate]="theraphistMinDate"
                                     maxlength="10" placeholder="DD-MM-YYYY">
                             </div>
                             <div class="error-msg-area">
@@ -183,7 +160,7 @@
                 </form>
                 <section class="flex items-center justify-center">
                     <div class="container">
-                        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" *ngIf="isTherapistReportSubmitted"
+                        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" *ngIf="istherapistReportForm"
                             class="w-full flex flex-row flex-no-wrap sm:bg-white rounded-lg overflow-hidden sm:shadow-lg my-5">
                             <thead class="text-white">
                                 <tr
@@ -194,13 +171,13 @@
                                 </tr>
                             </thead>
                             <tbody class="flex-1 sm:flex-none">
-                                <tr class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0" *ngFor="let data of therapistReportData">
+                                <tr class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0" *ngFor="let data of theraphistData">
                                     <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.staffName}}</td>
-                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.assigned}}</td>
-                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.completed}}</td>
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.Assigned}}</td>
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.Completed}}</td>
                                 </tr>
                             </tbody>
-                        <h4 class="text-center" *ngIf="therapistReportData.length == 0">No Data Available</h4>
+                        <h4 class="text-center" *ngIf="theraphistData.length == 0">No Data Available</h4>
                         </table>
                     </div>
                 </section>
@@ -210,19 +187,13 @@
                     <div class="grid sm:grid-cols-1 md:grid-cols-3 md:gap-3">
                         <div>
                             <div>
-                                <label for="StaffId" class="block mb-2 font-bold text-gray-600">Staff Name</label>
-                         
-                                
+                                <label for="StaffId" class="block mb-2 font-bold text-gray-600">Staff Name</label>   
                                     <ng-multiselect-dropdown [placeholder]="'-- Select --'" class="text-muted"
                                         [settings]="StaffId" formControlName="staffId1" [data]="staffLists" >
-                                    </ng-multiselect-dropdown>
-                                    
-                                
+                                    </ng-multiselect-dropdown>          
                             </div> 
-                           
                         </div>
                         <div>
-                            
                             <label for="startDate" class="block mb-2 font-bold text-gray-600">Start Date</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
@@ -230,7 +201,7 @@
                                 <input type="text" class="form-control data-picker-color user-font"
                                     formControlName="startDate" bsDatepicker
                                     [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
-                                    (bsValueChange)="onDateChangeStart($event)"  (input)="inputdobValidator($event)"
+                                    (bsValueChange)="onDateChangeStartTravel($event)"  (input)="inputdobValidator($event)"
                                      placeholder="DD-MM-YYYY">
                             </div>
                             <div class="error-msg-area">
@@ -247,9 +218,9 @@
                                 <div class="input-group-prepend">
                                 </div>
                                 <input type="text" class="form-control data-picker-color user-font"
-                                    formControlName="endDate" bsDatepicker
+                                    formControlName="endDate" bsDatepicker [minDate]="travelMinDate"
                                     [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
-                                    (bsValueChange)="onDateChangeEnd($event)" (input)="inputdobValidator($event)"
+                                     (input)="inputdobValidator($event)"
                                     maxlength="10" placeholder="DD-MM-YYYY">
                             </div>
                             <div class="error-msg-area">
@@ -266,7 +237,7 @@
                 </form>
                 <section class="flex items-center justify-center">
                     <div class="container">
-                        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger"
+                        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" *ngIf="isTravelExpenseReportSubmitted"
                             class="w-full flex flex-row flex-no-wrap sm:bg-white rounded-lg overflow-hidden sm:shadow-lg my-5">
                             <thead class="text-white">
                                 <tr
@@ -278,15 +249,16 @@
                                   
                                 </tr>
                             </thead>
-                            <tbody class="flex-1 sm:flex-none" *ngFor="let travelExpense of TravelExpenseData">
+                            <tbody class="flex-1 sm:flex-none" *ngFor="let data of travelExpense">
                                 <tr class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0">
-                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{travelExpense.staffName}}</td>
-                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{travelExpense.date}}</td>
-                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{travelExpense.travelDistanceinKm}}</td>
-                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{travelExpense.amount}}
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.staffName}}</td>
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.Date}}</td>
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.Distance}}</td>
+                                    <td class="border-grey-light border hover:bg-gray-100 p-3">{{data.Amount}}
                                     </td>
                                 </tr>
                             </tbody>
+                            <h4 class="text-center" *ngIf="travelExpense.length == 0">No Data Available</h4>
                         </table>
                     </div>
                 </section>
@@ -434,7 +406,6 @@
                     <!-- <button type="button" (click)="export()" style="width:5rem;margin-left: 70vw;"
                 class="btn btn-primary mr-3 mt-3 on"  *ngIf="finalData.length!=0" >Export</button> -->
                 </section>
-                
             </div>
         </div>
     </div>
