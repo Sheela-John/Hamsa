@@ -77,7 +77,7 @@ const routes: Routes = [
         component: AddEditAssignServiceComponent
     },
     {
-        path: 'assignService/:assignServiceId/addEditAssignService',
+        path: 'assignService/:assignServiceId/addEditAssignService/:show',
         component: AddEditAssignServiceComponent
     },
     {

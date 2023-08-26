@@ -570,6 +570,7 @@ async function getAllAssignedServicesbyclientstaff(data) {
                 new Date(assignServiceData[i].date) <= new Date(data.todate)) &&
                 assignServiceData[i].clientId == data.clientId) {
                 assignServiceData1.push(assignServiceData[i])
+                }
             }
             for (var i = 0; i < assignServiceData1.length; i++) {
                 let [err, clientData] = await handle(Client.findOne({ '_id': assignServiceData1[i].clientId }).lean());
@@ -581,7 +582,7 @@ async function getAllAssignedServicesbyclientstaff(data) {
             }
             if (lodash.isEmpty(assignServiceData1)) return Promise.reject(ERR.NO_RECORDS_FOUND);
             return Promise.resolve(assignServiceData1);
-        }
+        
     }
     if (data.staffId && data.fromDate && data.todate && !data.clientId) {
         let [Err, assignServiceData] = await handle(AssignService.find({}).lean());

@@ -106,11 +106,15 @@ export class AddEditAssignServiceComponent implements OnInit {
   public duration: any;
   public slotId: any;
   public assignId: any;
+  public show:any;
+  public update:boolean=false
 
   constructor(private fb: FormBuilder, public StaffService: StaffService, public ClientService: ClientService, private route: ActivatedRoute, public ServiceService: ServiceService, public BranchService: BranchService, public AssignService: AssignService, public ServiceRequestService: ServiceRequestService, private FlashMessageService: FlashMessageService, private router: Router, private RoleService: RoleService) {
     this.route.params.subscribe((param) => {
       this.assignServiceId = param['assignServiceId'];
       this.serviceRequestId = param['serviceRequestId']
+      this.show = param['show']
+      console.log(param)
     })
   }
 
@@ -128,13 +132,18 @@ export class AddEditAssignServiceComponent implements OnInit {
       this.ngxMaterialEndTimepicker.close();
     if (this.timepickerOpened && this.ngxMateriaTimepicker)
       this.ngxMateriaTimepicker.close();
-
     if (this.assignServiceId != undefined) {
       this.showAddEdit = true
       this.getAssignServiceById(this.assignServiceId);
     }
     if (this.serviceRequestId != undefined) {
       this.getServiceRequestById(this.serviceRequestId)
+    }
+    if(this.show == 'edit'){
+      this.update=true
+    }
+    else{
+      this.update=false
     }
   }
 
@@ -163,6 +172,7 @@ export class AddEditAssignServiceComponent implements OnInit {
       branchAddress: ['', [Validators.required]],
       branchType: ['', [Validators.required]],
       slot: ['', [Validators.required]],
+
     });
   }
 
@@ -237,7 +247,9 @@ export class AddEditAssignServiceComponent implements OnInit {
             endTime: element.endTime,
             status: element.status,
             date: this.formatDate(element.date),
-            serviceName: element.serviceName
+            serviceName: element.serviceName,
+            startDistance: element.startDistance,
+            endDistance: element.endDistance,
           }
           this.assignServiceArray.push(datas)
         })
@@ -701,6 +713,7 @@ export class AddEditAssignServiceComponent implements OnInit {
     this.AssignService.getAssignServiceById(id).subscribe(res => {
       if (res.status) {
         this.assignSercieDataArr = res.data;
+        console.log(this.assignSercieDataArr)
         this.assignServiceForm.patchValue({
           staffId: this.assignSercieDataArr.staffId,
           date: new Date(this.assignSercieDataArr.date),

@@ -355,6 +355,7 @@
                                         </div>
                                     </div>
                                 </div>
+
                                 <div class=" col-12" *ngIf="isShowSlotTime">
                                     <div class="card min-h-37">
                                         <div class="card-header bg-appointment text-center mb-3">
@@ -367,7 +368,8 @@
                                                     </div>
                                                     <div class="card-body">
                                                         <div class="row">
-                                                            <ng-container *ngFor="let slot of timeInterval; let i = index;">
+                                                            <ng-container
+                                                                *ngFor="let slot of timeInterval; let i = index;">
                                                                 <div class="col-md-4 sessionSlots card"
                                                                     [ngClass]="(slot.bookedStatus == 1) ? 'bg-gray-300' : 'pointer'"
                                                                     (click)="(slot.bookedStatus == 1) ? '' : slotSelection(slot,i)">
@@ -388,75 +390,108 @@
                             </div>
                             <div class="mb-4">
                                 <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg mt-3"
-                                    (click)="saveAssignService()" *ngIf="!showAddEdit">Add Assign Service</button>
+                                    (click)="saveAssignService()" *ngIf="!showAddEdit ">Add</button>
                                 <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg mt-3"
-                                    (click)="updateassignService()" *ngIf="showAddEdit">Update Assign Service</button>
+                                    (click)="updateassignService()" *ngIf="showAddEdit && update">Update Assign
+                                    Service</button>
+
                             </div>
                         </form>
-                        <section class="flex items-center justify-center" *ngIf="showAppointmentTable">
+                        <section class="flex items-center justify-center col-md-12" *ngIf="showAppointmentTable">
                             <div class="container">
-                                <table
-                                    class="w-full flex flex-row flex-no-wrap sm:bg-white rounded-lg overflow-hidden sm:shadow-lg my-5">
-                                    <thead class="text-white">
-                                        <tr
-                                            class="bg-teal-400 flex flex-col flex-no wrap sm:table-row rounded-l-lg sm:rounded-none mb-2 sm:mb-0">
-                                            <th class="p-3 text-left">Staff Name</th>
-                                            <th class="p-3 text-left">Date</th>
-                                            <th class="p-3 text-left">Client Name</th>
-                                            <th class="p-3 text-left">Phone Number</th>
-                                            <th class="p-3 text-left">Address</th>
-                                            <th class="p-3 text-left">Service</th>
-                                            <th class="p-3 text-left">StartTime</th>
-                                            <th class="p-3 text-left">End Time</th>
-                                            <th class="p-3 text-left">Status</th>
-                                            <th class="p-3 text-left">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="flex-1 sm:flex-none"
-                                        *ngFor="let assignServiceList of assignServiceArray">
-                                        <tr class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0">
-                                            <td class="border-grey-light border hover:bg-gray-100 p-3">
-                                                {{assignServiceList.staffName}}</td>
-                                            <td class="border-grey-light border hover:bg-gray-100 p-3">
-                                                {{assignServiceList.date}}
-                                            </td>
-                                            <td class="border-grey-light border hover:bg-gray-100 p-3">
-                                                {{assignServiceList.clientName}}</td>
-                                            <td class="border-grey-light border hover:bg-gray-100 p-3">
-                                                {{assignServiceList.phone}}</td>
-                                            <td class="border-grey-light border hover:bg-gray-100 p-3">
-                                                {{assignServiceList.address}}
-                                            </td>
-                                            <td class="border-grey-light border hover:bg-gray-100 p-3">
-                                                {{assignServiceList.serviceName}}</td>
-                                            <td class="border-grey-light border hover:bg-gray-100 p-3">
-                                                {{assignServiceList.startTime}}</td>
-                                            <td class="border-grey-light border hover:bg-gray-100 p-3">
-                                                {{assignServiceList.endTime}}
-                                            </td>
-                                            <td class="border-grey-light border hover:bg-gray-100 p-3">
-                                                <button class="btn" style="background-color: rgb(177, 9, 87);"
-                                                    *ngIf="assignServiceList.status == 0">Assigned</button>
-                                                <button class="btn" style="background-color: green;"
-                                                    *ngIf="assignServiceList.status == 1">Completed</button>
-                                                <button class="btn" style="background-color: rgb(255, 204, 0);"
-                                                    *ngIf="assignServiceList.status == 2">Reshedule</button>
-                                                <button class="btn" style="background-color: rgb(233, 19, 4);"
-                                                    *ngIf="assignServiceList.status == 3">Not Available</button>
-                                                <button class="btn" style="background-color: rgb(18, 69, 134);"
-                                                    *ngIf="assignServiceList.status == 4">Distance Mismatch</button>
-                                            </td>
-                                            <td
-                                                class="border-grey-light border hover:bg-gray-100 p-3 text-red-400 hover:text-red-600 hover:font-medium cursor-pointer">
-                                                <button class="btn"
-                                                    (click)="editAssignServiceClient(assignServiceList._id)"><i
-                                                        class='fa fa-edit'></i></button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                <div class="overflow-auto">
+                                    <table
+                                        class="w-full flex flex-row flex-no-wrap sm:bg-white rounded-lg overflow-hidden sm:shadow-lg my-5">
+                                        <thead class="text-white">
+                                            <tr
+                                                class="bg-teal-400 flex flex-col flex-no wrap sm:table-row rounded-l-lg sm:rounded-none mb-2 sm:mb-0">
+                                                <th class="p-3 text-left">Staff Name</th>
+                                                <th class="p-3 text-left">Date</th>
+                                                <th class="p-3 text-left">Client Name</th>
+                                                <th class="p-3 text-left">Phone Number</th>
+                                                <th class="p-3 text-left">Service</th>
+                                                <th class="p-3 text-left">StartTime</th>
+                                                <th class="p-3 text-left">EndTime </th>
+                                                <th class="p-3 text-left">start Distance </th>
+                                                <th class="p-3 text-left">End Distance </th>
+                                                <th class="p-3 text-left">Status</th>
+                                                <th class="p-3 text-left">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="flex-1 sm:flex-none"
+                                            *ngFor="let assignServiceList of assignServiceArray">
+                                            <tr class="flex flex-col flex-no wrap sm:table-row mb-2 sm:mb-0">
+                                                <td class="border-grey-light border hover:bg-gray-100 p-3">
+                                                    {{assignServiceList.staffName}}</td>
+                                                <td class="border-grey-light border hover:bg-gray-100 p-3">
+                                                    {{assignServiceList.date}}
+                                                </td>
+                                                <td class="border-grey-light border hover:bg-gray-100 p-3">
+                                                    {{assignServiceList.clientName}}</td>
+                                                <td class="border-grey-light border hover:bg-gray-100 p-3">
+                                                    {{assignServiceList.phone}}</td>
+                                                <td class="border-grey-light border hover:bg-gray-100 p-3">
+                                                    {{assignServiceList.serviceName}}</td>
+                                                <td class="border-grey-light border hover:bg-gray-100 p-3">
+                                                    {{assignServiceList.startTime}}</td>
+
+                                                <td class="border-grey-light border hover:bg-gray-100 p-3">
+                                                    {{assignServiceList.endTime}}
+                                                </td>
+                                                <td class="border-grey-light border hover:bg-gray-100 p-3">
+                                                    {{assignServiceList.startDistance}}
+                                                </td>
+                                                <td class="border-grey-light border hover:bg-gray-100 p-3">
+                                                    {{assignServiceList.endDistance}}
+                                                </td>
+                                                <td class="border-grey-light border hover:bg-gray-100 p-3">
+                                                    <button class="btn" style="background-color: rgb(177, 9, 87);"
+                                                        *ngIf="assignServiceList.status == 0">Assigned</button>
+                                                    <button class="btn" style="background-color: green;"
+                                                        *ngIf="assignServiceList.status == 1">Completed</button>
+                                                    <button class="btn" style="background-color: rgb(255, 204, 0);"
+                                                        *ngIf="assignServiceList.status == 2">Reshedule</button>
+                                                    <button class="btn" style="background-color: rgb(18, 69, 134);"
+                                                        *ngIf="assignServiceList.status == 3">Distance Mismatch</button>
+                                                </td>
+                                                <td
+                                                    class="border-grey-light border hover:bg-gray-100 p-3 text-red-400 hover:text-red-600 hover:font-medium cursor-pointer">
+                                                    <button class="btn"
+                                                        (click)="editAssignServiceClient(assignServiceList._id)"><i
+                                                            class='fa fa-edit'></i></button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </section>
+                        <!-- <div *ngFor="let assignServiceList of assignServiceArray">
+                            <div class="card1 row mt-10"  *ngIf="assignServiceList.status == 1 || assignServiceList.status == 3">
+                                <div class="col-md-1"></div>
+                                <div class="col-md-10">
+                                    <div class="card profile-card-3">
+                                        <div class="background-block">
+                                            <img src="/assets/images/credit-card-1730085_640.jpg" alt="profile-sample1"
+                                                class="background" />
+                                        </div>
+                                        <div class="profile-thumb-block">
+                                            <img src="{{assignSercieDataArr?.url}}" alt="profile-image" class="profile" />
+                                        </div>
+                                        <div class="card-content">
+                                            <p class="fw-bold lead mb-2"><strong>TravelExpense
+                                                    Mode:</strong>{{assignSercieDataArr?.transport}}</p>
+                                            <p class="fw-bold lead mb-2"><strong>Amount:
+                                                </strong>{{assignSercieDataArr?.travelAmount}}</p>
+                                            <p class="fw-bold lead mb-2">
+                                                <strong>Reference:{{assignSercieDataArr?.paymentRefNum}}</strong>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-1"></div>
+                            </div>
+                        </div> -->
                     </div>
                 </div>
             </div>

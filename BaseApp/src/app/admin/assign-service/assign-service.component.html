@@ -48,12 +48,13 @@
                         class="bg-teal-400 flex flex-col flex-no wrap sm:table-row rounded-l-lg sm:rounded-none mb-2 sm:mb-0">
                         <th class="p-3 text-left">Client Name</th>
                         <th class="p-3 text-left">Phone Number</th>
-                        <th class="p-3 text-left">Address</th>
                         <th class="p-3 text-left">Service</th>
                         <th class="p-3 text-left">Staff Name</th>
                         <th class="p-3 text-left">Date</th>
                         <th class="p-3 text-left">Start Time</th>
                         <th class="p-3 text-left">End Time</th>
+                        <th class="p-3 text-left">Start Distance</th>
+                        <th class="p-3 text-left">End Distance</th>
                         <th class="p-3 text-left">Status</th>
                         <th class="p-3 text-left">Action</th>
                         <!-- <th class="p-3 text-left" width="110px">Actions</th> -->
@@ -64,12 +65,13 @@
                         *ngFor="let assignService of assignServiceList">
                         <td class="border-grey-light border hover:bg-gray-100 p-3">{{assignService.ClientName}}</td>
                         <td class="border-grey-light border hover:bg-gray-100 p-3">{{assignService.Phone}}</td>
-                        <td class="border-grey-light border hover:bg-gray-100 p-3">{{assignService.Address}}</td>
                         <td class="border-grey-light border hover:bg-gray-100 p-3">{{assignService.Service}}</td>
                         <td class="border-grey-light border hover:bg-gray-100 p-3">{{assignService.staffName}}</td>
                         <td class="border-grey-light border hover:bg-gray-100 p-3">{{assignService.Date}}</td>
                         <td class="border-grey-light border hover:bg-gray-100 p-3">{{assignService.startTime}}</td>
                         <td class="border-grey-light border hover:bg-gray-100 p-3">{{assignService.endTime}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 p-3">{{assignService.startDistance}}</td>
+                        <td class="border-grey-light border hover:bg-gray-100 p-3">{{assignService.endDistance}}</td>
                         <td class="border-grey-light border hover:bg-gray-100 p-3">
                             <button class="btn" style="background-color: rgb(177, 9, 87);"
                                 *ngIf="assignService.Status == 0">Assigned</button>
@@ -83,9 +85,17 @@
                                 *ngIf="assignService.Status == 3">Distance Mismatch</button>
                         </td>
                         <td class="border-grey-light border hover:bg-gray-100 p-3">
-                            <button class="btn" (click)="edit(assignService._id)"><i class='fa fa-edit'></i></button>
+                            <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-1 mt-2">
+                                <div>
+                                    <button class="btn" title="Edit" style="background-color:green;padding: 0px 5px;"
+                                        (click)="edit(assignService._id, 'edit')" *ngIf="assignService.Status == 0 || assignService.Status == 2"><i class='fa fa-edit'></i></button>
+                                        <button class="btn" title="View"
+                                        style="background-color: rgb(253 179 18);padding: 0px 4px;"  *ngIf="assignService.Status == 1 || assignService.Status == 3"
+                                        (click)="edit(assignService._id, 'view')"><i class='fa fa-eye '></i></button>
+                                    </div>
+                               
+                            </div>
                         </td>
-
                         <!-- <td
                             class="border-grey-light border hover:bg-gray-100 p-3 text-red-400 hover:text-red-600 hover:font-medium cursor-pointer">
                             <button class="btn" (click)="editrole(roleList._id)"><i class='fa fa-edit'></i></button></td> -->

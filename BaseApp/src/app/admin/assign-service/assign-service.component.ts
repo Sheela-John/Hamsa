@@ -77,14 +77,14 @@ export class AssignServiceComponent implements OnInit {
     // this.getAllStaffbase4App()
     //this.getAllAssignService();
     // this.getAllAssignInBase4App()
-
+    this.getAllbyPast30Days();
     this.minDate = new Date()
     this.minDate.setDate(this.minDate.getDate() - 30);
     this.maxDate = new Date()
     this.maxDate.setDate(this.maxDate.getDate());
     this.searchForm.get('fromDate').patchValue(this.minDate = new Date(), this.minDate.setDate(this.minDate.getDate() - 30))
     this.searchForm.get('toDate').patchValue(this.maxDate);
-    this.getAllbyPast30Days();
+   
   }
 
   //initialise the searchForm
@@ -171,6 +171,7 @@ export class AssignServiceComponent implements OnInit {
     this.AssignService.getAllAssignService().subscribe(res => {
       if (res.status) {
         this.assignServiceData = res.data
+        console.log(this.assignServiceData,'assignservice')
         this.assignServiceList = []
         this.assignServiceData.forEach(element => {
           var data = {
@@ -183,9 +184,12 @@ export class AssignServiceComponent implements OnInit {
             endTime: element.endTime,
             Status: element.status,
             Date: this.formatDate(element.date),
+            startDistance: element.startDistance,
+            endDistance: element.endDistance,
             status: element.status,
             Service: element.serviceName
           }
+          console.log(data)
           this.assignServiceList.push(data)
         });
         this.dtTrigger.next(null);
@@ -201,6 +205,7 @@ export class AssignServiceComponent implements OnInit {
     this.AssignService.getAllbyPast30Days().subscribe(res => {
       if (res.status) {
         this.assignServiceData = res.data
+        console.log(this.assignServiceData,'assignservice')
         this.assignServiceList = []
         this.assignServiceData.forEach(element => {
           var data = {
@@ -213,6 +218,8 @@ export class AssignServiceComponent implements OnInit {
             endTime: element.endTime,
             Status: element.status,
             Date: this.formatDate(element.date),
+            startDistance: element.startDistance,
+            endDistance: element.endDistance,
             status: element.status,
             Service: element.serviceName
           }
@@ -242,6 +249,7 @@ export class AssignServiceComponent implements OnInit {
       if (res.status) {
         this.assignServiceData = res.data
         this.assignServiceList = []
+        console.log(this.assignServiceData,'assignservice')
         this.assignServiceData.forEach(element => {
           var data = {
             _id: element._id,
@@ -253,9 +261,12 @@ export class AssignServiceComponent implements OnInit {
             endTime: element.endTime,
             Status: element.status,
             Date: this.formatDate(element.date),
+            startDistance: element.startDistance,
+            endDistance: element.endDistance,
             status: element.status,
             Service: element.serviceName
           }
+          console.log
           this.assignServiceList.push(data)
         });
         this.dtTrigger.next(null);
@@ -298,8 +309,8 @@ export class AssignServiceComponent implements OnInit {
   }
 
   //Routing while click the edit Icon
-  edit(id) {
-    this.router.navigateByUrl('admin/assignService/' + id + '/addEditAssignService')
+  edit(id, show) {
+    this.router.navigateByUrl('admin/assignService/' + id + '/addEditAssignService/' + show);
   }
 
   //To get the time
