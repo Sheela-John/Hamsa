@@ -345,31 +345,7 @@ const travelDistance = async (data) => {
 }
 
 const getAttendenceofToday = async (data) => {
-    var query = [
-        {
-            '$match': {
-                'date': new Date(data.date),
-                'staffId': data.staffId
-            }
-        },
-        {
-            $addFields: {
-                'staffObjId': { $toObjectId: data.staffId }
-            }
-        },
-        {
-            $lookup: {
-                from: 'staff',
-                localField: 'staffObjId',
-                foreignField: '_id',
-                as: 'staffDetails'
-            }
-        },
-        {
-            $unwind: '$staffDetails'
-        },
-    ]
-    let [err, attendenceData] = await handle(Attendence.aggregate(query));
+    let [err, attendenceData] = await handle(Attendence.find({'staffId':data.staffId,'date':new Date(data.date)}));
     if (err) return Promise.reject(err);
     else return Promise.resolve(attendenceData);
 }
