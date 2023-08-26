@@ -156,11 +156,16 @@ const getAttendenceofStaffByDateRange = async (data) => {
         },
     ]
     let [err, attendenceData] = await handle(Attendence.aggregate(query));
+    console.log("attendenceData",attendenceData)
     for (var i = 0; i < attendenceData.length; i++) {
         console.log("attendenceData", attendenceData[i])
         for (var j = 0; j < attendenceData[i].doc.length; j++) {
-            if (attendenceData[i].doc[j].outTime == undefined) {
+            //if (attendenceData[i].doc[j].outTime == undefined)
+            if(attendenceData[i].doc[j].outTimeArray.length<attendenceData[i].doc[j].inTimeArray.length) {
+                console.log("attendenceData[i].doc[j].date",(attendenceData[i].doc[j].date).toString())
+
                 let [err, assign] = await handle(AssignService.find({ "staffId": (attendenceData[i]._id).toString(), "date": attendenceData[i].doc[j].date }))
+                console.log("#########################################",assign)
                 var out;
                 if (assign.length != 0) {
                     var val = Number(assign[0].endTime.split(':')[0] + assign[0].endTime.split(':')[1])
@@ -173,9 +178,11 @@ const getAttendenceofStaffByDateRange = async (data) => {
                         }
                     }
                     attendenceData[i].doc[j].outTime = out;
+                    attendenceData[i].doc[j].outTimeArray.push(out);
                 }
                 else {
                     attendenceData[i].doc[j].outTime = attendenceData[i].doc[j].endTime
+                    attendenceData[i].doc[j].outTimeArray.push(attendenceData[i].doc[j].endTime)
                 }
             }
             console.log("attendenceData[i].doc[j]", attendenceData[i].doc[j])
@@ -217,7 +224,7 @@ const getAttendenceofStaffByDateRange = async (data) => {
             }
             var distance = 0;
             var duration = 0;
-            let [Err1, travelCountData] = await handle(TravelCount.find({ 'staffId': attendenceData[i].doc[j].staffId, date: attendenceData[i].doc[j].date }).sort({ count: 1 }).lean());
+            let [Err1, travelCountData] = await handle(TravelCount.find({ 'staffId': attendenceData[i].doc[j].staffId, date: (attendenceData[i].doc[j].date) }).sort({ count: 1 }).lean());
             console.log("travelCountData", travelCountData)
             var totalDistance = [];
             var totalDuration = [];
