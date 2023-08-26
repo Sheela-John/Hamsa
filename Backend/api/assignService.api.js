@@ -2009,7 +2009,6 @@ async function getAssignServiceDataByDateForActivityReport(data) {
                     }
                 }
             }
-            console.log("assigned", assigned, completed)
             var temp = {
                 "staff": array[j],
                 "staffName": staff.staffName,
@@ -2030,7 +2029,15 @@ async function getAssignServiceDataByDateForActivityReport(data) {
             if(assignServiceData1[i].transport)
             {
             let [err3, transportData] = await handle(TravelAllowance.findOne({ _id: assignServiceData1[i].transport }).lean());
+            if(transportData)
+            {
             assignServiceData1[i].transportMode = transportData.travelExpenseMode;
+            }
+            else
+            {
+                assignServiceData1[i].transportMode = "Auto";
+  
+            }
             }
             assignServiceData1[i].clientName = clientData.clientName;
             assignServiceData1[i].staffName = staffData.staffName;
