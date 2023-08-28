@@ -97,7 +97,8 @@ export class AddEditClientComponent implements OnInit {
   public packageIds: any;
   public minDate: any;
   public hideUpdateButton: boolean = false;
-
+public clientLatitude:any;
+public clientLongitude:any;
   constructor(private fb: FormBuilder, private router: Router, public BranchService: BranchService,
     private flashMessageService: FlashMessageService, private assignService: AssignService,
     private route: ActivatedRoute, private staffService: StaffService, private roleService: RoleService,
@@ -175,6 +176,8 @@ export class AddEditClientComponent implements OnInit {
   // Get Latitude and Longitude for Address
   handleAddressChange(address: any) {
     this.clientForm.controls['address'].patchValue(address.formatted_address)
+    this.clientLatitude=address.geometry.location.lat();
+    this.clientLongitude=address.geometry.location.lng();
     this.clientForm.controls['clientAddressLatitude'].setValue(address.geometry.location.lat());
     this.clientForm.controls['clientAddressLongitude'].setValue(address.geometry.location.lng());
   }
@@ -565,6 +568,8 @@ export class AddEditClientComponent implements OnInit {
             }
           })
         })
+        this.clientLatitude=this.clientData.clientAddressLatitude;
+        this.clientLongitude=this.clientData.clientAddressLongitude;
         this.clientForm.patchValue({
           uhid: this.clientData.uhid,
           clientName: this.clientData.clientName,
@@ -659,6 +664,13 @@ export class AddEditClientComponent implements OnInit {
   updateClient() {
     this.isClientFormSubmitted = true;
     var data = this.clientForm.value;
+    console.log("form",data)
+    console.log(this.clientLatitude,"this.clientLatitude")
+    console.log("this.clientLongitude",this.clientLongitude)
+ 
+    data.clientAddressLatitude=this.clientLatitude;
+    data.clientAddressLongitude=this.clientLongitude;
+  
     data.startDate = (this.editClientData) ? this.reverseFormatDate(this.clientData.startDate) : this.reverseFormatDate(this.clientForm.value.startDate);
     data.endDate = (this.editClientData) ? this.reverseFormatDate(this.clientData.endDate) : this.reverseFormatDate(this.clientForm.value.endDate);
     for (let i = 0; i < this.sessionArr.value.length; i++) {
@@ -692,6 +704,7 @@ export class AddEditClientComponent implements OnInit {
       endTime: data.endTime
     }
     data.packageId = [packageArr];
+    console.log("data",data)
     this.clientService.updateClient(this.clientId, data).subscribe(res => {
       if (res.status) {
         this.flashMessageService.successMessage("Client Updated Sucessfully!!!");
