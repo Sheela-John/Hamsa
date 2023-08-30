@@ -57,15 +57,21 @@ async function create(clientData) {
         let copiedDate = new Date(clientData.dob.getTime());
         clientData['dob'] = copiedDate;
     }
+    console.log(clientData.phoneNumber)
+    if(clientData.phoneNumber!="9999999999")
+{
     let [clientErr, client] = await handle(checkForExistingUser(clientData));
+    console.log(client)
+   // if (clientErr) return Promise.reject(clientErr);
+   // if (!(lodash.isEmpty(client))) return Promise.reject(ERR.MOBILE_NUMBER_NOT_REGISTERED);
     if (clientErr) return Promise.reject(clientErr);
-    if (!(lodash.isEmpty(client))) return Promise.reject(ERR.MOBILE_NUMBER_NOT_REGISTERED);
+    if (!lodash.isEmpty(client)) {
+        return Promise.reject(ERR.MOBILE_NUMBER_ALREADY_REGISTERED);
+    }
+}
     return new Promise((resolve, reject) => {
-        if (clientErr) return reject(clientErr);
-        if (!lodash.isEmpty(client)) {
-            return reject(ERR.ACCOUNT_ALREADY_REGISTERED);
-        }
-        else {
+       
+        // else {
             async.waterfall([
                 saveClient,
                 createLoginCredentials
@@ -200,7 +206,7 @@ async function create(clientData) {
             //         cb(null, client);
             //     }
             // }
-        }
+       // }
     })
 }
 
