@@ -250,9 +250,9 @@
         "code": 159,
         "message": "The Appointment can be cancelled only after Certain Hours"
     },
-    "MOBILE_NUMBER_NOT_REGISTERED": {
+    "MOBILE_NUMBER_ALREADY_REGISTERED": {
         "code": 160,
-        "message": "Mobile Number Not Registered with Us"
+        "message": "Mobile Number Already Registered"
     },
     "NUMBER_OF_DAYS": {
         "code": 161,
@@ -267,5 +267,9 @@
     {
         "code" : 164,
         "message" : "Role Already Exists!"
+    },
+    "UHID_EXISTS":{
+        "code":165,
+        "message":"UHID Already Exists!"
     }
 }

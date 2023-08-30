@@ -57,156 +57,155 @@ async function create(clientData) {
         let copiedDate = new Date(clientData.dob.getTime());
         clientData['dob'] = copiedDate;
     }
-    console.log(clientData.phoneNumber)
-    if(clientData.phoneNumber!="9999999999")
-{
-    let [clientErr, client] = await handle(checkForExistingUser(clientData));
-    console.log(client)
-   // if (clientErr) return Promise.reject(clientErr);
-   // if (!(lodash.isEmpty(client))) return Promise.reject(ERR.MOBILE_NUMBER_NOT_REGISTERED);
-    if (clientErr) return Promise.reject(clientErr);
-    if (!lodash.isEmpty(client)) {
-        return Promise.reject(ERR.MOBILE_NUMBER_ALREADY_REGISTERED);
+    let [clientErr1, clientUHID] = await handle(checkForExistingUHID(clientData));
+    if (clientErr1) return Promise.reject(clientErr1);
+    if (!lodash.isEmpty(clientUHID)) {
+        return Promise.reject(ERR.UHID_EXISTS);
     }
-}
+    if (clientData.phoneNumber != "9999999999") {
+        let [clientErr, client] = await handle(checkForExistingUser(clientData));
+        if (clientErr) return Promise.reject(clientErr);
+        if (!lodash.isEmpty(client)) {
+            return Promise.reject(ERR.MOBILE_NUMBER_ALREADY_REGISTERED);
+        }
+    }
     return new Promise((resolve, reject) => {
-       
         // else {
-            async.waterfall([
-                saveClient,
-                createLoginCredentials
-            ], function (err, result) {
-                if (err) return reject(err);
-                return resolve(result);
-            });
-            function saveClient(cb) {
-                (async () => {
-                    clientData.role = "PORTAL_CLIENT";
-                    var pack = clientData.packageId;
-                    delete clientData.packageId;
-                    var temp = {
-                        "id": pack,
-                        "startDate": clientData.startDate,
-                        "endDate": clientData.endDate,
-                        "noOfSession": clientData.noOfSession,
-                        "staffId": clientData.staffId,
-                        "typeOfTreatment": clientData.typeOfTreatment,
-                        "serviceId": clientData.serviceId,
-                        "onWeekDay": clientData.onWeekDay,
-                        "addSession": clientData.addSession,
-                        "amount": clientData.amount,
-                        "slot": clientData.slot,
-                        "duration": clientData.duration,
-                        "startTime": clientData.startTime,
-                        "endTime": clientData.endTime
-                    }
-                    var arr = [];
-                    arr.push(temp);
-                    clientData['packageId'] = arr;
-                    var saveModel = new Client(clientData);
-                    let [err, client] = await handle(saveModel.save())
-                    var count = 1;
-                    var typeArray = [1, 3, 4];
-                    for (var i = 0; i < client.addSession.length; i++) {
-                        let [assignErr, assignServiceValue] = await handle(AssignService.find({}).lean());
-                        for (var j = 0; j < assignServiceValue.length; j++) {
-                            if (assignServiceValue[j].date == new Date(client.addSession[i].date)) {
-                                if (slotCheck(assignServiceValue[j].startTime) >= slotCheck(client.addSession[i].slotStartTime) && slotCheck(assignServiceValue[j].endTime) <= slotCheck(client.addSession[i].slotEndTime)) {
-                                    if (typeArray.includes(assignServiceValue[j].typeOfTreatment) && typeArray.includes(client.typeOfTreatment)) {
-                                        count = assignServiceValue[j].bookedCount + 1;
-                                        let [assignErr, assignServiceValue1] = await handle(AssignService.findOneAndUpdate({ _id: assignServiceValue[j]._id }, { $set: { bookedCount: count } }, { new: true, useFindAndModify: false }))
-                                    }
+        async.waterfall([
+            saveClient,
+            createLoginCredentials
+        ], function (err, result) {
+            if (err) return reject(err);
+            return resolve(result);
+        });
+        function saveClient(cb) {
+            (async () => {
+                clientData.role = "PORTAL_CLIENT";
+                var pack = clientData.packageId;
+                delete clientData.packageId;
+                var temp = {
+                    "id": pack,
+                    "startDate": clientData.startDate,
+                    "endDate": clientData.endDate,
+                    "noOfSession": clientData.noOfSession,
+                    "staffId": clientData.staffId,
+                    "typeOfTreatment": clientData.typeOfTreatment,
+                    "serviceId": clientData.serviceId,
+                    "onWeekDay": clientData.onWeekDay,
+                    "addSession": clientData.addSession,
+                    "amount": clientData.amount,
+                    "slot": clientData.slot,
+                    "duration": clientData.duration,
+                    "startTime": clientData.startTime,
+                    "endTime": clientData.endTime
+                }
+                var arr = [];
+                arr.push(temp);
+                clientData['packageId'] = arr;
+                var saveModel = new Client(clientData);
+                let [err, client] = await handle(saveModel.save())
+                var count = 1;
+                var typeArray = [1, 3, 4];
+                for (var i = 0; i < client.addSession.length; i++) {
+                    let [assignErr, assignServiceValue] = await handle(AssignService.find({}).lean());
+                    for (var j = 0; j < assignServiceValue.length; j++) {
+                        if (assignServiceValue[j].date == new Date(client.addSession[i].date)) {
+                            if (slotCheck(assignServiceValue[j].startTime) >= slotCheck(client.addSession[i].slotStartTime) && slotCheck(assignServiceValue[j].endTime) <= slotCheck(client.addSession[i].slotEndTime)) {
+                                if (typeArray.includes(assignServiceValue[j].typeOfTreatment) && typeArray.includes(client.typeOfTreatment)) {
+                                    count = assignServiceValue[j].bookedCount + 1;
+                                    let [assignErr, assignServiceValue1] = await handle(AssignService.findOneAndUpdate({ _id: assignServiceValue[j]._id }, { $set: { bookedCount: count } }, { new: true, useFindAndModify: false }))
                                 }
                             }
                         }
-                        var assignData = {
-                            "clientId": client._id,
-                            "clientName": client.clientName,
-                            "staffId": client.staffId,
-                            "phone": client.phoneNumber,
-                            "date": new Date(client.addSession[i].date),
-                            "status": 0,
-                            "packageId": pack,
-                            "address": client.address,
-                            "serviceId": client.serviceId,
-                            "endTime": client.addSession[i].slotEndTime,
-                            "startTime": client.addSession[i].slotStartTime,
-                            "duration": client.addSession[i].duration,
-                            "slot": client.addSession[i].slot,
-                            "typeOfTreatment": client.typeOfTreatment,
-                            "latitude": client.clientAddressLatitude,
-                            "longitude": client.clientAddressLongitude,
-                            "bookedCount": count,
-                            "branchId": client.homeBranchId,
-                            "branchType": 0
-                        }
-                        var saveAssignData = new AssignService(assignData);
-                        let [err1, assignServiceData] = await handle(saveAssignData.save())
                     }
-                    if (err) cb(err, null);
-                    else {
-                        cb(null, client);
+                    var assignData = {
+                        "clientId": client._id,
+                        "clientName": client.clientName,
+                        "staffId": client.staffId,
+                        "phone": client.phoneNumber,
+                        "date": new Date(client.addSession[i].date),
+                        "status": 0,
+                        "packageId": pack,
+                        "address": client.address,
+                        "serviceId": client.serviceId,
+                        "endTime": client.addSession[i].slotEndTime,
+                        "startTime": client.addSession[i].slotStartTime,
+                        "duration": client.addSession[i].duration,
+                        "slot": client.addSession[i].slot,
+                        "typeOfTreatment": client.typeOfTreatment,
+                        "latitude": client.clientAddressLatitude,
+                        "longitude": client.clientAddressLongitude,
+                        "bookedCount": count,
+                        "branchId": client.homeBranchId,
+                        "branchType": 0
                     }
-                })();
-            }
-            function createLoginCredentials(clientDatafromFunction, cb) {
-                log.debug(component, 'Inside Create Login Functionality', { attach: clientDatafromFunction });
-                (async () => {
-                    let clientDataModel = {};
-                    clientDataModel['ipNumber'] = clientDatafromFunction.empId;
-                    clientDataModel['email'] = clientDatafromFunction.email;
-                    clientDataModel['role'] = "PORTAL_CLIENT";
-                    // clientDataModel['password'] = Security.hash(clientDatafromFunction.createdAt, clientDatafromFunction.password);
-                    clientDataModel['phone'] = clientDatafromFunction.phoneNumber;
-                    clientDataModel['user'] = clientDatafromFunction._id;
-                    clientDataModel['createdAt'] = clientDatafromFunction.createdAt;
-                    const loginModel = new Login(clientDataModel);
-                    let [loginerr, loginData] = await handle(loginModel.save());
-                    if (loginerr) cb(loginerr, null);
-                    else {
-                        cb(null, clientDatafromFunction);
-                    }
-                })();
-            }
-            // function loginClient(clientData, cb) {
-            //     (async () => {
-            //         let [err, loginClient] = await handle(userLogin(clientData.empId, clientData.savepassword, 'PORTAL_CLIENT'));
-            //         if (err) cb(err, null);
-            //         else {
-            //             cb(null, clientData);
-            //         }
-            //     })();
-            // }
+                    var saveAssignData = new AssignService(assignData);
+                    let [err1, assignServiceData] = await handle(saveAssignData.save())
+                }
+                if (err) cb(err, null);
+                else {
+                    cb(null, client);
+                }
+            })();
+        }
+        function createLoginCredentials(clientDatafromFunction, cb) {
+            log.debug(component, 'Inside Create Login Functionality', { attach: clientDatafromFunction });
+            (async () => {
+                let clientDataModel = {};
+                clientDataModel['ipNumber'] = clientDatafromFunction.empId;
+                clientDataModel['email'] = clientDatafromFunction.email;
+                clientDataModel['role'] = "PORTAL_CLIENT";
+                // clientDataModel['password'] = Security.hash(clientDatafromFunction.createdAt, clientDatafromFunction.password);
+                clientDataModel['phone'] = clientDatafromFunction.phoneNumber;
+                clientDataModel['user'] = clientDatafromFunction._id;
+                clientDataModel['createdAt'] = clientDatafromFunction.createdAt;
+                const loginModel = new Login(clientDataModel);
+                let [loginerr, loginData] = await handle(loginModel.save());
+                if (loginerr) cb(loginerr, null);
+                else {
+                    cb(null, clientDatafromFunction);
+                }
+            })();
+        }
+        // function loginClient(clientData, cb) {
+        //     (async () => {
+        //         let [err, loginClient] = await handle(userLogin(clientData.empId, clientData.savepassword, 'PORTAL_CLIENT'));
+        //         if (err) cb(err, null);
+        //         else {
+        //             cb(null, clientData);
+        //         }
+        //     })();
+        // }
 
-            /* For Future Use */
-            // function sendEmail(client, cb) {
-            //     if ((clientData.email != '') && (clientData.email != undefined)) {
-            //         let subject = 'Verification Code';
-            //         var codeNew = generateCode.randomString(4, 'a#');
-            //         html.create({
-            //             data: {
-            //                 brandLogo: `${config.AWSCredentails.S3StorageLinkForimages}brand/brand-logo.png`,
-            //                 name: `${client.email}`,
-            //                 password: `${client.password}`
-            //             },
-            //             templateName: 'verification_code'
-            //         }, (err, contents) => {
-            //             if (err) cb(err, null);
-            //             else {
-            //                 Email.send(client.email, subject, contents, undefined, () => {
-            //                     log.debug(component, 'Verification Code email successfull');
-            //                     log.close()
-            //                     delete client.password;
-            //                     cb(null, client);
-            //                 });
-            //             }
-            //         });
-            //     }
-            //     else {
-            //         cb(null, client);
-            //     }
-            // }
-       // }
+        /* For Future Use */
+        // function sendEmail(client, cb) {
+        //     if ((clientData.email != '') && (clientData.email != undefined)) {
+        //         let subject = 'Verification Code';
+        //         var codeNew = generateCode.randomString(4, 'a#');
+        //         html.create({
+        //             data: {
+        //                 brandLogo: `${config.AWSCredentails.S3StorageLinkForimages}brand/brand-logo.png`,
+        //                 name: `${client.email}`,
+        //                 password: `${client.password}`
+        //             },
+        //             templateName: 'verification_code'
+        //         }, (err, contents) => {
+        //             if (err) cb(err, null);
+        //             else {
+        //                 Email.send(client.email, subject, contents, undefined, () => {
+        //                     log.debug(component, 'Verification Code email successfull');
+        //                     log.close()
+        //                     delete client.password;
+        //                     cb(null, client);
+        //                 });
+        //             }
+        //         });
+        //     }
+        //     else {
+        //         cb(null, client);
+        //     }
+        // }
+        // }
     })
 }
 
@@ -215,6 +214,27 @@ async function checkForExistingUser(loginCred) {
         [{
             $match: {
                 'phoneNumber': loginCred.phoneNumber
+            }
+        }]
+    return new Promise((resolve, reject) => {
+        Client.aggregate(query).collation({ locale: "en", strength: 2 }).exec((err, client) => {
+            if (err) {
+                log.error(component, { attach: err });
+                log.close();
+                return reject(err);
+            }
+            if (client.length > 0) {
+                return resolve(client);
+            }
+            return resolve([]);
+        })
+    })
+}
+async function checkForExistingUHID(loginCred) {
+    let query =
+        [{
+            $match: {
+                'uhid': loginCred.uhid
             }
         }]
     return new Promise((resolve, reject) => {
@@ -359,27 +379,26 @@ async function updateClient(datatoupdate, clientId) {
             ));
         }
     }
-    if(temp==0)
-    {
-   let[err, updatePackage] = await handle(Client.findOneAndUpdate({ _id: clientId }, { $push: { packageId: { $each: [packageData[0]], $sort: -1 } } }, { new: true, useFindAndModify: false }).lean());
+    if (temp == 0) {
+        let [err, updatePackage] = await handle(Client.findOneAndUpdate({ _id: clientId }, { $push: { packageId: { $each: [packageData[0]], $sort: -1 } } }, { new: true, useFindAndModify: false }).lean());
     }
-    else{
+    else {
         console.log("already exits")
     }
-    console.log( client.packageId.length,"gggg")
+    console.log(client.packageId.length, "gggg")
     for (let x = 0; x < client.packageId.length; x++) {
-        console.log("xxxxxxxxxxxxxxxx",x)
-    //    console.log(client.packageId,"client.packageId")
-       // var packageData = datatoupdate.packageId;
+        console.log("xxxxxxxxxxxxxxxx", x)
+        //    console.log(client.packageId,"client.packageId")
+        // var packageData = datatoupdate.packageId;
         delete datatoupdate.packageId;
         clientData = await handle(Client.findOneAndUpdate({ _id: clientId }, datatoupdate, { new: true, useFindAndModify: false }));
-        
+
         var count = 1;
         var typeArray = [1, 3, 4];
-        console.log(packageData[0].addSession.length,"gggggggggg")
+        console.log(packageData[0].addSession.length, "gggggggggg")
         for (let i = 0; i < packageData[0].addSession.length; i++) {
 
-             assignServiceData.push( {
+            assignServiceData.push({
                 staffId: packageData[0].staffId,
                 date: new Date(packageData[0].addSession[i].date),
                 clientId: clientId,
@@ -399,17 +418,17 @@ async function updateClient(datatoupdate, clientId) {
                 status: 0,
                 latitude: client.clientAddressLatitude,
                 longitude: client.clientAddressLongitude,
-               // bookedCount: count,
+                // bookedCount: count,
                 packageId: packageData[0].id
             }
-             )
+            )
         }
-     console.log("assignServiceData",assignServiceData)
+        console.log("assignServiceData", assignServiceData)
         let updatePackage;
         if (client.packageId[x].id == packageData[0].id) {
             console.log("if")
-           
-           // console.log("updatePackage:", updatePackage);
+
+            // console.log("updatePackage:", updatePackage);
             let [err, assignData] = await handle(AssignService.find({ packageId: packageData[0].id }))
             if (err) {
                 return Promise.reject(err);
