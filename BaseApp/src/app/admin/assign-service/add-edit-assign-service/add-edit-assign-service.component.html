@@ -401,7 +401,7 @@
                             <div class="container">
                                 <div class="overflow-auto">
                                     <table
-                                        class="w-full flex flex-row flex-no-wrap sm:bg-white rounded-lg overflow-hidden sm:shadow-lg my-5">
+                                        class="tableres w-full flex flex-row flex-no-wrap sm:bg-white rounded-lg overflow-hidden sm:shadow-lg my-5">
                                         <thead class="text-white">
                                             <tr
                                                 class="bg-teal-400 flex flex-col flex-no wrap sm:table-row rounded-l-lg sm:rounded-none mb-2 sm:mb-0">
@@ -466,8 +466,7 @@
                                 </div>
                             </div>
                         </section>
-                        <!-- <div *ngFor="let assignServiceList of assignServiceArray">
-                            <div class="card1 row mt-10"  *ngIf="assignServiceList.status == 1 || assignServiceList.status == 3">
+                            <div class="card1 row mt-10" *ngIf="showAddEdit && !update">
                                 <div class="col-md-1"></div>
                                 <div class="col-md-10">
                                     <div class="card profile-card-3">
@@ -491,7 +490,6 @@
                                 </div>
                                 <div class="col-md-1"></div>
                             </div>
-                        </div> -->
                     </div>
                 </div>
             </div>

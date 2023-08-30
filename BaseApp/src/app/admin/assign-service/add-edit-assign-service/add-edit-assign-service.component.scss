@@ -162,4 +162,11 @@
     z-index:99999;
     
   }
-  
+  img  {
+    color: transparent;
+  }
+  @media (min-width:300px) and (max-width: 700px){
+    .tableres{
+        overflow: scroll !important;
+    }
+  }
