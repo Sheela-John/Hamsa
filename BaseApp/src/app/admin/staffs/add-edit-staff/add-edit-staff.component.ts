@@ -109,6 +109,7 @@ export class AddEditStaffComponent implements OnInit {
       if(res.status)
       {
         this.staffData=res.data;
+        console.log("this.staffData",this.staffData.branchId);
         this.staffForm.patchValue({
           empId: this.staffData.empId,
           staffName: this.staffData.staffName,
@@ -120,10 +121,10 @@ export class AddEditStaffComponent implements OnInit {
         })
       
       }
-      console.log("this.staffData",this.staffData)
+      console.log("this.staffData",this.staffForm)
     })
-    this.getAllBranch();
-    this.getAllRole();
+    //this.getAllBranch();
+    //this.getAllRole();
   }
 
   getAllBranch()
