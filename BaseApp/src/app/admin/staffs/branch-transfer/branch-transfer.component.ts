@@ -9,6 +9,7 @@ import { environment } from 'src/environments/environment';
 import * as Parse from 'parse';
 import { FlashMessageService } from 'src/app/shared/flash-message/flash-message.service';
 import { BranchTransferService } from 'src/app/services/branchTransfer.service';
+import { StaffService } from 'src/app/services/staff.service';
 @Component({
   selector: 'app-branch-transfer',
   templateUrl: './branch-transfer.component.html',
@@ -54,8 +55,9 @@ export class BranchTransferComponent implements OnInit {
   startDateData: any;
   endDateData: any;
   public branchTransferType: any;
+  staffDataBranch: any;
 
-  constructor(private router: Router, private fb: FormBuilder, public branchTransferService: BranchTransferService, public BranchService: BranchService, private flashMessageService: FlashMessageService, private route: ActivatedRoute) {
+  constructor(private router: Router, private fb: FormBuilder, public staffService: StaffService,public branchTransferService: BranchTransferService, public BranchService: BranchService, private flashMessageService: FlashMessageService, private route: ActivatedRoute) {
     this.route.params.subscribe((param) => {
       this.StaffId = param['staffId'];
       this.routerData = param['branchTranferId'];
@@ -65,7 +67,8 @@ export class BranchTransferComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeBranchTransferForm();
-    this.getAllBranch();
+    this.getByStaffId(this.StaffId);
+  //  this.getAllBranch();
     //  // this.getAllBranchInBase4App()
     if (this.routerData != undefined) {
       this.getBranchTranferById(this.routerData)
@@ -73,6 +76,7 @@ export class BranchTransferComponent implements OnInit {
     } else {
       this.showAddEdit = false;
     }
+  
   }
 
   //Initialize Staff Form
@@ -94,15 +98,33 @@ export class BranchTransferComponent implements OnInit {
     if (this.endpickerOpened && this.ngxMaterialEndTimepicker)
       this.ngxMaterialEndTimepicker.close();
   }
+  getByStaffId(id)
+  {
+    
+    this.staffService.getStaffById(id).subscribe(res=>{
+      if(res.status)
+      {
+        this.staffDataBranch=res.data.branchId;
+        console.log("this.staffDataBranch",this.staffDataBranch)
+        this.getAllBranch();
+      }
+    })
+  
+  }
 
   //getAll Branch 
   getAllBranch() {
     this.BranchService.getAllBranches().subscribe(res => {
       if (res.status) {
         this.branchData = res.data;
+        console.log("res.data",res.data);
+        this.branchList=[];
         this.branchData.forEach(branchValue => {
           if (branchValue.status == 0) {
+            if(branchValue._id!=this.staffDataBranch)
+            {
             this.branchList.push(branchValue);
+          }
           }
         });
       }
@@ -140,6 +162,7 @@ export class BranchTransferComponent implements OnInit {
       }
     })
   }
+ 
 
   //Ngx-google Autocomplete --NPM
   options: any = {

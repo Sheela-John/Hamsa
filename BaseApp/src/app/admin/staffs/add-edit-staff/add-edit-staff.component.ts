@@ -44,7 +44,7 @@ export class AddEditStaffComponent implements OnInit {
   addressLongitude: any;
   addressLatitude: any;
   public staffData: any;
- public branchDataList: any;
+ public branchDataList: any=[];
   roleDataList: any;
 
 
@@ -133,7 +133,14 @@ export class AddEditStaffComponent implements OnInit {
       if(res.status)
       {
         console.log(res.data)
-        this.branchDataList=res.data;
+       // this.branchDataList=res.data;
+        this.branchData = res.data;
+        this.branchData.forEach(branchValue => {
+          if (branchValue.status == 0) {
+            
+            this.branchDataList.push(branchValue);
+          }
+        });
         console.log("this.branchDataList",this.branchDataList)
       }
     })
