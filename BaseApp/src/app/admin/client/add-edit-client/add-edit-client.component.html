@@ -55,10 +55,14 @@
                         <input type="text" placeholder="Enter Phone Number" maxlength="10" pattern="[0-9]{10}"
                             class="border border-gray-300 p-2 w-full rounded" formControlName="phoneNumber">
                         <div class="error-msg-area">
-                            <div *ngIf="clientForm.controls['phoneNumber'].errors && (!clientForm.controls['phoneNumber'].pristine|| isClientFormSubmitted)"
-                                class="error-msg">
+                            <div
+                                *ngIf="clientForm.controls['phoneNumber'].errors && (showError|| isClientFormSubmitted) && (!clientForm.controls['phoneNumber'].pristine|| isClientFormSubmitted)">
                                 <div [hidden]="!clientForm.controls['phoneNumber'].errors.required">
-                                    Please Enter Phone Number
+                                    Please Enter Phone Number.
+                                </div>
+                                <div [hidden]="clientForm.controls['phoneNumber'].errors.required">
+                                    <div [hidden]="!clientForm.controls['phoneNumber'].errors">
+                                        Please Enter Valid Phone Number.</div>
                                 </div>
                             </div>
                         </div>
@@ -84,6 +88,8 @@
                                 <div [hidden]="!clientForm.controls['address'].errors.required">Please Enter
                                     Address
                                 </div>
+                                <!-- <div class="error-msg" *ngIf="wrongLocationError">Please Choose Location
+                                    from the List</div> -->
                             </div>
                         </div>
                     </div>
@@ -464,6 +470,13 @@
                                                         type="text" placeholder="Start Time"
                                                         formControlName="slotStartTime">
                                                 </div>
+                                                <div *ngIf="clientForm.controls['addSession']['controls'][i]['controls'].slotStartTime?.errors && (!clientForm.controls['addSession']['controls'][i]['controls'].slotStartTime?.pristine || isClientFormSubmitted)"
+                                                    class="error-msg">
+                                                    <div
+                                                        [hidden]="!clientForm.controls['addSession']['controls'][i]['controls'].slotStartTime?.errors.required">
+                                                        Please select Slot Star Time
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div class="col-6">
                                                 <div>
@@ -472,6 +485,13 @@
                                                     <input class="border border-gray-300 p-2 w-full rounded disabled"
                                                         type="text" placeholder="End Time"
                                                         formControlName="slotEndTime">
+                                                </div>
+                                                <div *ngIf="clientForm.controls['addSession']['controls'][i]['controls'].slotEndTime?.errors && (!clientForm.controls['addSession']['controls'][i]['controls'].slotEndTime?.pristine || isClientFormSubmitted)"
+                                                    class="error-msg">
+                                                    <div
+                                                        [hidden]="!clientForm.controls['addSession']['controls'][i]['controls'].slotEndTime?.errors.required">
+                                                        Please select Slot End Time
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

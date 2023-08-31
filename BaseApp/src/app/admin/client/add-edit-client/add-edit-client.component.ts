@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, Component, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GooglePlaceDirective } from 'ngx-google-places-autocomplete';
@@ -97,8 +97,12 @@ export class AddEditClientComponent implements OnInit {
   public packageIds: any;
   public minDate: any;
   public hideUpdateButton: boolean = false;
-public clientLatitude:any;
-public clientLongitude:any;
+  public clientLatitude:any;
+  public clientLongitude:any;
+  public showError: boolean = false;
+  public wrongLocationError: boolean;
+  locationData: any=[];
+
   constructor(private fb: FormBuilder, private router: Router, public BranchService: BranchService,
     private flashMessageService: FlashMessageService, private assignService: AssignService,
     private route: ActivatedRoute, private staffService: StaffService, private roleService: RoleService,
@@ -129,9 +133,9 @@ public clientLongitude:any;
     this.clientForm = this.fb.group({
       uhid: ['', Validators.required],
       clientName: ['', Validators.required],
-      phoneNumber: ['', Validators.required],
+      phoneNumber: ['', [Validators.required, Validators.pattern("^((\\+91-?)|0)?[0-9]{10}$")]],
       email: [''],
-      address: ['', Validators.required],
+      address: ['', Validators.compose([Validators.required])],
       clientAddressLatitude: [''],
       clientAddressLongitude: [''],
       emergencyNumber: [''],
@@ -168,6 +172,47 @@ public clientLongitude:any;
     });
   }
 
+  //phone no validation
+  onKeyUp(control) {
+    if (this.clientForm.controls[control].value) {
+      if (control === 'phone') {
+        this.showError = true;
+      }
+    }
+  }
+
+  // checkLocation(event) {
+  //   if (!(this.locationData.includes(event.item))) {
+  //     this.wrongLocationError = true;
+  //   }
+  //   else {
+  //     this.wrongLocationError = false;
+  //   }
+  // }
+
+  //validation for the slot start time
+  setvalidation(){
+    for (let i = 0; i < this.sessionArr.value.length; i++) {
+      if(this.showAddSession == true){
+      var addSession = this.clientForm.get('addSession') as FormArray
+      addSession.at(i)['controls']["slotStartTime"].setValidators([Validators.required]);
+      addSession.at(i)['controls']["slotEndTime"].setValidators([Validators.required]);
+      addSession.at(i)['controls']["slotStartTime"].updateValueAndValidity();
+      addSession.at(i)['controls']["slotEndTime"].updateValueAndValidity();
+    }
+    else{
+      for (let i = 0; i < this.sessionArr.value.length; i++) {
+        var addSession = this.clientForm.get('addSession') as FormArray
+        addSession.at(i)['controls']["slotStartTime"].clearValidator();
+        addSession.at(i)['controls']["slotEndTime"].clearValidator();
+        addSession.at(i)['controls']["slotStartTime"].updateValueAndValidity();
+        addSession.at(i)['controls']["slotEndTime"].updateValueAndValidity();
+      }
+    }
+  }
+ 
+  }
+  
   // Back Button - Route
   addeditClientForm() {
     this.router.navigateByUrl('admin/client')
@@ -362,6 +407,7 @@ public clientLongitude:any;
   addClient() {
     this.showAddSession = true;
     this.isClientFormSubmitted = true;
+    console.log(this.clientForm)
     if (this.clientForm.valid) {
       var data = {
         startDate: (this.editClientData) ? this.reverseFormatDate(this.clientData.startDate) : this.reverseFormatDate(this.clientForm.value.startDate),
@@ -379,8 +425,10 @@ public clientLongitude:any;
       this.clientService.createSession(data).subscribe(res => {
         if (res.status) {
           this.addSessionData = res.data;
+          console.log(this.addSessionData)
           this.allDate = [];
           this.sessionDate = [];
+          console.log(res)
           this.addSessionData.forEach((value) => {
             this.allDate.push(value.date);
             this.sessionDate.push(this.formatDate(value.date));
@@ -391,6 +439,7 @@ public clientLongitude:any;
               this.clientData.addSession.forEach((ele, i) => {
                 if (this.allDate.includes(ele.date)) {
                   var session = this.clientForm.get('addSession') as FormArray;
+                  // this.setvalidation()
                   session.at(i)['controls']['slotStartTime'].patchValue(ele.slotStartTime);
                   session.at(i)['controls']['slotEndTime'].patchValue(ele.slotEndTime);
                 }
@@ -467,6 +516,7 @@ public clientLongitude:any;
   // Save Client Data
   saveClient() {
     this.isClientFormSubmitted = true;
+    this.showError = false;
     var data = this.clientForm.value;
     data.startDate = this.reverseFormatDate(this.clientForm.value.startDate);
     data.endDate = this.reverseFormatDate(this.clientForm.value.endDate);
@@ -485,14 +535,19 @@ public clientLongitude:any;
         }
       }
     })
-    //if (this.clientForm.valid) {
+    this.setvalidation()
+    if (this.clientForm.valid) {
     this.clientService.createClient(data).subscribe(res => {
       if (res.status) {
+        console.log(res)
         this.flashMessageService.successMessage("Client Added Sucessfully!!!");
         this.router.navigateByUrl('admin/client');
       }
+      else {
+        this.flashMessageService.errorMessage(res.message);
+      }
     })
-    //}
+    }
   }
 
   // When edit client to patch the slot
@@ -606,6 +661,7 @@ public clientLongitude:any;
     this.clientService.getDetailsByPackageId(data).subscribe(res => {
       if (res.status) {
         this.showAddSession = true
+        this.setvalidation()
         this.packageId = res.data.packageId;
         this.clientForm.patchValue(res.data);
         this.clientForm.controls['startDate'].patchValue(this.formatDate(res.data.startDate));
@@ -663,11 +719,12 @@ public clientLongitude:any;
   // Update Client
   updateClient() {
     this.isClientFormSubmitted = true;
+    this.showError = false;
     var data = this.clientForm.value;
     console.log("form",data)
     console.log(this.clientLatitude,"this.clientLatitude")
     console.log("this.clientLongitude",this.clientLongitude)
- 
+ this.setvalidation()
     data.clientAddressLatitude=this.clientLatitude;
     data.clientAddressLongitude=this.clientLongitude;
   
@@ -705,11 +762,14 @@ public clientLongitude:any;
     }
     data.packageId = [packageArr];
     console.log("data",data)
+    this.setvalidation()
+    if(this.clientForm.valid){
     this.clientService.updateClient(this.clientId, data).subscribe(res => {
       if (res.status) {
         this.flashMessageService.successMessage("Client Updated Sucessfully!!!");
         this.router.navigateByUrl('admin/client');
       }
     })
+  }
   }
 }
