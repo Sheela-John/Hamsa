@@ -188,7 +188,7 @@ export class AddEditAssignServiceComponent implements OnInit {
       if (res.status) {
         this.staffData = res.data;
         this.staffData.forEach(staffValue => {
-          if (staffValue.status == 0) {
+          if (staffValue.isDeleted == 0) {
             this.staffList.push({
               _id: staffValue._id,
               staffName: staffValue.staffName

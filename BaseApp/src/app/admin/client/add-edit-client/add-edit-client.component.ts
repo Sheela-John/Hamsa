@@ -273,8 +273,9 @@ export class AddEditClientComponent implements OnInit {
     this.staffService.getAllStaffs().subscribe(res => {
       if (res.status) {
         var staffData = res.data;
+        console.log("staffData",staffData)
         staffData.forEach(staff => {
-          if (staff.status == 0) {
+          if (staff.isDeleted == 0 ) {
             this.staffList.push(staff);
           }
         })
