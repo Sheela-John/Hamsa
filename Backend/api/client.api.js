@@ -321,6 +321,8 @@ async function updateClient(datatoupdate, clientId) {
         let [err, updatePackage] = await handle(Client.findOneAndUpdate({ _id: clientId }, { $push: { packageId: { $each: [packageData[0]], $sort: -1 } } }, { new: true, useFindAndModify: false }).lean());
     }
     else {
+        console.log("client.packageId",)
+        clientData = await handle(Client.findOneAndUpdate({ _id: clientId }, {$set:{packageId:packageData}}, { new: true, useFindAndModify: false }));  
     }
     for (let x = 0; x < client.packageId.length; x++) {
         // var packageData = datatoupdate.packageId;
