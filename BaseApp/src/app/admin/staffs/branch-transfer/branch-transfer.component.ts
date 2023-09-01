@@ -57,7 +57,7 @@ export class BranchTransferComponent implements OnInit {
   public branchTransferType: any;
   staffDataBranch: any;
 
-  constructor(private router: Router, private fb: FormBuilder, public staffService: StaffService,public branchTransferService: BranchTransferService, public BranchService: BranchService, private flashMessageService: FlashMessageService, private route: ActivatedRoute) {
+  constructor(private router: Router, private fb: FormBuilder, public staffService: StaffService, public branchTransferService: BranchTransferService, public BranchService: BranchService, private flashMessageService: FlashMessageService, private route: ActivatedRoute) {
     this.route.params.subscribe((param) => {
       this.StaffId = param['staffId'];
       this.routerData = param['branchTranferId'];
@@ -68,7 +68,7 @@ export class BranchTransferComponent implements OnInit {
   ngOnInit(): void {
     this.initializeBranchTransferForm();
     this.getByStaffId(this.StaffId);
-  //  this.getAllBranch();
+    //  this.getAllBranch();
     //  // this.getAllBranchInBase4App()
     if (this.routerData != undefined) {
       this.getBranchTranferById(this.routerData)
@@ -76,7 +76,7 @@ export class BranchTransferComponent implements OnInit {
     } else {
       this.showAddEdit = false;
     }
-  
+
   }
 
   //Initialize Staff Form
@@ -98,33 +98,36 @@ export class BranchTransferComponent implements OnInit {
     if (this.endpickerOpened && this.ngxMaterialEndTimepicker)
       this.ngxMaterialEndTimepicker.close();
   }
-  getByStaffId(id)
-  {
-    
-    this.staffService.getStaffById(id).subscribe(res=>{
-      if(res.status)
-      {
-        this.staffDataBranch=res.data.branchId;
-        console.log("this.staffDataBranch",this.staffDataBranch)
+  getByStaffId(id) {
+
+    this.staffService.getStaffById(id).subscribe(res => {
+      if (res.status) {
+        this.staffDataBranch = res.data.branchId;
+        console.log("this.staffDataBranch", this.staffDataBranch)
         this.getAllBranch();
       }
     })
-  
+
   }
 
   //getAll Branch 
   getAllBranch() {
+
     this.BranchService.getAllBranches().subscribe(res => {
       if (res.status) {
         this.branchData = res.data;
-        console.log("res.data",res.data);
-        this.branchList=[];
+       
+        this.branchList = [];
         this.branchData.forEach(branchValue => {
           if (branchValue.status == 0) {
-            if(branchValue._id!=this.staffDataBranch)
-            {
-            this.branchList.push(branchValue);
-          }
+            if (this.routerData==undefined) {
+              if (branchValue._id != this.staffDataBranch) {
+                this.branchList.push(branchValue);
+              }
+            }
+            else {
+              this.branchList.push(branchValue);
+            }
           }
         });
       }
@@ -133,16 +136,18 @@ export class BranchTransferComponent implements OnInit {
   getBranchTranferById(id) {
     this.branchTransferService.getBranchTransferbyId(id).subscribe(res => {
       if (res.data) {
+        console.log("res", res.data)
         this.BranchDatavalue = res.data
         this.branchTransferForm.controls['branchId'].patchValue(this.BranchDatavalue.branchId);
+        //   this.branchTransferForm.controls['b']
         this.branchTransferForm.controls['branchTransferType'].patchValue(this.BranchDatavalue.branchTransferType);
         this.branchTypeChange();
         if (this.BranchDatavalue.branchTransferType == 0) {
-          this.branchTransferForm.controls['startDate'].patchValue(this.BranchDatavalue.startDate);
-          this.branchTransferForm.controls['endDate'].patchValue(this.BranchDatavalue.endDate);
+          this.branchTransferForm.controls['startDate'].patchValue(this.formattedDate(this.BranchDatavalue.startDate));
+          this.branchTransferForm.controls['endDate'].patchValue(this.formattedDate(this.BranchDatavalue.endDate));
         }
         else {
-          this.branchTransferForm.controls['startDate'].patchValue(this.BranchDatavalue.startDate);
+          this.branchTransferForm.controls['startDate'].patchValue(this.formattedDate(this.BranchDatavalue.startDate));
         }
         if (this.BranchDatavalue.startDate == this.BranchDatavalue.endDate) {
           this.branchTransferForm.controls['startTime'].patchValue(this.BranchDatavalue.startTime);
@@ -162,7 +167,7 @@ export class BranchTransferComponent implements OnInit {
       }
     })
   }
- 
+
 
   //Ngx-google Autocomplete --NPM
   options: any = {
@@ -186,14 +191,14 @@ export class BranchTransferComponent implements OnInit {
       this.branchTransferForm.controls['endTime'].setValue('')
       this.branchTransferForm.controls['endDate'].setValue('')
     }
-    if (this.startDate != 'undefined' && this.endDate != 'undefined' ) {
+    if (this.startDate != 'undefined' && this.endDate != 'undefined') {
       this.isShowDate = true;
       // this.branchTransferForm.controls['endDate'].setValidators([Validators.required]);
     }
     else {
       this.isShowDate = false;
     }
-   
+
   }
   formattedDate(date) {
     var d = new Date(date),
@@ -250,20 +255,20 @@ export class BranchTransferComponent implements OnInit {
 
 
   sumbitbranchTranser() {
-    
+
   }
 
   updateBranchTransfer() {
- 
+
     var id = this.routerData
     this.isbranchTransferFormSubmitted = true;
     this.branchTransferForm.value._id = this.routerData;
     this.branchTransferForm.value.startDate = this.sDate;
-    
-    if(this.branchTransferForm.value.endDate){
+
+    if (this.branchTransferForm.value.endDate) {
       this.branchTransferForm.value.endDate = this.eDate;
     }
-  
+
     if (this.branchTransferForm.valid) {
       this.branchTransferService.updateBranchTransferById(this.branchTransferForm.value).subscribe(res => {
         if (res.status) {
@@ -280,9 +285,9 @@ export class BranchTransferComponent implements OnInit {
     this.isbranchTransferFormSubmitted = true;
 
     if (this.branchTransferForm.valid) {
-  
+
       // this.branchTransferForm.value.branchTransferType = this.branchTransferType;
-    
+
       this.branchTransferForm.value.staffId = this.StaffId;
       this.branchTransferForm.value.startDate = this.sDate;
       this.branchTransferForm.value.endDate = this.eDate;
