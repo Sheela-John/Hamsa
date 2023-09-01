@@ -40,6 +40,7 @@ export class AddEditStaffComponent implements OnInit {
   public RoleDataArr: any = [];
   public RoleNameArr: any = [];
   public Role: any;
+  public editEmpId:boolean;
   public roleNameArr: any=[];
   addressLongitude: any;
   addressLatitude: any;
@@ -65,8 +66,10 @@ export class AddEditStaffComponent implements OnInit {
     if (this.routerData != undefined) {
       this.getByStaffId(this.routerData);
       this.showAddEdit = true;
+      this.editEmpId=true;
     } else {
       this.showAddEdit = false;
+      this.editEmpId=false;
     }
   }
  
@@ -119,7 +122,14 @@ export class AddEditStaffComponent implements OnInit {
           phone: this.staffData.phone,
           staffRole:this.staffData.staffRole
         })
-      
+if(this.editEmpId)
+{
+  this.staffForm.controls['empId'].disable();
+}
+        // this.editEmpId = (this.staffData.empId != '') ? false : true;
+        // if (!this.editEmpId) {
+        //   this.staffForm.controls['empId'].setValue(this.staffData.empId);
+        // }
       }
       console.log("this.staffData",this.staffForm)
     })
