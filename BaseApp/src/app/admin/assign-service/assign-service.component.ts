@@ -70,7 +70,6 @@ export class AssignServiceComponent implements OnInit {
       lengthChange: true,
       retrieve: true,
       ordering: false
-
     }
     this.getAllClient();
     this.getAllStaffs()

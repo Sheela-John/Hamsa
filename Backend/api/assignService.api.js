@@ -65,7 +65,6 @@ const assignServiceClient = async (assignServiceData) => {
     assignServiceData['date'] = copiedAppointmentDate;
     console.log(assignServiceData.date)
     delete assignServiceData._id;
-
     return new Promise((resolve, reject) => {
         (async () => {
             let [findStaffErr, staffNameData] = await handle(Staff.findOne({ '_id': (assignServiceData.staffId) }));
@@ -547,7 +546,6 @@ async function getAllAssignedServicesbyclientstaff(data) {
                 new Date(assignServiceData[i].date) <= new Date(data.todate)) &&
                 assignServiceData[i].staffId == data.staffId &&
                 assignServiceData[i].clientId == data.clientId) {
-
                 assignServiceData1.push(assignServiceData[i])
             }
         }

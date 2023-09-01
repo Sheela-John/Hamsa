@@ -586,15 +586,17 @@ async function saveRecurringSession(data) {
         freq: RRule.WEEKLY,
         dtstart: new Date(data.startDate),
         until: new Date(data.endDate),
-        count: 30,
+        count: 100,
         interval: 1
     }
     recurringRule['byweekday'] = singleArray
     const rule = new RRule(recurringRule);
     var recurringdate = [];
     recurringdate = rule.all()
+    console.log(recurringdate)
     var dateSlot = []
-    if (recurringdate.length < data.noOfSession) {
+    if (recurringdate.length < Number(data.noOfSession) ){
+        console.log("recurringdate.length",(recurringdate.length),(Number(data.noOfSession)))
         return Promise.reject(ERR.NO_OF_SESSION_GREATER_THAN_NO_OF_SLOTS);
     }
     else {

@@ -271,5 +271,9 @@
     "UHID_EXISTS":{
         "code":165,
         "message":"UHID Already Exists!"
+    },
+    "NO_OF_SESSION_GREATER_THAN_NO_OF_SLOTS":{
+        "code":165,
+        "message":"Number of Sessions are greater than number of slots.Please select more days!"
     }
 }

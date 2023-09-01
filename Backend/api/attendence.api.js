@@ -169,7 +169,6 @@ const getAttendenceofStaffByDateRange = async (data) => {
                 console.log("attendenceData[i].doc[j].date",(attendenceData[i].doc[j].date).toString())
 
                 let [err, assign] = await handle(AssignService.find({ "staffId": (attendenceData[i]._id).toString(), "date": attendenceData[i].doc[j].date }))
-                console.log("#########################################",assign)
                 var out;
                 if (assign.length != 0) {
                     var val = Number(assign[0].endTime.split(':')[0] + assign[0].endTime.split(':')[1])
@@ -295,6 +294,7 @@ const getAttendenceofStaffByDateRange = async (data) => {
             // Convert totalDuration to hours:minutes format
             var totalDurationHours = Math.floor(attendenceData[i].doc[j].totalDuration / 60);
             var totalDurationMinutes = attendenceData[i].doc[j].totalDuration % 60;
+            
             attendenceData[i].doc[j].totalDurationFormatted = totalDurationHours + ":" + totalDurationMinutes;
 
         }
