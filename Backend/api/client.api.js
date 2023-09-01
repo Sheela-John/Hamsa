@@ -319,10 +319,7 @@ async function updateClient(datatoupdate, clientId) {
     }
     if (temp == 0) {
         let [err, updatePackage] = await handle(Client.findOneAndUpdate({ _id: clientId }, { $push: { packageId: { $each: [packageData[0]], $sort: -1 } } }, { new: true, useFindAndModify: false }).lean());
-    }
-    else {
-        console.log("client.packageId",)
-        clientData = await handle(Client.findOneAndUpdate({ _id: clientId }, {$set:{packageId:packageData}}, { new: true, useFindAndModify: false }));  
+        console.log("updatePackage",updatePackage)
     }
     for (let x = 0; x < client.packageId.length; x++) {
         // var packageData = datatoupdate.packageId;
@@ -373,7 +370,8 @@ async function updateClient(datatoupdate, clientId) {
                     'packageId.$.slot': packageData[0].slot,
                     'packageId.$.duration': packageData[0].duration,
                     'packageId.$.startTime': packageData[0].startTime,
-                    'packageId.$.endTime': packageData[0].endTime
+                    'packageId.$.endTime': packageData[0].endTime,
+                    'packageId.$.addSession':packageData[0].addSession
                 }
             }, {
                 new: true, useFindAndModify: false
@@ -381,23 +379,9 @@ async function updateClient(datatoupdate, clientId) {
             ));
         }
     }
-    if (temp == 0) {
-        let [err, updatePackage] = await handle(Client.findOneAndUpdate({ _id: clientId }, { $push: { packageId: { $each: [packageData[0]], $sort: -1 } } }, { new: true, useFindAndModify: false }).lean());
-    }
-    else {
-        console.log("already exits")
-    }
-    console.log(client.packageId.length, "gggg")
-    for (let x = 0; x < client.packageId.length; x++) {
-        console.log("xxxxxxxxxxxxxxxx", x)
-        //    console.log(client.packageId,"client.packageId")
-        // var packageData = datatoupdate.packageId;
-        delete datatoupdate.packageId;
-        clientData = await handle(Client.findOneAndUpdate({ _id: clientId }, datatoupdate, { new: true, useFindAndModify: false }));
-
+    for (let x = 0; x < client.packageId.length; x++) {   
         var count = 1;
         var typeArray = [1, 3, 4];
-        console.log(packageData[0].addSession.length, "gggggggggg")
         for (let i = 0; i < packageData[0].addSession.length; i++) {
 
             assignServiceData.push({
@@ -425,12 +409,10 @@ async function updateClient(datatoupdate, clientId) {
             }
             )
         }
-        console.log("assignServiceData", assignServiceData)
+      //  console.log("assignServiceData", assignServiceData)
         let updatePackage;
         if (client.packageId[x].id == packageData[0].id) {
-            console.log("if")
-
-            // console.log("updatePackage:", updatePackage);
+         
             let [err, assignData] = await handle(AssignService.find({ packageId: packageData[0].id }))
             if (err) {
                 return Promise.reject(err);
@@ -450,6 +432,7 @@ async function updateClient(datatoupdate, clientId) {
                     }
                 }
                 let [err2, assignData2] = await handle(AssignService.deleteMany({ packageId: packageData[0].id }));
+              //  console.log("assignData2",assignData2)
                 if (err2) {
                     return Promise.reject(err2);
                 }
@@ -469,6 +452,7 @@ async function updateClient(datatoupdate, clientId) {
                 assignServiceData[i].bookedCount = count
                 var saveAssignData = new AssignService(assignServiceData[i]);
                 let [err3, assignData3] = await handle(saveAssignData.save());
+               // console.log("assignData3",assignData3)
             }
             break;
         }
@@ -697,7 +681,14 @@ async function getAssignServiceByPackageId(data) {
     }
     return Promise.resolve(assignData);
 }
-
+const UpdateClientDetails = async function (datatoupdate) {
+    log.debug(component, 'Updating a Client', { 'attach': datatoupdate }); log.close();
+    let clientId = datatoupdate._id;
+    delete datatoupdate._id
+    let [branchErr, branchData] = await handle(Client.findOneAndUpdate({ "_id": clientId }, datatoupdate, { new: true, useFindAndModify: false }))
+    if (branchErr) return Promise.reject(branchErr);
+    else return Promise.resolve(branchData);
+}
 module.exports = {
     create: create,
     getClientDatabyId: getClientDatabyId,
@@ -709,5 +700,6 @@ module.exports = {
     enableDisableClient: enableDisableClient,
     generatePackageId: generatePackageId,
     getClientDetailsByPackageId: getClientDetailsByPackageId,
-    getAssignServiceByPackageId: getAssignServiceByPackageId
+    getAssignServiceByPackageId: getAssignServiceByPackageId,
+    UpdateClientDetails:UpdateClientDetails
 }

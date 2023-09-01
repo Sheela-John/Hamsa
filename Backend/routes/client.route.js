@@ -62,14 +62,19 @@ router
 
     /* Update Client API */
     .put('/:_id', async (req, res, next) => {
-        console.log("kdgke")
         if (lodash.isEmpty(req.body)) return next(ERR.MANDATORY_FIELD_MISSING)
         // req.body._id = req.params._id;
         let [err, clientData] = await handle(ClientAPI.updateClient(req.body, req.params._id));
         if (err) return next(err);
         else return res.status(200).json({ status: true, data: clientData, message: "Client Updated Successfully!" });
     })
-
+    .put('/UpdateClientDetails/:_id', async (req, res, next) => {
+        if (lodash.isEmpty(req.body)) return next(ERR.MANDATORY_FIELD_MISSING)
+         req.body._id = req.params._id;
+        let [err, clientData] = await handle(ClientAPI.UpdateClientDetails(req.body));
+        if (err) return next(err);
+        else return res.status(200).json({ status: true, data: clientData, message: "Client Updated Successfully!" });
+    })
     /* Send OTP to Mobile */
     .post('/generateOTP', async (req, res, next) => {
         if (lodash.isEmpty(req.body)) return next(ERR.MANDATORY_FIELD_MISSING)
