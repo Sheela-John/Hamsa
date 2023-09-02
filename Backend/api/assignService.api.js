@@ -1647,15 +1647,16 @@ async function getSlotsForAssignService(data) {
         var eMin = (final[z].slot.split('-')[1].split(':')[1])
         var IST = Number(sHr + sMin);
         var IET = Number(eHr + eMin);
+        console.log("IET",IST,IET)
         if (data.startTime) {
             console.log(data.startTime,"data.startTime")
             var NewStart = Number(data.startTime.split(':')[0] + data.startTime.split(':')[1]);
             var NewEnd = Number(data.endTime.split(':')[0] + data.endTime.split(':')[1]);
-            console.log("New Start",NewStart,NewEnd)
             for (var x = NewStart; x <= NewEnd; x++) {
-                console.log("x",x)
-                if (x >= IST && x <= IET) {
+                if (x >= IST && x < IET) {
+                    console.log("New Start",NewStart,NewEnd,IST,IET)
                     console.log("x", x >= IST && x <= IET, x, IST, IET)
+                    console.log("final",final[z])
                     if (final[z].bookedStatus == 0) {
                         condition = 0
                     }
@@ -1674,7 +1675,7 @@ async function getSlotsForAssignService(data) {
                 //     // z = final.length + 1;
                 //     // break;
                 // }
-                console.log("z",condition);
+              //  console.log("z",condition);
             }
             if (condition == 0) {
                 isAvailableTemp.push(true);
@@ -1686,7 +1687,7 @@ async function getSlotsForAssignService(data) {
     }
 
 
-
+console.log("isAvailableTemp",isAvailableTemp)
     if (isAvailableTemp.length != 0) {
         if (isAvailableTemp.includes(false)) {
             isAvailable = false;
@@ -1699,7 +1700,7 @@ async function getSlotsForAssignService(data) {
         isAvailable = true;
     }
     //}
-    console.log("date", data.date)
+    //console.log("date", data.date)
     var returnValue = {
         final: final,
         isAvailable: isAvailable
