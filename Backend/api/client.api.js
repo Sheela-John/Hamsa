@@ -567,7 +567,7 @@ async function saveRecurringSession(data) {
         freq: RRule.WEEKLY,
         dtstart: new Date(data.startDate),
         until: new Date(data.endDate),
-        count: 100,
+        count: 365,
         interval: 1
     }
     recurringRule['byweekday'] = singleArray
