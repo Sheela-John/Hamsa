@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Subject, max } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AssignService } from 'src/app/services/assign.service';
@@ -9,6 +9,7 @@ import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { RoleService } from 'src/app/services/role.service';
 import { StaffService } from 'src/app/services/staff.service';
 import { ClientService } from 'src/app/services/client.service';
+import { DataTableDirective } from 'angular-datatables';
 
 
 @Component({
@@ -59,6 +60,10 @@ export class AssignServiceComponent implements OnInit {
   }
   public clientData: any;
   public clientList: any[];
+  @ViewChild(DataTableDirective, { static: false })
+  datatableElement: DataTableDirective;
+  min: any = 0;
+  max: any = 0;
 
   constructor(private router: Router, public StaffService: StaffService, public ClientService: ClientService, public AssignService: AssignService, private fb: FormBuilder, private RoleService: RoleService) { }
 
@@ -69,8 +74,9 @@ export class AssignServiceComponent implements OnInit {
       searching: true,
       lengthChange: true,
       retrieve: true,
-      ordering: false
-    }
+      ordering: false,
+    };
+    
     this.getAllClient();
     this.getAllStaffs()
     // this.getAllStaffbase4App()
@@ -83,7 +89,6 @@ export class AssignServiceComponent implements OnInit {
     this.maxDate.setDate(this.maxDate.getDate());
     this.searchForm.get('fromDate').patchValue(this.minDate = new Date(), this.minDate.setDate(this.minDate.getDate() - 30))
     this.searchForm.get('toDate').patchValue(this.maxDate);
-   
   }
 
   //initialise the searchForm
@@ -170,7 +175,7 @@ export class AssignServiceComponent implements OnInit {
     this.AssignService.getAllAssignService().subscribe(res => {
       if (res.status) {
         this.assignServiceData = res.data
-        console.log(this.assignServiceData,'assignservice')
+        console.log(this.assignServiceData, 'assignservice')
         this.assignServiceList = []
         this.assignServiceData.forEach(element => {
           var data = {
@@ -204,7 +209,7 @@ export class AssignServiceComponent implements OnInit {
     this.AssignService.getAllbyPast30Days().subscribe(res => {
       if (res.status) {
         this.assignServiceData = res.data
-        console.log(this.assignServiceData,'assignservice')
+        console.log(this.assignServiceData, 'assignservice')
         this.assignServiceList = []
         this.assignServiceData.forEach(element => {
           var data = {
@@ -230,6 +235,7 @@ export class AssignServiceComponent implements OnInit {
         this.assignServiceList = []
       }
     })
+  // })
   }
 
   //Get All by Name and Date
@@ -243,37 +249,49 @@ export class AssignServiceComponent implements OnInit {
       "fromDate": (data1.fromDate != 'NaN-NaN-NaN') ? data1.fromDate : '',
       "todate": (data1.toDate != 'NaN-NaN-NaN') ? data1.toDate : ''
     }
-
-    this.AssignService.getAllByFilterSearch(data2).subscribe(res => {
-      if (res.status) {
-        this.assignServiceData = res.data
-        this.assignServiceList = []
-        console.log(this.assignServiceData,'assignservice')
-        this.assignServiceData.forEach(element => {
-          var data = {
-            _id: element._id,
-            ClientName: element.clientName,
-            Phone: element.phone,
-            Address: element.address,
-            staffName: element.staffName,
-            startTime: element.startTime,
-            endTime: element.endTime,
-            Status: element.status,
-            Date: this.formatDate(element.date),
-            startDistance: element.startDistance,
-            endDistance: element.endDistance,
-            status: element.status,
-            Service: element.serviceName
-          }
-          console.log
-          this.assignServiceList.push(data)
-        });
-        this.dtTrigger.next(null);
-      }
-      else {
-        this.assignServiceList = [];
-      }
+    console.log(data2.staffId)
+    this.datatableElement.dtInstance.then((dtInstance: DataTables.Api) => {
+      this.AssignService.getAllByFilterSearch(data2).subscribe(res => {
+        if (res.status) {
+          this.assignServiceData = res.data
+          this.assignServiceList = []
+          console.log(this.assignServiceData, 'assignservice')
+          this.assignServiceData.forEach(element => {
+            var data = {
+              _id: element._id,
+              ClientName: element.clientName,
+              Phone: element.phone,
+              Address: element.address,
+              staffName: element.staffName,
+              startTime: element.startTime,
+              endTime: element.endTime,
+              Status: element.status,
+              Date: this.formatDate(element.date),
+              startDistance: element.startDistance,
+              endDistance: element.endDistance,
+              status: element.status,
+              Service: element.serviceName
+            }
+            console.log
+            this.assignServiceList.push(data)
+          });
+          // dtInstance.draw()
+          // dtInstance.search(data1).draw();
+          dtInstance.destroy();
+          // this.dtTrigger.unsubscribe();
+          this.dtTrigger.next(null);
+        }
+        else {
+          this.assignServiceList = [];
+        }
+      })
     })
+  
+  }
+
+  ngOnDestroy(): void {
+    // Don't forget to unsubscribe to event.
+    this.dtTrigger.unsubscribe();
   }
 
   //formatDate -dd/mm/yyyy

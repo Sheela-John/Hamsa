@@ -11,28 +11,37 @@
         <div class="container ">
             &nbsp;&nbsp;
             <div class="col-md-12">
+                <!-- <label>
+                    Min
+                    <input type="number" name="min" id="min" [(ngModel)]="min" />
+                  </label>
+                  <label>
+                    Max
+                    <input type="number" name="max" id="max" [(ngModel)]="max" />
+                  </label>
+                  <button class="btn btn-primary" type="submit">Filter by ID</button> -->
                 <form [formGroup]="searchForm">
                     <div class="col-md-12">
                         <table col-lg-12 class="col-md-12">
                             <thead>
                                 <tr class="text">
                                     <th class=" p-3 text-left col-md-2 ">
-                                        <ng-multiselect-dropdown [placeholder]="'Client Name'" class="text-muted "
-                                            [settings]="clientId" formControlName="clientId" [data]="clientArr">
+                                        <ng-multiselect-dropdown [placeholder]="'Client Name'"  id="clientId"  class="text-muted " 
+                                            [settings]="clientId" formControlName="clientId" [data]="clientArr"  >
                                         </ng-multiselect-dropdown>
                                     </th>&nbsp;
                                     <th class="p-3 text-left col-md-2">
-                                        <ng-multiselect-dropdown [placeholder]="'Staff Name'" class="text-muted "
-                                            [settings]="staffId" formControlName="staffId" [data]="StaffArr">
+                                        <ng-multiselect-dropdown [placeholder]="'Staff Name'" class="text-muted " 
+                                            [settings]="staffId" formControlName="staffId" [data]="StaffArr" id="staffId" >
                                         </ng-multiselect-dropdown>
                                     </th>&nbsp;
-                                    <th class="p-3 text-left col-md-2"> <input type="text" class=" data-picker-color "
+                                    <th class="p-3 text-left col-md-2"> <input type="text" class=" data-picker-color "  id="fromDate" 
                                             formControlName="fromDate" (bsValueChange)="setStartDate($event)"
                                             bsDatepicker
                                             [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
                                             placeholder="From Date"></th>&nbsp;
                                     <th class="p-3 text-left col-md-2">
-                                        <input type="text" class="data-picker-color" formControlName="toDate"
+                                        <input type="text" class="data-picker-color" formControlName="toDate" id="toDate"
                                             (bsValueChange)="setEndDate($event)" [minDate]="minDate" bsDatepicker
                                             [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
                                             placeholder="To Date">
@@ -45,9 +54,9 @@
                     </div>
                 </form>
             </div>
-
-
-            <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger"
+             
+                    
+            <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" 
                 class="w-full flex flex-row flex-no-wrap sm:bg-white rounded-lg overflow-hidden sm:shadow-lg my-5">
                 <thead class="text-white">
                     <tr
@@ -112,11 +121,14 @@
                             <button class="btn" (click)="editrole(roleList._id)"><i class='fa fa-edit'></i></button></td> -->
                     </tr>
                 </tbody>
+               
                 <tbody *ngIf="assignServiceList.length == 0">
                     <tr>
                         <td class="warn" colspan="8">No Records Found</td>
                     </tr>
             </table>
+
+            
 
         </div>
     </section>
