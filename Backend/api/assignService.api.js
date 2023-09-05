@@ -1348,12 +1348,14 @@ const updateAssignService = async function (datatoupdate) {
     else return Promise.resolve(clientData);
 }
 async function getAssignServiceDataByStaffIdAndDate(data) {
-
+console.log("data",data)
     log.debug(component, 'Getting AssignService Data by StaffId And Date');
     log.close();
     let someDate = new Date(data.date);
     let copiedAppointmentDate = new Date(someDate.getTime());
-    let [Err, assignServiceData] = await handle(AssignService.find({ 'staffId': data.staffId, date: copiedAppointmentDate }).lean());
+    console.log("copiedAppointmentDate",copiedAppointmentDate.toString())
+    let [Err, assignServiceData] = await handle(AssignService.find({ 'staffId': data.staffId,date: copiedAppointmentDate}).lean());
+    console.log("assignServiceData",assignServiceData)
     if (assignServiceData.length != 0) {
         for (var i = 0; i < assignServiceData.length; i++) {
             let [err, clientData] = await handle(Client.findOne({ _id: assignServiceData[i].clientId }).lean());
@@ -1520,17 +1522,19 @@ async function getSlotsForAssignService(data) {
             final.push(temp);
         }
     }
-    console.log("final", final)
+ //   console.log("final", final)
     var condition;
     //console.log("bookedSlots.length",bookedSlots.length)
-   
+   console.log("bookedSlots",bookedSlots)
     if (bookedSlots) {
-
         for (var i = 0; i < bookedSlots.length; i++) {
+            console.log("bookedSlots[i].date",bookedSlots[i].date,new Date(data.date))
             if (bookedSlots[i].date == new Date(data.date)) {
                 var count = bookedSlots[i].bookedCount;
+                console.log("count",count);
                 let typeOfTreament = typeOfTreamentArray.filter(a => (a == data.typeOfTreatment))
                 let bookedTreatment = typeOfTreamentArray.filter(a => (a == bookedSlots[i].typeOfTreatment))
+                console.log("bookedTreatment",bookedTreatment);
                 if (typeOfTreament.length != 0) {
                     for (var j = 0; j < final.length; j++) {
                         var start = bookedSlots[i].startTime.split(' ')[0];
@@ -1553,7 +1557,7 @@ async function getSlotsForAssignService(data) {
 
                         if (bookedTreatment.length != 0) {
                             var slot = bookedSlots[i].startTime + '-' + bookedSlots[i].endTime;
-                            if (count < 3) {
+                            if (count < 100) {
                                 console.log(true);
                                 final[j].bookedStatus = 0;
                                 condition = 0;
@@ -1576,7 +1580,6 @@ async function getSlotsForAssignService(data) {
                                 }
 
                             }
-
                         }
                         else {
                             console.log("sfsfsf")
