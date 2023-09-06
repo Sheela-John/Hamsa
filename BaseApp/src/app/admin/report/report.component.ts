@@ -506,7 +506,7 @@ export class ReportComponent implements OnInit {
             // this.dates=ele.doc.sort()
             var datess = ele.doc
             // console.log(ele.date)
-            if (ele._id == this.TravelHours.value.staffId) {
+            // if (ele._id == this.TravelHours.value.staffId) {
               // this.view=datess.sort((a, b) => a.date - b.date);
               // console.log(this.view, "datess1")
               datess.forEach((item) => {
@@ -542,11 +542,11 @@ export class ReportComponent implements OnInit {
                   }
                 })
               })
-            }
+            // }
             
-            else {
-              console.log("hrr")
-            }
+            // else {
+            //   console.log("hrr")
+            // }
             console.log(this.AllData, "data hours");this.finalData=this.AllData
           })
         }
