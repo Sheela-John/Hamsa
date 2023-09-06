@@ -452,7 +452,8 @@ export class ReportComponent implements OnInit {
     var value1 = this.startDate
     var data = {
       startDate: this.ReverseformatDate(this.TravelHours.value.startDate),
-      endDate: this.ReverseformatDate(this.TravelHours.value.endDate)
+      endDate: this.ReverseformatDate(this.TravelHours.value.endDate),
+      staffId:this.TravelHours.value.staffId
     }
     var sDate = this.TravelHours.value.startDate;
     var eDate = this.TravelHours.value.endDate;
