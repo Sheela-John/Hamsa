@@ -44,6 +44,12 @@ router.post('/getAttendenceReport', async (req, res, next) => {
     if (err) return next(err);
     else return res.status(200).json({ status: true, data: attendenceData });
 })
+router.post('/getAttendenceReportStaffAndDate', async (req, res, next) => {
+    console.log("in")
+    let [err, attendenceData] = await handle(AttendenceAPI.getAttendenceofStaffByDateRangeDetails(req.body));
+    if (err) return next(err);
+    else return res.status(200).json({ status: true, data: attendenceData });
+})
 router.post('/tosaveCount', async (req, res, next) => {
     let [err, attendenceData] = await handle(AttendenceAPI.tosaveCount(req.body));
     if (err) return next(err);

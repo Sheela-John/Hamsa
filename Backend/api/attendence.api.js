@@ -160,35 +160,39 @@ const getAttendenceofStaffByDateRange = async (data) => {
         },
     ]
     let [err, attendenceData] = await handle(Attendence.aggregate(query));
-    console.log("attendenceData",attendenceData)
+   // console.log("attendenceData",attendenceData)
     for (var i = 0; i < attendenceData.length; i++) {
-        console.log("attendenceData", attendenceData[i])
+   //     console.log("attendenceData", attendenceData[i])
         for (var j = 0; j < attendenceData[i].doc.length; j++) {
             //if (attendenceData[i].doc[j].outTime == undefined)
             if(attendenceData[i].doc[j].outTimeArray.length<attendenceData[i].doc[j].inTimeArray.length) {
-                console.log("attendenceData[i].doc[j].date",(attendenceData[i].doc[j].date).toString())
+               // console.log("attendenceData[i].doc[j].date",(attendenceData[i].doc[j].date).toString())
 
                 let [err, assign] = await handle(AssignService.find({ "staffId": (attendenceData[i]._id).toString(), "date": attendenceData[i].doc[j].date }))
+                //console.log("assign",assign)
                 var out;
                 if (assign.length != 0) {
                     var val = Number(assign[0].endTime.split(':')[0] + assign[0].endTime.split(':')[1])
-                    console.log("inside")
-                    for (var x = 1; x < assign.length; x++) {
-                        if (Number(assign[x].endTime.split(':')[0] + assign[x].endTime.split(':')[1]) > val) {
+                  //  console.log("inside",val)
+                    for (var x = 0; x < assign.length; x++) {
+                        if (Number(assign[x].endTime.split(':')[0] + assign[x].endTime.split(':')[1]) >= val) {
                             val = Number(assign[x].endTime.split(':')[0] + assign[x].endTime.split(':')[1])
                             out = assign[x].endTime;
-                            //  console.log("out",out)
+                              console.log("out",out)
                         }
                     }
+                   // console.log("out2",out)
                     attendenceData[i].doc[j].outTime = out;
                     attendenceData[i].doc[j].outTimeArray.push(out);
                 }
                 else {
                     attendenceData[i].doc[j].outTime = attendenceData[i].doc[j].endTime
+                    //console.log("attendenceData[i].doc[j].endTime",attendenceData[i].doc[j].endTime)
                     attendenceData[i].doc[j].outTimeArray.push(attendenceData[i].doc[j].endTime)
                 }
             }
-            console.log("attendenceData[i].doc[j]", attendenceData[i].doc[j])
+
+           // console.log("attendenceData[i].doc[j]",  attendenceData[i].doc[j].outTimeArray)
             var startTime = attendenceData[i].doc[j].startTime.split(':');
             var endTime = attendenceData[i].doc[j].inTime.split(':');
             var startHr = parseInt(startTime[0], 10);
@@ -228,24 +232,24 @@ const getAttendenceofStaffByDateRange = async (data) => {
             var distance = 0;
             var duration = 0;
             let [Err1, travelCountData] = await handle(TravelCount.find({ 'staffId': attendenceData[i].doc[j].staffId, date: (attendenceData[i].doc[j].date) }).sort({ count: 1 }).lean());
-            console.log("travelCountData", travelCountData)
+           // console.log("travelCountData", travelCountData)
             var totalDistance = [];
             var totalDuration = [];
             for (var l = 0; l < travelCountData.length; l++) {
                 let [Err, assignServiceData] = await handle(AssignService.findOne({ '_id': travelCountData[l].assignServiceId }).lean());
-                console.log("assignServiceData", assignServiceData)
+               // console.log("assignServiceData", assignServiceData)
                 if (l == 0) {
                     let [err, branchData] = await handle(Branch.findOne({ "_id": assignServiceData.branchId }))
-                    console.log("branchData", branchData)
+                   // console.log("branchData", branchData)
                     var temp = {
                         "latitude": branchData.latitude,
                         "longitude": branchData.longitude,
                         "elatitude": assignServiceData.slatitude,
                         "elongitude": assignServiceData.slongitude
                     }
-                    console.log(temp)
+                   // console.log(temp)
                     var [err3, val] = await handle(travelDistance(temp));
-                    console.log("val", val)
+                  //  console.log("val", val)
                     totalDistance.push(val.distance);
                     console.log()
                     totalDuration.push(Number((val.duration).split('s')[0]))
@@ -258,19 +262,222 @@ const getAttendenceofStaffByDateRange = async (data) => {
                         "elatitude": assignServiceData.slatitude,
                         "elongitude": assignServiceData.slongitude
                     }
-                    console.log(temp)
+                   // console.log(temp)
                     var [err3, val] = await handle(travelDistance(temp));
-                    console.log("val1", val)
+                 //   console.log("val1", val)
                     totalDistance.push(val.distance);
                     totalDuration.push(Number((val.duration).split('s')[0]))
                 }
             }
-            console.log("totalDistance", totalDuration)
-            console.log(
-                totalDuration.reduce((a, b) => a + b, 0)
-            )
+           // console.log("totalDistance", totalDuration)
+            // console.log(
+            //     totalDuration.reduce((a, b) => a + b, 0)
+            // )
             distance = totalDistance.reduce((a, b) => a + b, 0);
             duration = totalDuration.reduce((a, b) => a + b, 0);
+           console.log("distance",distance);
+            console.log("duration",duration)
+            attendenceData[i].doc[j].travelDistance = distance;
+            attendenceData[i].doc[j].travelDuration = duration / 60;
+            // console.log("attendenceData[i].doc[j].date.toLocaleDateString().split('/')[2]",attendenceData[i].doc[j].date.toLocaleDateString())
+            // var tempDate = attendenceData[i].doc[j].date.toLocaleDateString().split('/')[2] + "-" + attendenceData[i].doc[j].date.toLocaleDateString().split('/')[1] + "-" + attendenceData[i].doc[j].date.toLocaleDateString().split('/')[0]
+            // attendenceData[i].doc[j].date=attendenceData[i].doc[j].date.toLocaleDateString();
+
+            // Calculate totalDuration
+            attendenceData[i].doc[j].totalDuration = 0;  // Initialize totalDuration
+
+            for (var k = 0; k < attendenceData[i].doc[j].inTimeArray.length; k++) {
+                var startTime = attendenceData[i].doc[j].inTimeArray[k].split(':');
+                var endTime = attendenceData[i].doc[j].outTimeArray[k].split(':');
+                var startHr = parseInt(startTime[0], 10);
+                var startMin = parseInt(startTime[1], 10);
+                var endHr = parseInt(endTime[0], 10);
+                var endMin = parseInt(endTime[1], 10);
+                var duration = ((endHr - startHr) * 60) + (endMin - startMin);
+                attendenceData[i].doc[j].totalDuration += duration;
+            }
+
+            // Convert totalDuration to hours:minutes format
+            var totalDurationHours = Math.floor(attendenceData[i].doc[j].totalDuration / 60);
+            var totalDurationMinutes = attendenceData[i].doc[j].totalDuration % 60;
+            
+            attendenceData[i].doc[j].totalDurationFormatted = totalDurationHours + ":" + totalDurationMinutes;
+            console.log("attendenceData",attendenceData)
+        }
+    }
+
+    for (var i = 0; i < attendenceData.length; i++) {
+        attendenceData[i].doc.sort(GFG_sortFunction);
+        function GFG_sortFunction(a, b) {
+            return a.date > b.date ? 1 : -1;
+        }
+    };
+    if (err) return Promise.reject(err);
+    else return Promise.resolve(attendenceData);
+}
+
+const getAttendenceofStaffByDateRangeDetails = async (data) => {
+    var value = new Date(data.endDate).getTime() - new Date(data.startDate).getTime()
+    let differentDays = Math.ceil(value / (1000 * 3600 * 24));
+    if ((differentDays + 1) > 31) {
+        return Promise.reject(ERR.NUMBER_OF_DAYS)
+    }
+    var query = [
+        {
+            '$match': {
+                'date': { '$gte': new Date(data.startDate), '$lte': new Date(data.endDate) },
+                'staffId':data.staffId
+            }
+        },
+        {
+            $addFields: {
+                'staffObjId': { $toObjectId: '$staffId' }
+            }
+        },
+        {
+            $lookup: {
+                from: 'staff',
+                localField: 'staffObjId',
+                foreignField: '_id',
+                as: 'staffDetails'
+            }
+        },
+        {
+            $unwind: '$staffDetails'
+        },
+        {
+            $project: {
+                staffId: "$staffDetails._id",
+                staffName: "$staffDetails.staffName",
+                startTime: "$startTime",
+                endTime: "$endTime",
+                inTime: "$inTime",
+                outTime: "$outTime",
+                date: "$date",
+                inTimeArray: "$inTimeArray",
+                outTimeArray: "$outTimeArray"
+            }
+        },
+        {
+            $group: {
+                "_id": "$staffId",
+                "doc": { "$addToSet": "$$ROOT" }
+            }
+        },
+    ]
+    let [err, attendenceData] = await handle(Attendence.aggregate(query));
+    console.log("attendenceData",attendenceData)
+    for (var i = 0; i < attendenceData.length; i++) {
+        for (var j = 0; j < attendenceData[i].doc.length; j++) {
+            if(attendenceData[i].doc[j].outTimeArray.length<attendenceData[i].doc[j].inTimeArray.length) {
+                let [err, assign] = await handle(AssignService.find({ "staffId": (attendenceData[i]._id).toString(), "date": attendenceData[i].doc[j].date }))
+                var out;
+                if (assign.length != 0) {
+                    var val = Number(assign[0].endTime.split(':')[0] + assign[0].endTime.split(':')[1])
+                    for (var x = 0; x < assign.length; x++) {
+                        console.log("ff",Number(assign[x].endTime.split(':')[0] + assign[x].endTime.split(':')[1]) )
+                        if (Number(assign[x].endTime.split(':')[0] + assign[x].endTime.split(':')[1]) >= val) {
+                            val = Number(assign[x].endTime.split(':')[0] + assign[x].endTime.split(':')[1])
+                            out = assign[x].endTime;
+                              
+                        }
+                    }
+                    console.log("out2",out)
+                    attendenceData[i].doc[j].outTime = out;
+                    attendenceData[i].doc[j].outTimeArray.push(out);
+                }
+                else {
+                    attendenceData[i].doc[j].outTime = attendenceData[i].doc[j].endTime
+                    console.log("attendenceData[i].doc[j].endTime",attendenceData[i].doc[j].endTime)
+                    attendenceData[i].doc[j].outTimeArray.push(attendenceData[i].doc[j].endTime)
+                }
+            }
+
+            console.log("attendenceData[i].doc[j]",  attendenceData[i].doc[j].outTimeArray)
+            var startTime = attendenceData[i].doc[j].startTime.split(':');
+            var endTime = attendenceData[i].doc[j].inTime.split(':');
+            var startHr = parseInt(startTime[0], 10);
+            var startMin = parseInt(startTime[1], 10);
+            var endHr = parseInt(endTime[0], 10);
+            var endMin = parseInt(endTime[1], 10);
+            var lateBy, ot;
+            if (startHr == endHr) {
+                lateBy = (endMin - startMin);
+            }
+            else {
+                lateBy = ((endHr - startHr) * 60) + (endMin - startMin)
+            }
+            if (lateBy < 0) {
+                attendenceData[i].doc[j].earlyBy = Math.abs(lateBy)
+                attendenceData[i].doc[j].lateBy = 0;
+            }
+            else {
+                attendenceData[i].doc[j].earlyBy = 0
+                attendenceData[i].doc[j].lateBy = lateBy;
+            }
+            attendenceData[i].doc[j].totalOT = ot;
+            var tempDate = attendenceData[i].doc[j].date.toLocaleDateString().split('/')[2] + "-" + attendenceData[i].doc[j].date.toLocaleDateString().split('/')[1] + "-" + attendenceData[i].doc[j].date.toLocaleDateString().split('/')[0]
+            var tempdate = new Date(tempDate + " " + attendenceData[i].doc[j].inTime).getTime();
+            var tempdate1 = new Date(tempDate + " " + attendenceData[i].doc[j].outTime).getTime();
+            var data1 = Math.ceil((tempdate1 - tempdate) / (1000 * 60));
+            var hours = Math.floor(data1 / 60);
+            var minutes = data1 % 60;
+            attendenceData[i].doc[j].duration = hours + ":" + minutes;
+            var otData = data1 - 480;
+            var othours = Math.floor(otData / 60);
+            var otminutes = data1 % 60;
+            attendenceData[i].doc[j].totalOT = othours + ":" + otminutes;;
+            if (data1 == 480 || data1 < 480) {
+                attendenceData[i].doc[j].totalOT = "0:0";
+            }
+            var distance = 0;
+            var duration = 0;
+            let [Err1, travelCountData] = await handle(TravelCount.find({ 'staffId': attendenceData[i].doc[j].staffId, date: (attendenceData[i].doc[j].date) }).sort({ count: 1 }).lean());
+           // console.log("travelCountData", travelCountData)
+            var totalDistance = [];
+            var totalDuration = [];
+            for (var l = 0; l < travelCountData.length; l++) {
+                let [Err, assignServiceData] = await handle(AssignService.findOne({ '_id': travelCountData[l].assignServiceId }).lean());
+               // console.log("assignServiceData", assignServiceData)
+                if (l == 0) {
+                    let [err, branchData] = await handle(Branch.findOne({ "_id": assignServiceData.branchId }))
+                   // console.log("branchData", branchData)
+                    var temp = {
+                        "latitude": branchData.latitude,
+                        "longitude": branchData.longitude,
+                        "elatitude": assignServiceData.slatitude,
+                        "elongitude": assignServiceData.slongitude
+                    }
+                   // console.log(temp)
+                    var [err3, val] = await handle(travelDistance(temp));
+                  //  console.log("val", val)
+                    totalDistance.push(val.distance);
+                    console.log()
+                    totalDuration.push(Number((val.duration).split('s')[0]))
+                }
+                else {
+                    let [Err, assignServiceData1] = await handle(AssignService.findOne({ '_id': travelCountData[l - 1].assignServiceId }).lean());
+                    var temp = {
+                        "latitude": assignServiceData1.slatitude,
+                        "longitude": assignServiceData1.slongitude,
+                        "elatitude": assignServiceData.slatitude,
+                        "elongitude": assignServiceData.slongitude
+                    }
+                   // console.log(temp)
+                    var [err3, val] = await handle(travelDistance(temp));
+                 //   console.log("val1", val)
+                    totalDistance.push(val.distance);
+                    totalDuration.push(Number((val.duration).split('s')[0]))
+                }
+            }
+           // console.log("totalDistance", totalDuration)
+            // console.log(
+            //     totalDuration.reduce((a, b) => a + b, 0)
+            // )
+            distance = totalDistance.reduce((a, b) => a + b, 0);
+            duration = totalDuration.reduce((a, b) => a + b, 0);
+           // console.log("distance",distance);
+           // console.log("duration",duration)
             attendenceData[i].doc[j].travelDistance = distance;
             attendenceData[i].doc[j].travelDuration = duration / 60;
             // console.log("attendenceData[i].doc[j].date.toLocaleDateString().split('/')[2]",attendenceData[i].doc[j].date.toLocaleDateString())
@@ -308,7 +515,6 @@ const getAttendenceofStaffByDateRange = async (data) => {
     if (err) return Promise.reject(err);
     else return Promise.resolve(attendenceData);
 }
-
 const travelDistance = async (data) => {
     return new Promise((resolve, reject) => {
         const options = {
@@ -383,5 +589,6 @@ module.exports = {
     getAttendenceofStaffByDateRange: getAttendenceofStaffByDateRange,
     getAttendenceofToday: getAttendenceofToday,
     tosaveCount: tosaveCount,
-    togetPreviouseCount: togetPreviouseCount
+    togetPreviouseCount: togetPreviouseCount,
+    getAttendenceofStaffByDateRangeDetails:getAttendenceofStaffByDateRangeDetails
 }
