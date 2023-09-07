@@ -13,6 +13,8 @@ const staffSchema = new mongoose.Schema({
    phone:{
     type:String
    },
+   resetPasswordToken: { type: String },
+   resetPasswordExpire: { type: Date },
    status:{
     type:String,
     default:0
