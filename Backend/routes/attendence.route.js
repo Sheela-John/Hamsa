@@ -55,6 +55,21 @@ router.post('/tosaveCount', async (req, res, next) => {
     if (err) return next(err);
     else return res.status(200).json({ status: true, data: attendenceData });
 })
+router.post('/tosaveCount', async (req, res, next) => {
+    let [err, attendenceData] = await handle(AttendenceAPI.tosaveCount(req.body));
+    if (err) return next(err);
+    else return res.status(200).json({ status: true, data: attendenceData });
+})
+router.post('/AttendanceReportDailyMail', async (req, res, next) => {
+    let [err, attendenceData] = await handle(AttendenceAPI.AttendanceReportDailyMail());
+    if (err) return next(err);
+    else return res.status(200).json({ status: true, data: attendenceData });
+})
+router.post('/AttendanceReportMonthlyMail', async (req, res, next) => {
+    let [err, attendenceData] = await handle(AttendenceAPI.AttendanceReportMonthlyMail());
+    if (err) return next(err);
+    else return res.status(200).json({ status: true, data: attendenceData });
+})
 /* Get Attendence of Particluar Staff of Today */
 router.post('/getAttendenceofToday', async (req, res, next) => {
     let [err, attendenceData] = await handle(AttendenceAPI.getAttendenceofToday(req.body));

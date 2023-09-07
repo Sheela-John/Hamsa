@@ -3,8 +3,12 @@ const component = "Attemdence API";
 const models = require('../models');
 const Security = require("../util/security");
 const Attendence = models.Attendence;
+const { convertArrayToCSV } = require('convert-array-to-csv');
+const converter = require('convert-array-to-csv');
 const AssignService = models.AssignService;
 const Branch = models.Branch;
+let cron = require('node-cron');
+let nodemailer = require('nodemailer');
 const TravelCount = models.TravelCount;
 const Staff = models.Staff;
 const lodash = require('lodash');
@@ -21,6 +25,7 @@ const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 const awsConfig = require('../services/aws/aws');
 const multer = require('multer')
+var fs = require('fs');
 const multerS3 = require('multer-s3');
 const moment = require('moment');
 const momentTz = require('moment-timezone');
@@ -88,9 +93,8 @@ const UpdateAttendence = async function (datatoupdate) {
     }
 
     // Update the document
-    if(datatoupdate.switchStatus)
-    {
-        existingAttendenceData.switchStatus=datatoupdate.switchStatus
+    if (datatoupdate.switchStatus) {
+        existingAttendenceData.switchStatus = datatoupdate.switchStatus
     }
     let [attendenceUpdateErr, updatedAttendenceData] = await handle(Attendence.findOneAndUpdate(
         { "_id": AttendenceId },
@@ -111,211 +115,6 @@ const getAttendenceofStaff = async (staffId) => {
     return Promise.resolve(staffData);
 }
 
-const getAttendenceofStaffByDateRange = async (data) => {
-    var value = new Date(data.endDate).getTime() - new Date(data.startDate).getTime()
-    let differentDays = Math.ceil(value / (1000 * 3600 * 24));
-    if ((differentDays + 1) > 31) {
-        return Promise.reject(ERR.NUMBER_OF_DAYS)
-    }
-    var query = [
-        {
-            '$match': {
-                'date': { '$gte': new Date(data.startDate), '$lte': new Date(data.endDate) },
-            }
-        },
-        {
-            $addFields: {
-                'staffObjId': { $toObjectId: '$staffId' }
-            }
-        },
-        {
-            $lookup: {
-                from: 'staff',
-                localField: 'staffObjId',
-                foreignField: '_id',
-                as: 'staffDetails'
-            }
-        },
-        {
-            $unwind: '$staffDetails'
-        },
-        {
-            $project: {
-                staffId: "$staffDetails._id",
-                staffName: "$staffDetails.staffName",
-                startTime: "$startTime",
-                endTime: "$endTime",
-                inTime: "$inTime",
-                outTime: "$outTime",
-                date: "$date",
-                inTimeArray: "$inTimeArray",
-                outTimeArray: "$outTimeArray"
-            }
-        },
-        {
-            $group: {
-                "_id": "$staffId",
-                "doc": { "$addToSet": "$$ROOT" }
-            }
-        },
-    ]
-    let [err, attendenceData] = await handle(Attendence.aggregate(query));
-   // console.log("attendenceData",attendenceData)
-    for (var i = 0; i < attendenceData.length; i++) {
-   //     console.log("attendenceData", attendenceData[i])
-        for (var j = 0; j < attendenceData[i].doc.length; j++) {
-            //if (attendenceData[i].doc[j].outTime == undefined)
-            if(attendenceData[i].doc[j].outTimeArray.length<attendenceData[i].doc[j].inTimeArray.length) {
-               // console.log("attendenceData[i].doc[j].date",(attendenceData[i].doc[j].date).toString())
-
-                let [err, assign] = await handle(AssignService.find({ "staffId": (attendenceData[i]._id).toString(), "date": attendenceData[i].doc[j].date }))
-                //console.log("assign",assign)
-                var out;
-                if (assign.length != 0) {
-                    var val = Number(assign[0].endTime.split(':')[0] + assign[0].endTime.split(':')[1])
-                  //  console.log("inside",val)
-                    for (var x = 0; x < assign.length; x++) {
-                        if (Number(assign[x].endTime.split(':')[0] + assign[x].endTime.split(':')[1]) >= val) {
-                            val = Number(assign[x].endTime.split(':')[0] + assign[x].endTime.split(':')[1])
-                            out = assign[x].endTime;
-                              console.log("out",out)
-                        }
-                    }
-                   // console.log("out2",out)
-                    attendenceData[i].doc[j].outTime = out;
-                    attendenceData[i].doc[j].outTimeArray.push(out);
-                }
-                else {
-                    attendenceData[i].doc[j].outTime = attendenceData[i].doc[j].endTime
-                    //console.log("attendenceData[i].doc[j].endTime",attendenceData[i].doc[j].endTime)
-                    attendenceData[i].doc[j].outTimeArray.push(attendenceData[i].doc[j].endTime)
-                }
-            }
-
-           // console.log("attendenceData[i].doc[j]",  attendenceData[i].doc[j].outTimeArray)
-            var startTime = attendenceData[i].doc[j].startTime.split(':');
-            var endTime = attendenceData[i].doc[j].inTime.split(':');
-            var startHr = parseInt(startTime[0], 10);
-            var startMin = parseInt(startTime[1], 10);
-            var endHr = parseInt(endTime[0], 10);
-            var endMin = parseInt(endTime[1], 10);
-            var lateBy, ot;
-            if (startHr == endHr) {
-                lateBy = (endMin - startMin);
-            }
-            else {
-                lateBy = ((endHr - startHr) * 60) + (endMin - startMin)
-            }
-            if (lateBy < 0) {
-                attendenceData[i].doc[j].earlyBy = Math.abs(lateBy)
-                attendenceData[i].doc[j].lateBy = 0;
-            }
-            else {
-                attendenceData[i].doc[j].earlyBy = 0
-                attendenceData[i].doc[j].lateBy = lateBy;
-            }
-            attendenceData[i].doc[j].totalOT = ot;
-            var tempDate = attendenceData[i].doc[j].date.toLocaleDateString().split('/')[2] + "-" + attendenceData[i].doc[j].date.toLocaleDateString().split('/')[1] + "-" + attendenceData[i].doc[j].date.toLocaleDateString().split('/')[0]
-            var tempdate = new Date(tempDate + " " + attendenceData[i].doc[j].inTime).getTime();
-            var tempdate1 = new Date(tempDate + " " + attendenceData[i].doc[j].outTime).getTime();
-            var data1 = Math.ceil((tempdate1 - tempdate) / (1000 * 60));
-            var hours = Math.floor(data1 / 60);
-            var minutes = data1 % 60;
-            attendenceData[i].doc[j].duration = hours + ":" + minutes;
-            var otData = data1 - 480;
-            var othours = Math.floor(otData / 60);
-            var otminutes = data1 % 60;
-            attendenceData[i].doc[j].totalOT = othours + ":" + otminutes;;
-            if (data1 == 480 || data1 < 480) {
-                attendenceData[i].doc[j].totalOT = "0:0";
-            }
-            var distance = 0;
-            var duration = 0;
-            let [Err1, travelCountData] = await handle(TravelCount.find({ 'staffId': attendenceData[i].doc[j].staffId, date: (attendenceData[i].doc[j].date) }).sort({ count: 1 }).lean());
-           // console.log("travelCountData", travelCountData)
-            var totalDistance = [];
-            var totalDuration = [];
-            for (var l = 0; l < travelCountData.length; l++) {
-                let [Err, assignServiceData] = await handle(AssignService.findOne({ '_id': travelCountData[l].assignServiceId }).lean());
-               // console.log("assignServiceData", assignServiceData)
-                if (l == 0) {
-                    let [err, branchData] = await handle(Branch.findOne({ "_id": assignServiceData.branchId }))
-                   // console.log("branchData", branchData)
-                    var temp = {
-                        "latitude": branchData.latitude,
-                        "longitude": branchData.longitude,
-                        "elatitude": assignServiceData.slatitude,
-                        "elongitude": assignServiceData.slongitude
-                    }
-                   // console.log(temp)
-                    var [err3, val] = await handle(travelDistance(temp));
-                  //  console.log("val", val)
-                    totalDistance.push(val.distance);
-                    console.log()
-                    totalDuration.push(Number((val.duration).split('s')[0]))
-                }
-                else {
-                    let [Err, assignServiceData1] = await handle(AssignService.findOne({ '_id': travelCountData[l - 1].assignServiceId }).lean());
-                    var temp = {
-                        "latitude": assignServiceData1.slatitude,
-                        "longitude": assignServiceData1.slongitude,
-                        "elatitude": assignServiceData.slatitude,
-                        "elongitude": assignServiceData.slongitude
-                    }
-                   // console.log(temp)
-                    var [err3, val] = await handle(travelDistance(temp));
-                 //   console.log("val1", val)
-                    totalDistance.push(val.distance);
-                    totalDuration.push(Number((val.duration).split('s')[0]))
-                }
-            }
-           // console.log("totalDistance", totalDuration)
-            // console.log(
-            //     totalDuration.reduce((a, b) => a + b, 0)
-            // )
-            distance = totalDistance.reduce((a, b) => a + b, 0);
-            duration = totalDuration.reduce((a, b) => a + b, 0);
-           console.log("distance",distance);
-            console.log("duration",duration)
-            attendenceData[i].doc[j].travelDistance = distance;
-            attendenceData[i].doc[j].travelDuration = duration / 60;
-            // console.log("attendenceData[i].doc[j].date.toLocaleDateString().split('/')[2]",attendenceData[i].doc[j].date.toLocaleDateString())
-            // var tempDate = attendenceData[i].doc[j].date.toLocaleDateString().split('/')[2] + "-" + attendenceData[i].doc[j].date.toLocaleDateString().split('/')[1] + "-" + attendenceData[i].doc[j].date.toLocaleDateString().split('/')[0]
-            // attendenceData[i].doc[j].date=attendenceData[i].doc[j].date.toLocaleDateString();
-
-            // Calculate totalDuration
-            attendenceData[i].doc[j].totalDuration = 0;  // Initialize totalDuration
-
-            for (var k = 0; k < attendenceData[i].doc[j].inTimeArray.length; k++) {
-                var startTime = attendenceData[i].doc[j].inTimeArray[k].split(':');
-                var endTime = attendenceData[i].doc[j].outTimeArray[k].split(':');
-                var startHr = parseInt(startTime[0], 10);
-                var startMin = parseInt(startTime[1], 10);
-                var endHr = parseInt(endTime[0], 10);
-                var endMin = parseInt(endTime[1], 10);
-                var duration = ((endHr - startHr) * 60) + (endMin - startMin);
-                attendenceData[i].doc[j].totalDuration += duration;
-            }
-
-            // Convert totalDuration to hours:minutes format
-            var totalDurationHours = Math.floor(attendenceData[i].doc[j].totalDuration / 60);
-            var totalDurationMinutes = attendenceData[i].doc[j].totalDuration % 60;
-            
-            attendenceData[i].doc[j].totalDurationFormatted = totalDurationHours + ":" + totalDurationMinutes;
-            console.log("attendenceData",attendenceData)
-        }
-    }
-
-    for (var i = 0; i < attendenceData.length; i++) {
-        attendenceData[i].doc.sort(GFG_sortFunction);
-        function GFG_sortFunction(a, b) {
-            return a.date > b.date ? 1 : -1;
-        }
-    };
-    if (err) return Promise.reject(err);
-    else return Promise.resolve(attendenceData);
-}
-
 const getAttendenceofStaffByDateRangeDetails = async (data) => {
     var value = new Date(data.endDate).getTime() - new Date(data.startDate).getTime()
     let differentDays = Math.ceil(value / (1000 * 3600 * 24));
@@ -326,7 +125,7 @@ const getAttendenceofStaffByDateRangeDetails = async (data) => {
         {
             '$match': {
                 'date': { '$gte': new Date(data.startDate), '$lte': new Date(data.endDate) },
-                'staffId':data.staffId
+                'staffId': data.staffId
             }
         },
         {
@@ -366,34 +165,8 @@ const getAttendenceofStaffByDateRangeDetails = async (data) => {
         },
     ]
     let [err, attendenceData] = await handle(Attendence.aggregate(query));
-    console.log("attendenceData",attendenceData)
     for (var i = 0; i < attendenceData.length; i++) {
         for (var j = 0; j < attendenceData[i].doc.length; j++) {
-            if(attendenceData[i].doc[j].outTimeArray.length<attendenceData[i].doc[j].inTimeArray.length) {
-                let [err, assign] = await handle(AssignService.find({ "staffId": (attendenceData[i]._id).toString(), "date": attendenceData[i].doc[j].date }))
-                var out;
-                if (assign.length != 0) {
-                    var val = Number(assign[0].endTime.split(':')[0] + assign[0].endTime.split(':')[1])
-                    for (var x = 0; x < assign.length; x++) {
-                        console.log("ff",Number(assign[x].endTime.split(':')[0] + assign[x].endTime.split(':')[1]) )
-                        if (Number(assign[x].endTime.split(':')[0] + assign[x].endTime.split(':')[1]) >= val) {
-                            val = Number(assign[x].endTime.split(':')[0] + assign[x].endTime.split(':')[1])
-                            out = assign[x].endTime;
-                              
-                        }
-                    }
-                    console.log("out2",out)
-                    attendenceData[i].doc[j].outTime = out;
-                    attendenceData[i].doc[j].outTimeArray.push(out);
-                }
-                else {
-                    attendenceData[i].doc[j].outTime = attendenceData[i].doc[j].endTime
-                    console.log("attendenceData[i].doc[j].endTime",attendenceData[i].doc[j].endTime)
-                    attendenceData[i].doc[j].outTimeArray.push(attendenceData[i].doc[j].endTime)
-                }
-            }
-
-            console.log("attendenceData[i].doc[j]",  attendenceData[i].doc[j].outTimeArray)
             var startTime = attendenceData[i].doc[j].startTime.split(':');
             var endTime = attendenceData[i].doc[j].inTime.split(':');
             var startHr = parseInt(startTime[0], 10);
@@ -415,7 +188,7 @@ const getAttendenceofStaffByDateRangeDetails = async (data) => {
                 attendenceData[i].doc[j].earlyBy = 0
                 attendenceData[i].doc[j].lateBy = lateBy;
             }
-            attendenceData[i].doc[j].totalOT = ot;
+
             var tempDate = attendenceData[i].doc[j].date.toLocaleDateString().split('/')[2] + "-" + attendenceData[i].doc[j].date.toLocaleDateString().split('/')[1] + "-" + attendenceData[i].doc[j].date.toLocaleDateString().split('/')[0]
             var tempdate = new Date(tempDate + " " + attendenceData[i].doc[j].inTime).getTime();
             var tempdate1 = new Date(tempDate + " " + attendenceData[i].doc[j].outTime).getTime();
@@ -433,24 +206,25 @@ const getAttendenceofStaffByDateRangeDetails = async (data) => {
             var distance = 0;
             var duration = 0;
             let [Err1, travelCountData] = await handle(TravelCount.find({ 'staffId': attendenceData[i].doc[j].staffId, date: (attendenceData[i].doc[j].date) }).sort({ count: 1 }).lean());
-           // console.log("travelCountData", travelCountData)
             var totalDistance = [];
             var totalDuration = [];
+            if(travelCountData.length!=0)
+            {
             for (var l = 0; l < travelCountData.length; l++) {
                 let [Err, assignServiceData] = await handle(AssignService.findOne({ '_id': travelCountData[l].assignServiceId }).lean());
-               // console.log("assignServiceData", assignServiceData)
+                // console.log("assignServiceData", assignServiceData)
                 if (l == 0) {
                     let [err, branchData] = await handle(Branch.findOne({ "_id": assignServiceData.branchId }))
-                   // console.log("branchData", branchData)
+                    // console.log("branchData", branchData)
                     var temp = {
                         "latitude": branchData.latitude,
                         "longitude": branchData.longitude,
                         "elatitude": assignServiceData.slatitude,
                         "elongitude": assignServiceData.slongitude
                     }
-                   // console.log(temp)
+                    // console.log(temp)
                     var [err3, val] = await handle(travelDistance(temp));
-                  //  console.log("val", val)
+                    //  console.log("val", val)
                     totalDistance.push(val.distance);
                     console.log()
                     totalDuration.push(Number((val.duration).split('s')[0]))
@@ -463,31 +237,33 @@ const getAttendenceofStaffByDateRangeDetails = async (data) => {
                         "elatitude": assignServiceData.slatitude,
                         "elongitude": assignServiceData.slongitude
                     }
-                   // console.log(temp)
+                    // console.log(temp)
                     var [err3, val] = await handle(travelDistance(temp));
-                 //   console.log("val1", val)
+                    //   console.log("val1", val)
                     totalDistance.push(val.distance);
                     totalDuration.push(Number((val.duration).split('s')[0]))
                 }
             }
-           // console.log("totalDistance", totalDuration)
-            // console.log(
-            //     totalDuration.reduce((a, b) => a + b, 0)
-            // )
+        }
+        console.log("totalDistance",totalDistance,totalDuration)
+          if(totalDistance.length!=0 && totalDuration.length!=0)
+          {
             distance = totalDistance.reduce((a, b) => a + b, 0);
             duration = totalDuration.reduce((a, b) => a + b, 0);
-           // console.log("distance",distance);
-           // console.log("duration",duration)
+          
             attendenceData[i].doc[j].travelDistance = distance;
             attendenceData[i].doc[j].travelDuration = duration / 60;
-            // console.log("attendenceData[i].doc[j].date.toLocaleDateString().split('/')[2]",attendenceData[i].doc[j].date.toLocaleDateString())
-            // var tempDate = attendenceData[i].doc[j].date.toLocaleDateString().split('/')[2] + "-" + attendenceData[i].doc[j].date.toLocaleDateString().split('/')[1] + "-" + attendenceData[i].doc[j].date.toLocaleDateString().split('/')[0]
-            // attendenceData[i].doc[j].date=attendenceData[i].doc[j].date.toLocaleDateString();
-
+          }
+          else{
+            attendenceData[i].doc[j].travelDistance = distance;
+            attendenceData[i].doc[j].travelDuration = duration ;
+          }
+          console.log("success3")
             // Calculate totalDuration
             attendenceData[i].doc[j].totalDuration = 0;  // Initialize totalDuration
-
             for (var k = 0; k < attendenceData[i].doc[j].inTimeArray.length; k++) {
+                if(attendenceData[i].doc[j].outTimeArray.length!=0)
+                {
                 var startTime = attendenceData[i].doc[j].inTimeArray[k].split(':');
                 var endTime = attendenceData[i].doc[j].outTimeArray[k].split(':');
                 var startHr = parseInt(startTime[0], 10);
@@ -496,14 +272,22 @@ const getAttendenceofStaffByDateRangeDetails = async (data) => {
                 var endMin = parseInt(endTime[1], 10);
                 var duration = ((endHr - startHr) * 60) + (endMin - startMin);
                 attendenceData[i].doc[j].totalDuration += duration;
+                }
+                else{
+                    attendenceData[i].doc[j].totalDuration = 0;
+                }
             }
-
-            // Convert totalDuration to hours:minutes format
+            if(attendenceData[i].doc[j].totalDuration!=0)
+            {
             var totalDurationHours = Math.floor(attendenceData[i].doc[j].totalDuration / 60);
             var totalDurationMinutes = attendenceData[i].doc[j].totalDuration % 60;
-            
-            attendenceData[i].doc[j].totalDurationFormatted = totalDurationHours + ":" + totalDurationMinutes;
-
+            totalDurationMinutes=String(totalDurationMinutes);
+            totalDurationHours=String(totalDurationHours);
+            attendenceData[i].doc[j].totalDurationFormatted =( (totalDurationHours).length!=2 ? "0"+totalDurationHours :totalDurationHours) + ":" +( (totalDurationMinutes).length!=2 ? "0"+totalDurationMinutes : totalDurationMinutes);
+            }
+            else{
+                attendenceData[i].doc[j].totalDurationFormatted="00:00" 
+            }
         }
     }
     for (var i = 0; i < attendenceData.length; i++) {
@@ -512,6 +296,7 @@ const getAttendenceofStaffByDateRangeDetails = async (data) => {
             return a.date > b.date ? 1 : -1;
         }
     };
+    console.log("attendenceData",attendenceData)
     if (err) return Promise.reject(err);
     else return Promise.resolve(attendenceData);
 }
@@ -562,7 +347,7 @@ const travelDistance = async (data) => {
 }
 
 const getAttendenceofToday = async (data) => {
-    let [err, attendenceData] = await handle(Attendence.find({'staffId':data.staffId,'date':new Date(data.date)}));
+    let [err, attendenceData] = await handle(Attendence.find({ 'staffId': data.staffId, 'date': new Date(data.date) }));
     if (err) return Promise.reject(err);
     else return Promise.resolve(attendenceData);
 }
@@ -582,13 +367,178 @@ async function togetPreviouseCount(data) {
     else return Promise.resolve(countData)
 }
 
+async function AttendanceReportDailyMail() {
+    var schedule=cron.schedule('30 20 * * *', async () => {
+    var from1 = new Date();
+    var to1 = new Date();
+    var from = from1.getFullYear() + "-" + ((from1.getMonth() + 1).length != 2 ? "0" + (from1.getMonth() + 1) : (from1.getMonth() + 1)) + "-" + (from1.getDate().length != 2 ? "0" + from1.getDate() : from1.getDate());
+    var to = to1.getFullYear() + "-" + ((to1.getMonth() + 1).length != 2 ? "0" + (to1.getMonth() + 1) : (to1.getMonth() + 1)) + "-" + (to1.getDate().to1 != 2 ? "0" + to1.getDate() : to1.getDate());
+    console.log("ada")
+    let [err, staffData] = await handle(Staff.find().lean());
+    var attendanceArray = [];
+    console.log(staffData)
+    for (var i = 0; i < staffData.length; i++) {
+        if (staffData[i].role == "PORTAL_STAFF") {
+            var temp = {
+                startDate: from,
+                endDate: to,
+                staffId: (staffData[i]._id).toString()
+            }
+            let [err1, staffAttendanceData] = await handle(getAttendenceofStaffByDateRangeDetails(temp));
+            if (staffAttendanceData.length != 0) {
+                for (var j = 0; j < staffAttendanceData.length; j++) {
+                    for (var k = 0; k < staffAttendanceData[j].doc.length; k++) {
+                        var value = {
+                            Staff_Name: staffAttendanceData[j].doc[k].staffName,
+                            InTime: staffAttendanceData[j].doc[k].inTime,
+                            OutTime: staffAttendanceData[j].doc[k].outTime,
+                            Date: staffAttendanceData[j].doc[k].date,
+                            Travel_Distance: staffAttendanceData[j].doc[k].travelDistance,
+                            Travel_Duration: staffAttendanceData[j].doc[k].travelDuration,
+                            Total_Duration: staffAttendanceData[j].doc[k].totalDurationFormatted,
+                        }
+                        attendanceArray.push(value)
+                    }
+                }
+            }
+        }
+    }
+    const header = ['staffName', 'startTime', 'endTime', 'inTime', 'outTime', 'date', 'travelDistance', 'travelDuration', 'totalDuration'];
+    const csvFromArrayOfArrays = convertArrayToCSV(attendanceArray, {
+        header,
+        separator: ';'
+    });
+    console.log(csvFromArrayOfArrays)
+    sendMail(csvFromArrayOfArrays)
+      })
+      schedule.start();
+
+}
+function sendMail(csvFromArrayOfArrays) {
+    let userName = '';
+    console.log("csvFromArrayOfArrays", csvFromArrayOfArrays)
+    var attachments = {
+        filename: "DailyReport.csv",
+        content: csvFromArrayOfArrays,
+    }
+    var staffData=[];
+    staffData=[{staffName:"Hr",email:"Hr@hamsarehab.com"},{staffName:"Operations",email:"Operations@hamsarehab.com"}]
+    staffData.forEach((element) => {
+        userName = element.staffName;
+     
+            let subject = "Daily Attendance Report"
+            html.create({
+                data: {
+                    userName: `${element.staffName}`,
+                },
+                templateName: "attendance_report"
+            },
+                (err, contents) => {
+                    if (err == null)
+
+                        require('../util/email').send(element.email, subject, contents, attachments, () => {
+                         //   cb(null);
+                        });
+                    else {
+                       // cb(err);
+                    }
+                })
+
+       
+    });
+}
+async function AttendanceReportMonthlyMail() {
+    var schedule=cron.schedule('30 20 25 * *', async () => {
+    var from1 = new Date();
+    var to1 = new Date(new Date().setDate(from1.getDate() - 30));
+   
+    var from = from1.getFullYear() + "-" + ((from1.getMonth() + 1).length != 2 ? "0" + (from1.getMonth() + 1) : (from1.getMonth() + 1)) + "-" + (from1.getDate().length != 2 ? "0" + from1.getDate() : from1.getDate());
+    var to = to1.getFullYear() + "-" + ((to1.getMonth() + 1).length != 2 ? "0" + (to1.getMonth() + 1) : (to1.getMonth() + 1)) + "-" + (to1.getDate().to1 != 2 ? "0" + to1.getDate() : to1.getDate());
+    let [err, staffData] = await handle(Staff.find().lean());
+    var attendanceArray = [];
+    for (var i = 0; i < staffData.length; i++) {
+        if (staffData[i].role == "PORTAL_STAFF") {
+            console.log("staffData[i].role",staffData[i].role)
+            var temp = {
+                startDate: to,
+                endDate: from,
+                staffId: (staffData[i]._id).toString()
+            }
+            console.log("temp",temp)
+            let [err1, staffAttendanceData] = await handle(getAttendenceofStaffByDateRangeDetails(temp));
+            if (staffAttendanceData.length != 0) {
+                for (var j = 0; j < staffAttendanceData.length; j++) {
+                    for (var k = 0; k < staffAttendanceData[j].doc.length; k++) {
+                        var value = {
+                            Staff_Name: staffAttendanceData[j].doc[k].staffName,
+                            InTime: staffAttendanceData[j].doc[k].inTime,
+                            OutTime: staffAttendanceData[j].doc[k].outTime,
+                            Date: staffAttendanceData[j].doc[k].date,
+                            Travel_Distance: staffAttendanceData[j].doc[k].travelDistance,
+                            Travel_Duration: staffAttendanceData[j].doc[k].travelDuration,
+                            Total_Duration: staffAttendanceData[j].doc[k].totalDurationFormatted,
+                        }
+                        attendanceArray.push(value)
+                    }
+                }
+            }
+        }
+    }
+    const header = ['staffName','inTime', 'outTime', 'date', 'travelDistance', 'travelDuration', 'totalDuration'];
+    const csvFromArrayOfArrays = convertArrayToCSV(attendanceArray, {
+        header,
+        separator: ';'
+    });
+    console.log(csvFromArrayOfArrays)
+   sendMailMonth(csvFromArrayOfArrays)
+     })
+     schedule.start();
+
+}
+function sendMailMonth(csvFromArrayOfArrays) {
+    let userName = '';
+    console.log("csvFromArrayOfArrays", csvFromArrayOfArrays)
+    var attachments = {
+        filename: "MonthlyStaffViseReport.csv",
+        content: csvFromArrayOfArrays,
+    }
+    var staffData=[];
+    staffData=[{staffName:"Hr",email:"Hr@hamsarehab.com"},{staffName:"Operations",email:"Operations@hamsarehab.com"},{staffName:"Accounts",email:"Accounts@hamsarehab.com"}]
+    staffData.forEach((element) => {
+        userName = element.staffName;
+      
+            let subject = "Monthly Staff Attendance Report"
+            html.create({
+                data: {
+                    userName: `${element.staffName}`,
+                },
+                templateName: "attendance_report"
+            },
+                (err, contents) => {
+                    if (err == null)
+
+                        require('../util/email').send(element.email, subject, contents, attachments, () => {
+                            //cb(null);
+                        });
+                    else {
+                       // cb(err);
+                    }
+                })
+    });
+}
+
+
+
+
+
 module.exports = {
     entryAttendence: entryAttendence,
     UpdateAttendence: UpdateAttendence,
     getAttendenceofStaff: getAttendenceofStaff,
-    getAttendenceofStaffByDateRange: getAttendenceofStaffByDateRange,
     getAttendenceofToday: getAttendenceofToday,
     tosaveCount: tosaveCount,
     togetPreviouseCount: togetPreviouseCount,
-    getAttendenceofStaffByDateRangeDetails:getAttendenceofStaffByDateRangeDetails
+    getAttendenceofStaffByDateRangeDetails: getAttendenceofStaffByDateRangeDetails,
+    AttendanceReportDailyMail: AttendanceReportDailyMail,
+    AttendanceReportMonthlyMail:AttendanceReportMonthlyMail
 }
