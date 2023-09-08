@@ -1441,7 +1441,8 @@ async function getAssignServiceDataByStaffIdAndDateForDashBoard(data) {
     }
     var data1 = {
         "startDate": fromDate,
-        "endDate": toDate
+        "endDate": toDate,
+        "staffId":data.staffId
     }
     var [err, value] = await handle(AttendenceAPI.getAttendenceofStaffByDateRangeDetails(data1));
     if (value) {
