@@ -245,20 +245,19 @@ const getAttendenceofStaffByDateRangeDetails = async (data) => {
                 }
             }
         }
-        console.log("totalDistance",totalDistance,totalDuration)
           if(totalDistance.length!=0 && totalDuration.length!=0)
           {
             distance = totalDistance.reduce((a, b) => a + b, 0);
             duration = totalDuration.reduce((a, b) => a + b, 0);
           
-            attendenceData[i].doc[j].travelDistance = distance;
+            attendenceData[i].doc[j].travelDistance = distance.toFixed(2);
             attendenceData[i].doc[j].travelDuration = duration / 60;
           }
           else{
-            attendenceData[i].doc[j].travelDistance = distance;
+            attendenceData[i].doc[j].travelDistance = distance.toFixed(2);
             attendenceData[i].doc[j].travelDuration = duration ;
           }
-          console.log("success3")
+         // console.log("success3")
             // Calculate totalDuration
             attendenceData[i].doc[j].totalDuration = 0;  // Initialize totalDuration
             for (var k = 0; k < attendenceData[i].doc[j].inTimeArray.length; k++) {
@@ -390,9 +389,9 @@ async function AttendanceReportDailyMail() {
                     for (var k = 0; k < staffAttendanceData[j].doc.length; k++) {
                         var value = {
                             Staff_Name: staffAttendanceData[j].doc[k].staffName,
+                            Date: staffAttendanceData[j].doc[k].date,
                             InTime: staffAttendanceData[j].doc[k].inTime,
                             OutTime: staffAttendanceData[j].doc[k].outTime,
-                            Date: staffAttendanceData[j].doc[k].date,
                             Travel_Distance: staffAttendanceData[j].doc[k].travelDistance,
                             Travel_Duration: staffAttendanceData[j].doc[k].travelDuration,
                             Total_Duration: staffAttendanceData[j].doc[k].totalDurationFormatted,
@@ -403,10 +402,10 @@ async function AttendanceReportDailyMail() {
             }
         }
     }
-    const header = ['staffName', 'startTime', 'endTime', 'inTime', 'outTime', 'date', 'travelDistance', 'travelDuration', 'totalDuration'];
+    const header = ['Staff Name', 'Date','In Time', 'Out Time',  'Travel Distance', 'Travel Duration', 'Total Working Hours'];
     const csvFromArrayOfArrays = convertArrayToCSV(attendanceArray, {
         header,
-        separator: ';'
+        separator: ','
     });
     console.log(csvFromArrayOfArrays)
     sendMail(csvFromArrayOfArrays)
@@ -417,16 +416,19 @@ async function AttendanceReportDailyMail() {
 function sendMail(csvFromArrayOfArrays) {
     let userName = '';
     console.log("csvFromArrayOfArrays", csvFromArrayOfArrays)
+    var date=new Date();
+    var from = date.getFullYear() + "-" + ((date.getMonth() + 1).length != 2 ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1)) + "-" + (date.getDate().length != 2 ? "0" + date.getDate() : date.getDate());
     var attachments = {
-        filename: "DailyReport.csv",
+        filename: "DailyReport-"+from+".csv",
         content: csvFromArrayOfArrays,
     }
     var staffData=[];
-    staffData=[{staffName:"Hr",email:"Hr@hamsarehab.com"},{staffName:"Operations",email:"Operations@hamsarehab.com"}]
+    //staffData=[{staffName:"Hr",email:"Hr@hamsarehab.com"},{staffName:"Operations",email:"Operations@hamsarehab.com"}]
+    staffData=[{staffName:"Sheela",email:"sheelak@deemsys.in"}]
     staffData.forEach((element) => {
         userName = element.staffName;
      
-            let subject = "Daily Attendance Report"
+            let subject = "Daily Attendance Report : "+from;
             html.create({
                 data: {
                     userName: `${element.staffName}`,
@@ -437,7 +439,7 @@ function sendMail(csvFromArrayOfArrays) {
                     if (err == null)
 
                         require('../util/email').send(element.email, subject, contents, attachments, () => {
-                         //   cb(null);
+                       
                         });
                     else {
                        // cb(err);
@@ -471,9 +473,9 @@ async function AttendanceReportMonthlyMail() {
                     for (var k = 0; k < staffAttendanceData[j].doc.length; k++) {
                         var value = {
                             Staff_Name: staffAttendanceData[j].doc[k].staffName,
+                            Date: staffAttendanceData[j].doc[k].date,
                             InTime: staffAttendanceData[j].doc[k].inTime,
                             OutTime: staffAttendanceData[j].doc[k].outTime,
-                            Date: staffAttendanceData[j].doc[k].date,
                             Travel_Distance: staffAttendanceData[j].doc[k].travelDistance,
                             Travel_Duration: staffAttendanceData[j].doc[k].travelDuration,
                             Total_Duration: staffAttendanceData[j].doc[k].totalDurationFormatted,
@@ -484,30 +486,32 @@ async function AttendanceReportMonthlyMail() {
             }
         }
     }
-    const header = ['staffName','inTime', 'outTime', 'date', 'travelDistance', 'travelDuration', 'totalDuration'];
+    const header = ['Staff Name', 'In Time','Date', 'Out Time',  'Travel Distance', 'Travel Duration', 'Total Working Hours'];
     const csvFromArrayOfArrays = convertArrayToCSV(attendanceArray, {
         header,
-        separator: ';'
+        separator: ','
     });
     console.log(csvFromArrayOfArrays)
-   sendMailMonth(csvFromArrayOfArrays)
+   sendMailMonth(to,from,csvFromArrayOfArrays)
      })
      schedule.start();
 
 }
-function sendMailMonth(csvFromArrayOfArrays) {
+function sendMailMonth(from,to,csvFromArrayOfArrays) {
+
     let userName = '';
     console.log("csvFromArrayOfArrays", csvFromArrayOfArrays)
     var attachments = {
-        filename: "MonthlyStaffViseReport.csv",
+        filename: "MonthlyStaffViseReport:"+from+"-"+to+".csv",
         content: csvFromArrayOfArrays,
     }
     var staffData=[];
-    staffData=[{staffName:"Hr",email:"Hr@hamsarehab.com"},{staffName:"Operations",email:"Operations@hamsarehab.com"},{staffName:"Accounts",email:"Accounts@hamsarehab.com"}]
-    staffData.forEach((element) => {
+ //   staffData=[{staffName:"Hr",email:"Hr@hamsarehab.com"},{staffName:"Operations",email:"Operations@hamsarehab.com"},{staffName:"Accounts",email:"Accounts@hamsarehab.com"}]
+ staffData=[{staffName:"Sheela",email:"sheelak@deemsys.in"}] 
+ staffData.forEach((element) => {
         userName = element.staffName;
       
-            let subject = "Monthly Staff Attendance Report"
+            let subject = "Monthly Staff Attendance Report : "+from+"-"+to;
             html.create({
                 data: {
                     userName: `${element.staffName}`,
