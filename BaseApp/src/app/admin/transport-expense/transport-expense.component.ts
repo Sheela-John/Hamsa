@@ -39,12 +39,12 @@ export class TransportExpenseComponent {
 
   //Add Transport Expense
   addTransportExpense() {
-    this.router.navigateByUrl('admin/add-transport-expense');
+    this.router.navigateByUrl('admin/transport-expense/add-transport-expense');
   }
 
   //Edit Button-Route
   editTransportExpense(id) {
-    this.router.navigateByUrl('admin/edit-transport-expense/' + id);
+    this.router.navigateByUrl('admin/transport-expense/edit-transport-expense/' + id);
   }
 
   //Get All TravelExpense

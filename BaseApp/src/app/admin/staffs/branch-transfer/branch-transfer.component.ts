@@ -250,7 +250,8 @@ export class BranchTransferComponent implements OnInit {
 
 
   backTostaff() {
-    this.router.navigateByUrl('admin/staffs')
+    // this.router.navigateByUrl('admin/staffs')
+    this.router.navigateByUrl('admin/staff/viewStaff-branchTransfer/' + this.StaffId)
   }
 
 

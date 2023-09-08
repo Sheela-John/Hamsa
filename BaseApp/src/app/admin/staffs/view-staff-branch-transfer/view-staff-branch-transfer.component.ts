@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { FlashMessageService } from 'src/app/shared/flash-message/flash-message.service';
@@ -13,6 +13,7 @@ import { BranchTransferService } from 'src/app/services/branchTransfer.service';
   styleUrls: ['./view-staff-branch-transfer.component.scss']
 })
 export class ViewStaffBranchTransferComponent implements OnInit {
+  // @ViewChild('cancelSessionModal') public cancelSessionModal: ModalDirective;
   public routerData: any;
   public showAddEdit: boolean = false;
   public empid: any;
@@ -125,14 +126,18 @@ export class ViewStaffBranchTransferComponent implements OnInit {
   }
   async deleteBranchTransfer(id) {
     console.log(id)
+    if(confirm("Are you sure to delete ")){
     this.branchTransferService.deleteBranchTransferbyId(id).subscribe(res => {
-      if (res.status) {
-        this.flashMessageService.successMessage("Branch Transfer Deleted Successfully", 2);
-        window.location.reload()
-      }
-      else {
-        this.flashMessageService.errorMessage("Error in Branch Transfer Delete ", 2);
-      }
-    })
+      
+        if (res.status) {
+          this.flashMessageService.successMessage("Branch Transfer Deleted Successfully", 2);
+          window.location.reload()
+        }
+        else {
+          this.flashMessageService.errorMessage("Error in Branch Transfer Delete ", 2);
+        }
+      })
+      
+    }
   }
 }

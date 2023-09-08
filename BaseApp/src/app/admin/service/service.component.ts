@@ -39,7 +39,7 @@ export class ServiceComponent implements OnInit {
 
   //Navigation for Add Service Form
   addService() {
-    this.router.navigateByUrl('admin/addEditService');
+    this.router.navigateByUrl('admin/service/addEditService');
   }
 
   //Get All Services
@@ -54,7 +54,7 @@ export class ServiceComponent implements OnInit {
  
   //Navigation for Edit Service Form
   editService(id) {
-    this.router.navigateByUrl('admin/addEditService/' + id);
+    this.router.navigateByUrl('admin/service/addEditService/' + id);
   }
   // Enable or Disable Service         // 0 - enable, 2 - disable (status)
   enableDisableService(id) {      

@@ -43,25 +43,25 @@ const routes: Routes = [
         component: StaffsComponent
     },
     {
-        path: 'addEditStaff',
+        path: 'staffs/addEditStaff',
         component: AddEditStaffComponent
     },
     {
-        path: 'addEditStaff/:id',
-        component: AddEditStaffComponent
+        path: 'staffs/branch-Transfer/:id',
+        component: BranchTransferComponent
     },
     {
-        path:'staff/viewStaff-branchTransfer/:id',
+        path:'staffs/viewStaff/:id',
         component:ViewStaffBranchTransferComponent
         // path: 'service',
         // component: ServiceComponent
     },
     {
-        path: 'addEditService',
+        path: 'service/addEditService',
         component: AddEditServiceComponent
     },
     {
-        path: 'addEditService/:id',
+        path: 'service/addEditService/:id',
         component: AddEditServiceComponent
     },
     {
@@ -105,7 +105,7 @@ const routes: Routes = [
         component: SettingComponent
     },
     {
-        path: 'addeditrole',
+        path: 'role/addeditrole',
         component: AddEditRoleComponent
     },
     {
@@ -113,7 +113,7 @@ const routes: Routes = [
         component: AddEditRoleComponent
     },
     {
-        path: 'addEditBranch',
+        path: 'branch/addEditBranch',
         component: AddEditBranchComponent
     },
     {
@@ -259,11 +259,11 @@ const routes: Routes = [
         component: TransportExpenseComponent
     },
     {
-        path: 'add-transport-expense',
+        path: 'transport-expense/add-transport-expense',
         component: AddEditTransportExpenseComponent
     },
     {
-        path: 'edit-transport-expense/:id',
+        path: 'transport-expense/edit-transport-expense/:id',
         component: AddEditTransportExpenseComponent
     },
 
@@ -279,7 +279,7 @@ const routes: Routes = [
         component:LeaveRequestComponent
     }
 ];
-
+console.log(routes,"routes")
 @NgModule({
     imports: [RouterModule.forChild(routes)],
     exports: [RouterModule]

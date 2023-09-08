@@ -55,7 +55,7 @@ export class RoleComponent implements OnInit {
 
   //Add Button Route
   addRole() {
-    this.router.navigateByUrl('admin/addeditrole');
+    this.router.navigateByUrl('admin/role/addeditrole');
   }
 
   //Edit button Route

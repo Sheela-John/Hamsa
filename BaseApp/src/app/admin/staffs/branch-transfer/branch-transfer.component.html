@@ -13,17 +13,16 @@
                     <div>
                         <label for="name" class="block mb-2 font-bold text-gray-600 ">Select Branch<span class="required">*</span></label>
                         <div class="flex items-center mr-4">
-                            <input id="teal-radio" type="radio" [value]=0 formControlName="branchTransferType"
+                            <label for="teal-radio" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                <input id="teal-radio" type="radio" [value]=0 formControlName="branchTransferType"
                                 name="branchTransferType" (change)="branchTypeChange()"
                                 class="w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 focus:ring-teal-500 dark:focus:ring-teal-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                            <label for="teal-radio"
-                                class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Temporary</label>
-                            <input id="teal-radio" checked type="radio" checked [value]=1  name="branchTransferType" (change)="branchTypeChange()"
-                                formControlName="branchTransferType"
-                                class="w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 focus:ring-teal-500 dark:focus:ring-teal-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 ml-4"> 
-                            
-                            <label for="teal-radio"
-                                class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Permanent</label>
+                                Temporary</label>
+                                            
+                            <label class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                <input id="teal-radio" checked type="radio" checked [value]=1  name="branchTransferType" (change)="branchTypeChange()"
+                                formControlName="branchTransferType" class="w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 focus:ring-teal-500 dark:focus:ring-teal-600 
+                                dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 ml-4"> Permanent</label>
                         </div>
                         <div class="error-msg-area">
                             <div *ngIf="branchTransferForm.controls['branchTransferType'].errors && (!branchTransferForm.controls['branchTransferType'].pristine|| isbranchTransferFormSubmitted)"

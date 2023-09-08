@@ -64,7 +64,19 @@ export class StaffsComponent implements OnInit {
     this.staffService.getAllStaffs().subscribe(res => {
       if (res.status) {
         this.staffList = res.data;
-        console.log(this.staffList);
+        function compare( a, b ) {
+          if ( a.staffName < b.staffName ){
+            return -1;
+          }
+          if ( a.staffName > b.staffName ){
+            return 1;
+          }
+          return 0;
+        }
+        
+        this.staffList.sort( compare );
+        // console.log(res.data,"normal");
+        console.log(this.staffList,"sorted");
         this.dtTrigger.next(null);
       }
     })
@@ -72,24 +84,23 @@ export class StaffsComponent implements OnInit {
 
   //Navigation Add Staff Form
   addStaffs() {
-    this.router.navigateByUrl('admin/addEditStaff');
+    this.router.navigateByUrl('admin/staffs/addEditStaff');
   }
 
   //Navigation for Edit Staff Form
   editStaff(id) {
     console.log("id",id);
-    this.router.navigateByUrl('admin/addEditStaff/' + id);
+    this.router.navigateByUrl('admin/staffs/addEditStaff/' + id);
   }
 
   //Navigation for View Staff/BranchTransfer
   viewStaff(id) {
-    this.router.navigateByUrl('admin/staff/viewStaff-branchTransfer/' + id);
+    this.router.navigateByUrl('admin/staffs/viewStaff/' + id);
   }
 
   //Navigation for branch Transfer
   branchTransfer(id) {
-
-    this.router.navigateByUrl('admin/branch-Transfer/'+id)
+    this.router.navigateByUrl('admin/staffs/branch-Transfer/'+id)
   }
 
   // Enable or Disable Staff         // 0 - enable, 2 - disable (status)

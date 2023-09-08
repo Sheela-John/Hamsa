@@ -40,7 +40,7 @@ export class BranchComponent implements OnInit {
 
   //Add Button-Route
   addBranch() {
-    this.router.navigateByUrl('admin/addEditBranch');
+    this.router.navigateByUrl('admin/branch/addEditBranch');
   }
 
   //Edit Button-Route

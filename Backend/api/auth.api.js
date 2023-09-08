@@ -39,6 +39,7 @@ async function login(loginCred, password, role) {
     return new Promise((resolve, reject) => {
         if (err) return reject(err);
         if (!lodash.isEmpty(user)) {
+            console.log(!(user[0].password == security.hash(user[0].createdAt, password)))
             if (!(user[0].password == security.hash(user[0].createdAt, password)) || !user[0].user || user[0].status != 0) {
                 return reject(ERR.INVALID_CREDENTIALS);
             }

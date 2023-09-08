@@ -4,19 +4,18 @@
     <div style="min-height: 716px"
         class="side-nav w-64 absolute sm:relative shadow md:h-full flex-col justify-between hidden sm:flex">
         <!-- Mobile View -->
-        <div class="px-8">
-            <div class="h-16 mt-4 w-full flex items-center">
+        <div>
+            <div class="h-16 mt-4 w-full flex items-center px-8">
                 <img src="assets/images/Logo.png" alt="#">
             </div>
             <ul class="sidenav-nav">
-                <li *ngFor="let data of navData"
+                <li *ngFor="let data of navData" [routerLink]="[data.url]" routerLinkActive="active"
+                
                     class="sidenav-nav-item flex w-full justify-between text-gray-300 hover:text-gray-500 cursor-pointer items-center mb-3">
-                    <div class="flex items-center">
-                        <a class="sidenav-nav-link" [routerLink]="[data.url]" routerLinkActive="active"
-                            [routerLinkActiveOptions]="{ exact: true }">
-                            <i class="icon" aria-hidden="true" [class]="data.icon" routerLinkActive="active"
-                                [routerLinkActiveOptions]="{exact:
-                            true}"></i>
+                    <div class="flex items-center px-8">
+                        <a class="sidenav-nav-link" >
+                            <!-- <i class="icon" aria-hidden="true" [class]="data.icon" routerLinkActive="active"
+                                [routerLinkActiveOptions]="{exact:true}"></i> -->
                             <span class="text-md ml-2">{{ data.name }}</span>
                         </a>
                     </div>
@@ -27,8 +26,7 @@
                         <a class="sidenav-nav-link" routerLink="/auth/login" routerLinkActive="active"
                             [routerLinkActiveOptions]="{ exact: true }">
                             <i class="fa fa-sign-out" aria-hidden="true" routerLinkActive="active"
-                                [routerLinkActiveOptions]="{exact:
-                            true}"></i>
+                                [routerLinkActiveOptions]="{exact:true}"></i>
                             <span class="text-md ml-2">Logout</span>
                         </a>
                     </div>
@@ -52,18 +50,21 @@
                 <img src="assets/images/Logo.png" alt="#">
             </div>
             <ul class="mt-12">
-                <li *ngFor="let data of navData"
+                <div *ngFor="let data of navData">
+                <li 
                     class="sidenav-nav-item flex w-full justify-between text-gray-300 active:bg-white active:text-black cursor-pointer items-center mb-6">
                     <div class="flex items-center">
-                        <a class="sidenav-nav-link" [routerLink]="[data.url]" routerLinkActive="active"
+                        <a class="sidenav-nav-link " [routerLink]="[data.url]" routerLinkActive="active"
                             [routerLinkActiveOptions]="{ exact: true }">
                             <i class="icon" aria-hidden="true" [class]="data.icon" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact:
                             true}"></i>
                             <span class="text-md ml-2">{{ data.name }}</span>
                         </a>
+                    
                     </div>
                 </li>
+                </div>
                 <li
                     class="sidenav-nav-item flex w-full justify-between text-gray-300 hover:text-gray-500 cursor-pointer items-center mb-6">
                     <div class="flex items-center">
