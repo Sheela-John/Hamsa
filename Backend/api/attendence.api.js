@@ -423,8 +423,8 @@ function sendMail(csvFromArrayOfArrays) {
         content: csvFromArrayOfArrays,
     }
     var staffData=[];
-    //staffData=[{staffName:"Hr",email:"Hr@hamsarehab.com"},{staffName:"Operations",email:"Operations@hamsarehab.com"}]
-    staffData=[{staffName:"Sheela",email:"sheelak@deemsys.in"}]
+    staffData=[{staffName:"Hr",email:"Hr@hamsarehab.com"},{staffName:"Operations",email:"Operations@hamsarehab.com"}]
+    // staffData=[{staffName:"Sheela",email:"sheelak@deemsys.in"}]
     staffData.forEach((element) => {
         userName = element.staffName;
      
@@ -506,8 +506,8 @@ function sendMailMonth(from,to,csvFromArrayOfArrays) {
         content: csvFromArrayOfArrays,
     }
     var staffData=[];
- //   staffData=[{staffName:"Hr",email:"Hr@hamsarehab.com"},{staffName:"Operations",email:"Operations@hamsarehab.com"},{staffName:"Accounts",email:"Accounts@hamsarehab.com"}]
- staffData=[{staffName:"Sheela",email:"sheelak@deemsys.in"}] 
+   staffData=[{staffName:"Hr",email:"Hr@hamsarehab.com"},{staffName:"Operations",email:"Operations@hamsarehab.com"},{staffName:"Accounts",email:"Accounts@hamsarehab.com"}]
+//  staffData=[{staffName:"Sheela",email:"sheelak@deemsys.in"}] 
  staffData.forEach((element) => {
         userName = element.staffName;
       
