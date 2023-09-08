@@ -1389,7 +1389,7 @@ async function getAssignServiceDataByStaffIdAndDateForDashBoard(data) {
     let assignServiceData = [];
     let [err5, assign] = await handle(AssignService.find({ 'staffId': data.staffId }).lean());
     assignServiceData = assign;
-    console.log("assignServiceData", assignServiceData)
+    // console.log("assignServiceData", assignServiceData)
     var assignServiceData1 = [];
     for (var i = 0; i < assignServiceData.length; i++) {
         if (new Date(assignServiceData[i].date) >= fromDate && new Date(assignServiceData[i].date) <= toDate) {
@@ -1399,7 +1399,7 @@ async function getAssignServiceDataByStaffIdAndDateForDashBoard(data) {
     var totalCount, assigned = 0, completed = 0, rescheduled = 0, notAvailable = 0;
     var op = 0, ip = 0, teletherapy = 0, home = 0;
     var staffDetails = []
-    console.log("assignServiceData1", assignServiceData1)
+  //  console.log("assignServiceData1", assignServiceData1)
     if (assignServiceData1.length != 0) {
         for (var i = 0; i < assignServiceData1.length; i++) {
             if (assignServiceData1[i].status == 0) {
@@ -1432,13 +1432,18 @@ async function getAssignServiceDataByStaffIdAndDateForDashBoard(data) {
 
             }
         }
+        totalCount = assignServiceData1.length;
+
     }
-    totalCount = assignServiceData1.length;
+    else
+    {
+        totalCount=0;
+    }
     var data1 = {
         "startDate": fromDate,
         "endDate": toDate
     }
-    var [err, value] = await handle(AttendenceAPI.getAttendenceofStaffByDateRange(data1));
+    var [err, value] = await handle(AttendenceAPI.getAttendenceofStaffByDateRangeDetails(data1));
     if (value) {
         var newValue = [];
         for (var i = 0; i < value.length; i++) {
