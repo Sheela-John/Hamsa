@@ -486,7 +486,7 @@ async function AttendanceReportMonthlyMail() {
             }
         }
     }
-    const header = ['Staff Name', 'In Time','Date', 'Out Time',  'Travel Distance', 'Travel Duration', 'Total Working Hours'];
+    const header = ['Staff Name','Date', 'In Time','Out Time',  'Travel Distance', 'Travel Duration', 'Total Working Hours'];
     const csvFromArrayOfArrays = convertArrayToCSV(attendanceArray, {
         header,
         separator: ','
