@@ -47,6 +47,10 @@ const routes: Routes = [
         component: AddEditStaffComponent
     },
     {
+        path: 'staffs/addEditStaff/:id',
+        component: AddEditStaffComponent
+    },
+    {
         path: 'staffs/branch-Transfer/:id',
         component: BranchTransferComponent
     },
