@@ -522,7 +522,7 @@ export class ReportComponent implements OnInit {
                     console.log("hello")
                     this.AllData.splice(index, 1, {
                       date: this.Reverse1formatDate(item.date),
-                      duration: item.duration,
+                      duration: item.totalDurationFormatted,
                       earlyBy: item.earlyBy,
                       endTime: item.endTime,
                       inTime: item.inTime,

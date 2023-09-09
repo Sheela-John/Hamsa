@@ -39,7 +39,6 @@ const generateRandomPassword = require('../util/generateCode').randomString;
 const genrateDefaultImage = require('../util/generateCode').genrateDefaultImage;
 const request = require('request');
 const NodeGeocoder = require('node-geocoder');
-
 const log = require('../util/logger').log(component, __filename);
 
 /* For error handling in async await function */
@@ -59,11 +58,8 @@ const assignServiceClient = async (assignServiceData) => {
     assignServiceData.status = 0;
     assignServiceData.date = new Date(assignServiceData.date);
     let someDate = assignServiceData.date
-    console.log(someDate, "someDate")
     let copiedAppointmentDate = new Date(someDate.getTime());
-    console.log(copiedAppointmentDate, "copiedA")
     assignServiceData['date'] = copiedAppointmentDate;
-    console.log(assignServiceData.date)
     delete assignServiceData._id;
     return new Promise((resolve, reject) => {
         (async () => {
@@ -96,8 +92,6 @@ const assignServiceClient = async (assignServiceData) => {
                 latitude: res[0].latitude,
                 longitude: res[0].longitude
             }
-
-            // console.log("assignServiceData", assignServiceData)
             let [assignErr, assignServiceValue] = await handle(AssignService.find({}).lean());
             // console.log("assignServiceData", assignServiceValue)
             var typeArray = [1, 3, 4];
@@ -107,7 +101,7 @@ const assignServiceClient = async (assignServiceData) => {
                     if (assignServiceValue[j].date == new Date(assignServiceData.date)) {
 
                         if ((slotCheck(assignServiceValue[j].startTime) >= slotCheck(assignServiceData.startTime)) && (slotCheck(assignServiceValue[j].endTime) <= slotCheck(assignServiceData.endTime))) {
-                            console.log(true, assignServiceData.typeOfTreatment)
+                       
                             if (typeArray.includes(assignServiceValue[j].typeOfTreatment) && typeArray.includes(assignServiceData.typeOfTreatment)) {
                                 console.log("bookedCount", assignServiceValue[j].bookedCount)
                                 count = assignServiceValue[j].bookedCount + 1;
@@ -1467,13 +1461,17 @@ async function getAssignServiceDataByStaffIdAndDateForDashBoard(data) {
     console.log("prod", prod, value == undefined, total == undefined)
     if (value == undefined && total == undefined) {
         console.log("if")
-        prod = 0;
-        time = 0
+        prod = "00:00";
+        time = "00:00"
     }
     else {
         console.log("else")
-        prod = Math.floor((total - value) / 60).toString() + ":" + (((total - value) % 60).toString()).split('.')[0];
-        time = Math.floor(total / 60).toString() + ":" + (total % 60).toString();
+        var hour=Math.floor((total - value) / 60).toString();
+        var min=(((total - value) % 60).toString()).split('.')[0];
+        var timeHour= Math.floor(total / 60).toString();
+        var timeMin=(total % 60).toString()
+        prod = ( (hour).length!=2 ? "0"+hour :hour) + ":" + ( (min).length!=2 ? "0"+min :min);
+        time = ( (timeHour).length!=2 ? "0"+timeHour :timeHour) + ":" + ( (timeMin).length!=2 ? "0"+timeMin :timeMin);
     }
 
     var output = {
@@ -2033,6 +2031,7 @@ async function getAssignServiceDataByDateForActivityReport(data) {
             }
         }
     }
+    console.log("assignServiceData1",assignServiceData1)
     var arr = []
     if (assignServiceData1.length != 0) {
         for (var j = 0; j < array.length; j++) {
@@ -2041,11 +2040,9 @@ async function getAssignServiceDataByDateForActivityReport(data) {
                 if (assignServiceData1[i].staffId == array[j]) {
                     if (assignServiceData1[i].status == 0) {
                         assigned = assigned + 1;
-
                     }
                     if (assignServiceData1[i].status == 1 || assignServiceData1[i].status == 3) {
                         completed = completed + 1;
-
                     }
                     if (assignServiceData1[i].status == 2) {
                         rescheduled = rescheduled + 1;
@@ -2071,26 +2068,24 @@ async function getAssignServiceDataByDateForActivityReport(data) {
             let [err2, serviceData] = await handle(Service.findOne({ _id: assignServiceData1[i].serviceId }).lean());
             if (assignServiceData1[i].transport) {
                 let [err3, transportData] = await handle(TravelAllowance.findOne({ _id: assignServiceData1[i].transport }).lean());
+                console.log("transportData",transportData)
                 if (transportData) {
                     assignServiceData1[i].transportMode = transportData.travelExpenseMode;
                 }
                 else {
                     assignServiceData1[i].transportMode = "Auto";
-
                 }
             }
             assignServiceData1[i].clientName = clientData.clientName;
             assignServiceData1[i].staffName = staffData.staffName;
             assignServiceData1[i].empId = staffData.empId;
             assignServiceData1[i].serviceName = serviceData.serviceName;
-
         }
         return Promise.resolve(assignServiceData1);
     }
     // if (Err) return Promise.reject(Err);
     if (lodash.isEmpty(arr)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(arr);
-
 }
 async function getAssignServiceDataByDateForTravelReport(data) {
     log.debug(component, 'Getting AssignService Data by StaffId And Date');

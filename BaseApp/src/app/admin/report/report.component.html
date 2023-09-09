@@ -381,7 +381,7 @@
                                     </tr>        
                                     <td *ngFor="let data of AllData" class="size border-grey-light border hover:bg-gray-100 p-3">{{data.endTime}}</td>
                                 </div>
-                                <div class="d-flex">
+                                <!-- <div class="d-flex">
                                     <tr>
                                         <th class="p-3 text-left head-size">LateBy</th>
                                     </tr>
@@ -398,7 +398,7 @@
                                         <th class="p-3 text-left head-size">TotalIOT</th>
                                     </tr> 
                                     <td *ngFor="let data of AllData" class="size border-grey-light border hover:bg-gray-100 p-3">{{data.totalOT}}</td>     
-                                </div>                                        
+                                </div>                                         -->
                             </tbody>
                         </table>
                         <button type="button" (click)="export()" class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg"  *ngIf="finalData.length!=0" >Export</button>
