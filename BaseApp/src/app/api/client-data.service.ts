@@ -49,6 +49,14 @@ export class ClientDataService {
         }), catchError(error => throwError(error)));
     }
 
+      //Update Client Name ,Address and Phone Number Separately
+      public updateClientdetails(id, data): Observable<any> {
+        console.log("UpdateL:", data);
+        return this.httpClient.put('client/updateClientDetails/' + id, data).pipe(tap(res => {
+            return res;
+        }), catchError(error => throwError(error)));
+    }
+
     //get Details By PackageId
     public getDetailsByPackageId(data): Observable<any> {
         return this.httpClient.post('client/getClientDetailsByPackageId', data).pipe(tap(res => {

@@ -97,11 +97,18 @@ export class AddEditClientComponent implements OnInit {
   public packageIds: any;
   public minDate: any;
   public hideUpdateButton: boolean = false;
-  public clientLatitude:any;
-  public clientLongitude:any;
+  public clientLatitude: any;
+  public clientLongitude: any;
   public showError: boolean = false;
   public wrongLocationError: boolean;
-  locationData: any=[];
+  public isShowable: boolean = true;
+  public locationData: any = [];
+  public hidesession: Boolean = false
+  public edit: boolean;
+  public show: boolean = false
+  public count: number = 0;
+  public showlatti: boolean = false;
+  public onchangeaddress: boolean = false;
 
   constructor(private fb: FormBuilder, private router: Router, public BranchService: BranchService,
     private flashMessageService: FlashMessageService, private assignService: AssignService,
@@ -126,39 +133,42 @@ export class AddEditClientComponent implements OnInit {
       this.showAddPackage = true;
       this.showPackage = true
     }
+
   }
 
   // Initialize ClientForm
   initializeClientForm() {
     this.clientForm = this.fb.group({
-      uhid: ['', Validators.required],
-      clientName: ['', Validators.required],
-      phoneNumber: ['', [Validators.required, Validators.pattern("^((\\+91-?)|0)?[0-9]{10}$")]],
+      uhid: [''],
+      clientName: [''],
+      phoneNumber: [''],
       email: [''],
-      address: ['', Validators.compose([Validators.required])],
+      address: [''],
       clientAddressLatitude: [''],
       clientAddressLongitude: [''],
       emergencyNumber: [''],
-      homeBranchId: ['', Validators.required],
-      homeBranchAddress: ['', Validators.required],
+      homeBranchId: [''],
+      homeBranchAddress: [''],
       clientHomeBranchLattitude: [''],
       clientHomeBranchLongitude: [''],
       addSession: this.fb.array([this.initializeAddSessionForm()]),
       packageId: [''],
-      noOfSession: ['', Validators.required],
-      onWeekDay: ['', Validators.required],
+      noOfSession: [''],
+      onWeekDay: [''],
       amount: [''],
-      staffId: ['', Validators.required],
-      startDate: ['', Validators.required],
-      endDate: ['', Validators.required],
-      serviceId: ['', Validators.required],
-      typeOfTreatment: ['', Validators.required],
-      slot: ['', Validators.required],
-      duration: ['', Validators.required],
-      startTime: ['', Validators.required],
-      endTime: ['', Validators.required]
+      staffId: [''],
+      startDate: [''],
+      endDate: [''],
+      serviceId: [''],
+      typeOfTreatment: [''],
+      slot: [''],
+      duration: [''],
+      startTime: [''],
+      endTime: ['']
     })
     this.sessionArr = this.clientForm.get('addSession') as FormArray
+    this.setvalidator();
+    this.clearvalidator()
   }
 
   // Intialize Session Form
@@ -174,7 +184,7 @@ export class AddEditClientComponent implements OnInit {
 
   //phone no validation
   onKeyUp(control) {
-    if (this.clientForm.controls[control].value) {
+    if (this.clientForm.controls[control].phoneNumber) {
       if (control === 'phone') {
         this.showError = true;
       }
@@ -191,28 +201,142 @@ export class AddEditClientComponent implements OnInit {
   // }
 
   //validation for the slot start time
-  setvalidation(){
+  setvalidation() {
     for (let i = 0; i < this.sessionArr.value.length; i++) {
-      if(this.showAddSession == true){
-      var addSession = this.clientForm.get('addSession') as FormArray
-      addSession.at(i)['controls']["slotStartTime"].setValidators([Validators.required]);
-      addSession.at(i)['controls']["slotEndTime"].setValidators([Validators.required]);
-      addSession.at(i)['controls']["slotStartTime"].updateValueAndValidity();
-      addSession.at(i)['controls']["slotEndTime"].updateValueAndValidity();
-    }
-    else{
-      for (let i = 0; i < this.sessionArr.value.length; i++) {
+      if (this.showAddSession == true) {
         var addSession = this.clientForm.get('addSession') as FormArray
-        addSession.at(i)['controls']["slotStartTime"].clearValidator();
-        addSession.at(i)['controls']["slotEndTime"].clearValidator();
+        addSession.at(i)['controls']["slotStartTime"].setValidators([Validators.required]);
+        addSession.at(i)['controls']["slotEndTime"].setValidators([Validators.required]);
         addSession.at(i)['controls']["slotStartTime"].updateValueAndValidity();
         addSession.at(i)['controls']["slotEndTime"].updateValueAndValidity();
       }
+      else {
+        for (let i = 0; i < this.sessionArr.value.length; i++) {
+          var addSession = this.clientForm.get('addSession') as FormArray
+          addSession.at(i)['controls']["slotStartTime"].clearValidator();
+          addSession.at(i)['controls']["slotEndTime"].clearValidator();
+          addSession.at(i)['controls']["slotStartTime"].updateValueAndValidity();
+          addSession.at(i)['controls']["slotEndTime"].updateValueAndValidity();
+        }
+      }
     }
+
   }
- 
+
+  //validation for the edit the client details like address name and phnone number
+  setvalidator() {
+    this.clientForm.controls["uhid"].setValidators([Validators.required]);
+    this.clientForm.controls["uhid"].updateValueAndValidity();
+    this.clientForm.controls["clientName"].setValidators([Validators.required]);
+    this.clientForm.controls["clientName"].updateValueAndValidity();
+    this.clientForm.controls["phoneNumber"].setValidators([Validators.required, Validators.pattern("^[0-9]*$"), Validators.minLength(10), Validators.maxLength(10)]);
+    this.clientForm.controls["phoneNumber"].updateValueAndValidity();
+    this.clientForm.controls["address"].setValidators([Validators.required]);
+    this.clientForm.controls["address"].updateValueAndValidity();
+    this.clientForm.controls["homeBranchId"].setValidators([Validators.required]);
+    this.clientForm.controls["homeBranchId"].updateValueAndValidity();
+    this.clientForm.controls["homeBranchAddress"].setValidators();
+    this.clientForm.controls["homeBranchAddress"].updateValueAndValidity();
+    this.clientForm.controls["noOfSession"].clearValidators();
+    this.clientForm.controls["noOfSession"].updateValueAndValidity();
+    this.clientForm.controls["onWeekDay"].clearValidators();
+    this.clientForm.controls["onWeekDay"].updateValueAndValidity();
+    this.clientForm.controls["staffId"].clearValidators();
+    this.clientForm.controls["staffId"].updateValueAndValidity();
+    this.clientForm.controls["startDate"].clearValidators();
+    this.clientForm.controls["startDate"].updateValueAndValidity();
+    this.clientForm.controls["endDate"].clearValidators();
+    this.clientForm.controls["endDate"].updateValueAndValidity();
+    this.clientForm.controls["serviceId"].clearValidators();
+    this.clientForm.controls["serviceId"].updateValueAndValidity();
+    this.clientForm.controls["typeOfTreatment"].clearValidators();
+    this.clientForm.controls["typeOfTreatment"].updateValueAndValidity();
+    this.clientForm.controls["slot"].clearValidators();
+    this.clientForm.controls["slot"].updateValueAndValidity();
+    this.clientForm.controls["duration"].clearValidators();
+    this.clientForm.controls["duration"].updateValueAndValidity();
+    this.clientForm.controls["startTime"].clearValidators();
+    this.clientForm.controls["startTime"].updateValueAndValidity();
+    this.clientForm.controls["endTime"].clearValidators();
+    this.clientForm.controls["endTime"].updateValueAndValidity();
   }
-  
+
+  // validation for the add session while edit
+  clearvalidator() {
+    this.clientForm.controls["noOfSession"].setValidators([Validators.required]);
+    this.clientForm.controls["noOfSession"].updateValueAndValidity();
+    this.clientForm.controls["onWeekDay"].setValidators([Validators.required]);
+    this.clientForm.controls["onWeekDay"].updateValueAndValidity();
+    this.clientForm.controls["staffId"].setValidators([Validators.required]);
+    this.clientForm.controls["staffId"].updateValueAndValidity();
+    this.clientForm.controls["startDate"].setValidators([Validators.required]);
+    this.clientForm.controls["startDate"].updateValueAndValidity();
+    this.clientForm.controls["endDate"].setValidators([Validators.required]);
+    this.clientForm.controls["endDate"].updateValueAndValidity();
+    this.clientForm.controls["serviceId"].setValidators([Validators.required]);
+    this.clientForm.controls["serviceId"].updateValueAndValidity();
+    this.clientForm.controls["typeOfTreatment"].setValidators([Validators.required]);
+    this.clientForm.controls["typeOfTreatment"].updateValueAndValidity();
+    this.clientForm.controls["slot"].setValidators([Validators.required]);
+    this.clientForm.controls["slot"].updateValueAndValidity();
+    this.clientForm.controls["duration"].setValidators([Validators.required]);
+    this.clientForm.controls["duration"].updateValueAndValidity();
+    this.clientForm.controls["startTime"].setValidators([Validators.required]);
+    this.clientForm.controls["startTime"].updateValueAndValidity();
+    this.clientForm.controls["endTime"].setValidators([Validators.required]);
+    this.clientForm.controls["endTime"].updateValueAndValidity();
+    this.clientForm.controls["uhid"].clearValidators();
+    this.clientForm.controls["uhid"].updateValueAndValidity();
+    this.clientForm.controls["clientName"].clearValidators();
+    this.clientForm.controls["clientName"].updateValueAndValidity();
+    this.clientForm.controls["phoneNumber"].clearValidators();
+    this.clientForm.controls["phoneNumber"].updateValueAndValidity();
+    this.clientForm.controls["address"].clearValidators();
+    this.clientForm.controls["address"].updateValueAndValidity();
+    this.clientForm.controls["homeBranchId"].clearValidators();
+    this.clientForm.controls["homeBranchId"].updateValueAndValidity();
+    this.clientForm.controls["homeBranchAddress"].clearValidators();
+    this.clientForm.controls["homeBranchAddress"].updateValueAndValidity();
+  }
+
+  // validation for the add form
+  validation() {
+    this.clientForm.controls["uhid"].setValidators([Validators.required]);
+    this.clientForm.controls["uhid"].updateValueAndValidity();
+    this.clientForm.controls["clientName"].setValidators([Validators.required]);
+    this.clientForm.controls["clientName"].updateValueAndValidity();
+    this.clientForm.controls["phoneNumber"].setValidators([Validators.required, Validators.pattern("^[0-9]*$"), Validators.minLength(10), Validators.maxLength(10)]);
+    this.clientForm.controls["phoneNumber"].updateValueAndValidity();
+    this.clientForm.controls["address"].setValidators([Validators.required]);
+    this.clientForm.controls["address"].updateValueAndValidity();
+    this.clientForm.controls["homeBranchId"].setValidators([Validators.required]);
+    this.clientForm.controls["homeBranchId"].updateValueAndValidity();
+    this.clientForm.controls["homeBranchAddress"].setValidators();
+    this.clientForm.controls["homeBranchAddress"].updateValueAndValidity();
+    this.clientForm.controls["noOfSession"].setValidators([Validators.required]);
+    this.clientForm.controls["noOfSession"].updateValueAndValidity();
+    this.clientForm.controls["onWeekDay"].setValidators([Validators.required]);
+    this.clientForm.controls["onWeekDay"].updateValueAndValidity();
+    this.clientForm.controls["staffId"].setValidators([Validators.required]);
+    this.clientForm.controls["staffId"].updateValueAndValidity();
+    this.clientForm.controls["startDate"].setValidators([Validators.required]);
+    this.clientForm.controls["startDate"].updateValueAndValidity();
+    this.clientForm.controls["endDate"].setValidators([Validators.required]);
+    this.clientForm.controls["endDate"].updateValueAndValidity();
+    this.clientForm.controls["serviceId"].setValidators([Validators.required]);
+    this.clientForm.controls["serviceId"].updateValueAndValidity();
+    this.clientForm.controls["typeOfTreatment"].setValidators([Validators.required]);
+    this.clientForm.controls["typeOfTreatment"].updateValueAndValidity();
+    this.clientForm.controls["slot"].setValidators([Validators.required]);
+    this.clientForm.controls["slot"].updateValueAndValidity();
+    this.clientForm.controls["duration"].setValidators([Validators.required]);
+    this.clientForm.controls["duration"].updateValueAndValidity();
+    this.clientForm.controls["startTime"].setValidators([Validators.required]);
+    this.clientForm.controls["startTime"].updateValueAndValidity();
+    this.clientForm.controls["endTime"].setValidators([Validators.required]);
+    this.clientForm.controls["endTime"].updateValueAndValidity();
+  }
+
   // Back Button - Route
   addeditClientForm() {
     this.router.navigateByUrl('admin/client')
@@ -220,9 +344,11 @@ export class AddEditClientComponent implements OnInit {
 
   // Get Latitude and Longitude for Address
   handleAddressChange(address: any) {
+    this.showlatti = true
+    this.count = this.count + 1;
     this.clientForm.controls['address'].patchValue(address.formatted_address)
-    this.clientLatitude=address.geometry.location.lat();
-    this.clientLongitude=address.geometry.location.lng();
+    this.clientLatitude = address.geometry.location.lat();
+    this.clientLongitude = address.geometry.location.lng();
     this.clientForm.controls['clientAddressLatitude'].setValue(address.geometry.location.lat());
     this.clientForm.controls['clientAddressLongitude'].setValue(address.geometry.location.lng());
   }
@@ -254,6 +380,11 @@ export class AddEditClientComponent implements OnInit {
     })
   }
 
+  // To Show the add session cards based on the values are changed or not
+  changeaddsession() {
+    this.showAddSession = false
+  }
+
   // Add Session Array based on Number of session count
   addSessionBasedOnSessionCount(eve) {
     this.sessionArr.clear();
@@ -273,9 +404,8 @@ export class AddEditClientComponent implements OnInit {
     this.staffService.getAllStaffs().subscribe(res => {
       if (res.status) {
         var staffData = res.data;
-        console.log("staffData",staffData)
         staffData.forEach(staff => {
-          if (staff.isDeleted == 0 ) {
+          if (staff.status == 0) {
             this.staffList.push(staff);
           }
         })
@@ -404,61 +534,136 @@ export class AddEditClientComponent implements OnInit {
     this.clientForm.controls['endTime'].patchValue('');
   }
 
+  // while Click The Edit and then change the start date the add session will be hide
+  onClickTheDate() {
+    if (this.clientData != undefined || this.clientId != null) {
+      if (this.formatDate(this.clientData.startDate) == this.clientForm.value.startDate) {
+        this.showAddSession = true;
+      }
+      else {
+        this.showAddSession = false;
+      }
+    }
+  }
+
+  //While Click The  Edit And Change The End Date It Will Hide The Add Session Slots
+  onClickTheEndDate() {
+    this.count = this.count + 1;
+    if (this.clientData != undefined || this.clientId != null) {
+      if (this.count <= 4) {
+        this.showAddSession = true;
+      }
+      else {
+        if (this.reverseFormatDate(this.clientData.endDate) == this.clientForm.value.endDate) {
+          this.showAddSession = true;
+        }
+        else {
+          this.showAddSession = false;
+        }
+
+      }
+    }
+  }
+
+  //While Click The  Edit And Change The Starttime It Will Hide The Add Session Slots
+  onClickTheTime() {
+    if (this.clientId != null || this.clientId != undefined) {
+      if (this.clientForm.value.startTime = '') {
+        if (this.clientData.startTime == this.clientForm.value.startTime) {
+          this.showAddSession = true;
+        }
+        else {
+          this.showAddSession = false;
+        }
+      }
+      else {
+        this.showAddSession = false;
+      }
+    }
+  }
+
+  //While Click The  edit and change the select days it will hide the add session slots
+  onClickWeekDays() {
+    if (this.clientId != null || this.clientId != undefined) {
+      if (this.clientData.onWeekDay == this.clientForm.value.onWeekDay) {
+        this.showAddSession = true;
+      }
+      else {
+        this.showAddSession = false;
+      }
+    }
+  }
+
   // When click add session button this function will work
   addClient() {
     this.showAddSession = true;
     this.isClientFormSubmitted = true;
-    console.log(this.clientForm)
-    if (this.clientForm.valid) {
-      var data = {
-        startDate: (this.editClientData) ? this.reverseFormatDate(this.clientData.startDate) : this.reverseFormatDate(this.clientForm.value.startDate),
-        endDate: (this.editClientData) ? this.reverseFormatDate(this.clientData.endDate) : this.reverseFormatDate(this.clientForm.value.endDate),
-        noOfSession: this.clientForm.value.noOfSession,
-        staffId: this.clientForm.value.staffId,
-        slotId: this.clientForm.value.slot,
-        duration: this.clientForm.value.duration,
-        typeOfTreatment: this.clientForm.value.typeOfTreatment,
-        weekDaysArr: this.clientForm.value.onWeekDay,
-        startTime: this.clientForm.value.startTime,
-        endTime: this.clientForm.value.endTime
-      }
-      // if (this.clientForm.value.staffId != '' && this.clientForm.value.typeOfTreatment != '') {
-      this.clientService.createSession(data).subscribe(res => {
-        if (res.status) {
-          this.addSessionData = res.data;
-          console.log(this.addSessionData)
-          this.allDate = [];
-          this.sessionDate = [];
-          console.log(res)
-          this.addSessionData.forEach((value) => {
-            this.allDate.push(value.date);
-            this.sessionDate.push(this.formatDate(value.date));
-          })
-          if (this.clientId != undefined) {
-            if (this.clientData.startTime == this.clientForm.value.startTime ||
-              this.clientData.endTime == this.clientForm.value.endTime) {
-              this.clientData.addSession.forEach((ele, i) => {
-                if (this.allDate.includes(ele.date)) {
-                  var session = this.clientForm.get('addSession') as FormArray;
-                  // this.setvalidation()
-                  session.at(i)['controls']['slotStartTime'].patchValue(ele.slotStartTime);
-                  session.at(i)['controls']['slotEndTime'].patchValue(ele.slotEndTime);
-                }
-                else {
-                  this.addSessionData.forEach((ele, index) => {
-                    if (ele.isAvailable == true) {
-                      var session = this.clientForm.get('addSession') as FormArray;
-                      session.at(index)['controls']['slotStartTime'].patchValue(this.clientForm.value.startTime);
-                      session.at(index)['controls']['slotEndTime'].patchValue(this.clientForm.value.endTime);
-                    }
-                    else {
-                      var session = this.clientForm.get('addSession') as FormArray;
-                      session.at(index)['controls']['slotStartTime'].patchValue('');
-                      session.at(index)['controls']['slotEndTime'].patchValue('');
-                    }
-                  })
-                }
-              })
+    this.validation()
+    if (this.clientForm.value.clientAddressLatitude != "" || this.clientForm.value.clientAddressLongitude != "") {
+      if (this.clientForm.valid) {
+        var data = {
+          startDate: (this.editClientData) ? this.reverseFormatDate(this.clientData.startDate) : this.reverseFormatDate(this.clientForm.value.startDate),
+          endDate: (this.editClientData) ? this.reverseFormatDate(this.clientData.endDate) : this.reverseFormatDate(this.clientForm.value.endDate),
+          noOfSession: this.clientForm.value.noOfSession,
+          staffId: this.clientForm.value.staffId,
+          slotId: this.clientForm.value.slot,
+          duration: this.clientForm.value.duration,
+          typeOfTreatment: this.clientForm.value.typeOfTreatment,
+          weekDaysArr: this.clientForm.value.onWeekDay,
+          startTime: this.clientForm.value.startTime,
+          endTime: this.clientForm.value.endTime
+        }
+        this.setvalidator();
+        this.clearvalidator()
+        // if (this.clientForm.value.staffId != '' && this.clientForm.value.typeOfTreatment != '') {
+        this.clientService.createSession(data).subscribe(res => {
+          if (res.status) {
+            this.addSessionData = res.data;
+            this.allDate = [];
+            this.sessionDate = [];
+            this.addSessionData.forEach((value) => {
+              this.allDate.push(value.date);
+              this.sessionDate.push(this.formatDate(value.date));
+            })
+            if (this.clientId != undefined) {
+              if (this.clientData.startTime == this.clientForm.value.startTime ||
+                this.clientData.endTime == this.clientForm.value.endTime) {
+                this.clientData.addSession.forEach((ele, i) => {
+                  if (this.allDate.includes(ele.date)) {
+                    var session = this.clientForm.get('addSession') as FormArray;
+                    session.at(i)['controls']['slotStartTime'].patchValue(ele.slotStartTime);
+                    session.at(i)['controls']['slotEndTime'].patchValue(ele.slotEndTime);
+                  }
+                  else {
+                    this.addSessionData.forEach((ele, index) => {
+                      if (ele.isAvailable == true) {
+                        var session = this.clientForm.get('addSession') as FormArray;
+                        session.at(index)['controls']['slotStartTime'].patchValue(this.clientForm.value.startTime);
+                        session.at(index)['controls']['slotEndTime'].patchValue(this.clientForm.value.endTime);
+                      }
+                      else {
+                        var session = this.clientForm.get('addSession') as FormArray;
+                        session.at(index)['controls']['slotStartTime'].patchValue('');
+                        session.at(index)['controls']['slotEndTime'].patchValue('');
+                      }
+                    })
+                  }
+                })
+              }
+              else {
+                this.addSessionData.forEach((ele, index) => {
+                  if (ele.isAvailable == true) {
+                    var session = this.clientForm.get('addSession') as FormArray;
+                    session.at(index)['controls']['slotStartTime'].patchValue(this.clientForm.value.startTime);
+                    session.at(index)['controls']['slotEndTime'].patchValue(this.clientForm.value.endTime);
+                  }
+                  else {
+                    var session = this.clientForm.get('addSession') as FormArray;
+                    session.at(index)['controls']['slotStartTime'].patchValue('');
+                    session.at(index)['controls']['slotEndTime'].patchValue('');
+                  }
+                })
+              }
             }
             else {
               this.addSessionData.forEach((ele, index) => {
@@ -474,32 +679,23 @@ export class AddEditClientComponent implements OnInit {
                 }
               })
             }
+
           }
           else {
-            this.addSessionData.forEach((ele, index) => {
-              if (ele.isAvailable == true) {
-                var session = this.clientForm.get('addSession') as FormArray;
-                session.at(index)['controls']['slotStartTime'].patchValue(this.clientForm.value.startTime);
-                session.at(index)['controls']['slotEndTime'].patchValue(this.clientForm.value.endTime);
-              }
-              else {
-                var session = this.clientForm.get('addSession') as FormArray;
-                session.at(index)['controls']['slotStartTime'].patchValue('');
-                session.at(index)['controls']['slotEndTime'].patchValue('');
-              }
-            })
+            this.flashMessageService.errorMessage(res.message);
           }
-        }
-        else {
-          this.flashMessageService.errorMessage(res.message);
-        }
-      })
-      // }
-      this.Slot(this.clientForm.value.slot);
+        })
+        this.Slot(this.clientForm.value.slot);
+      }
+      else {
+        this.showAddSession = false;
+      }
     }
     else {
+      this.flashMessageService.errorMessage("Please select Address From The List");
       this.showAddSession = false;
     }
+
   }
 
   // When click slot the start and end time will patch in session slot start and end time
@@ -517,8 +713,10 @@ export class AddEditClientComponent implements OnInit {
   // Save Client Data
   saveClient() {
     this.isClientFormSubmitted = true;
-    this.showError = false;
+    this.showError = false
     var data = this.clientForm.value;
+    this.setvalidator();
+    this.clearvalidator();
     data.startDate = this.reverseFormatDate(this.clientForm.value.startDate);
     data.endDate = this.reverseFormatDate(this.clientForm.value.endDate);
     for (let i = 0; i < this.sessionArr.value.length; i++) {
@@ -538,21 +736,25 @@ export class AddEditClientComponent implements OnInit {
     })
     this.setvalidation()
     if (this.clientForm.valid) {
-    this.clientService.createClient(data).subscribe(res => {
-      if (res.status) {
-        console.log(res)
-        this.flashMessageService.successMessage("Client Added Sucessfully!!!");
-        this.router.navigateByUrl('admin/client');
-      }
-      else {
-        this.flashMessageService.errorMessage(res.message);
-      }
-    })
+      this.clientService.createClient(data).subscribe(res => {
+        if (res.status) {
+          this.flashMessageService.successMessage("Client Added Sucessfully!!!");
+          this.router.navigateByUrl('admin/client');
+        }
+        else {
+          this.flashMessageService.errorMessage(res.message);
+        }
+      })
+    }
+    else {
+      this.flashMessageService.errorMessage("Please Select All The Required Fields");
     }
   }
 
   // When edit client to patch the slot
   editClient(i) {
+    this.setvalidator();
+    this.clearvalidator();
     var data = {
       startDate: this.reverseFormatDate(this.clientData.packageId[i].startDate),
       endDate: this.reverseFormatDate(this.clientData.packageId[i].endDate),
@@ -563,7 +765,11 @@ export class AddEditClientComponent implements OnInit {
       typeOfTreatment: this.clientForm.value.typeOfTreatment,
       weekDaysArr: this.clientForm.value.onWeekDay,
       startTime: this.clientForm.value.startTime,
-      endTime: this.clientForm.value.endTime
+      endTime: this.clientForm.value.endTime,
+      clientAddressLongitude: this.clientForm.value.clientAddressLongitude,
+      clientAddressLatitude: this.clientData.clientAddressLatitude,
+      clientHomeBranchLongitude: this.clientData.clientHomeBranchLongitude,
+      clientHomeBranchLattitude: this.clientData.clientHomeBranchLattitude
     }
     this.clientService.createSession(data).subscribe(res => {
       if (res.status) {
@@ -584,9 +790,9 @@ export class AddEditClientComponent implements OnInit {
 
   // Get Client Details By client Id
   getClientById(clientId) {
+    this.show = true
     this.clientService.getClientById(clientId).subscribe(res => {
       if (res.status) {
-        // this.showAddSession = true;
         this.showAddEdit = true;
         this.clientData = res.data;
         this.type = [];
@@ -619,13 +825,15 @@ export class AddEditClientComponent implements OnInit {
                 noOfSession: ele.noOfSession,
                 typeOfTreatment: this.type[index],
                 staffName: ele.staffName,
-                status: (res.data.length == 0) ? 0 : 1
+                status: (res.data.length == 0) ? 0 : 1,
+                clientAddressLatitude: this.clientData.clientAddressLatitude,
+                clientAddressLongitude: this.clientData.clientAddressLongitude,
               })
             }
           })
         })
-        this.clientLatitude=this.clientData.clientAddressLatitude;
-        this.clientLongitude=this.clientData.clientAddressLongitude;
+        this.clientLatitude = this.clientData.clientAddressLatitude;
+        this.clientLongitude = this.clientData.clientAddressLongitude;
         this.clientForm.patchValue({
           uhid: this.clientData.uhid,
           clientName: this.clientData.clientName,
@@ -634,7 +842,9 @@ export class AddEditClientComponent implements OnInit {
           address: this.clientData.address,
           homeBranchId: this.clientData.homeBranchId,
           homeBranchAddress: this.clientData.homeBranchAddress,
-          emergencyNumber: this.clientData.emergencyNumber
+          emergencyNumber: this.clientData.emergencyNumber,
+          clientAddressLatitude: this.clientData.clientAddressLatitude,
+          clientAddressLongitude: this.clientData.clientAddressLongitude,
         })
       }
     })
@@ -661,6 +871,7 @@ export class AddEditClientComponent implements OnInit {
     }
     this.clientService.getDetailsByPackageId(data).subscribe(res => {
       if (res.status) {
+        this.count = 0;
         this.showAddSession = true
         this.setvalidation()
         this.packageId = res.data.packageId;
@@ -695,8 +906,8 @@ export class AddEditClientComponent implements OnInit {
 
   //While click to add Package
   showPackageForm() {
+    this.show = true
     this.showPackage = false
-    this.showAddSession = false
     this.showEditPackage = false
     this.showAddSession = false
     this.hideButton = false
@@ -713,22 +924,76 @@ export class AddEditClientComponent implements OnInit {
       slot: '',
       duration: '',
       startTime: '',
-      endTime: ''
+      endTime: '',
     })
+  }
+
+  //to throw error while address is not selected from the adress dropdown
+  check() {
+    this.onchangeaddress = true
+  }
+
+  //update the client  name address and the phonenumber separately in the edit client
+  updateClientdetails() {
+    this.isClientFormSubmitted = true;
+    this.setvalidator();
+    if (this.showlatti) {
+      this.clientForm.value.clientAddressLongitude = this.clientForm.value.clientAddressLongitude;
+      this.clientForm.value.clientAddressLatitude = this.clientForm.value.clientAddressLatitude;
+    }
+    else {
+      this.clientForm.value.clientAddressLongitude = this.clientData.clientAddressLongitude;
+      this.clientForm.value.clientAddressLatitude = this.clientData.clientAddressLatitude
+    }
+
+    if (this.onchangeaddress && !this.showlatti) {
+      this.clientForm.value.clientAddressLongitude = "";
+      this.clientForm.value.clientAddressLatitude = "";
+    }
+    else {
+      this.clientForm.value.clientAddressLongitude = this.clientForm.value.clientAddressLongitude;
+      this.clientForm.value.clientAddressLatitude = this.clientForm.value.clientAddressLatitude;
+    }
+
+    this.clientForm.value._id = this.clientId;
+    var data = {
+      _id: this.clientId,
+      uhid: this.clientForm.value.uhid,
+      clientName: this.clientForm.value.clientName,
+      email: this.clientForm.value.email,
+      phoneNumber: this.clientForm.value.phoneNumber,
+      address: this.clientForm.value.address,
+      homeBranchId: this.clientForm.value.homeBranchId,
+      homeBranchAddress: this.clientForm.value.homeBranchAddress,
+      emergencyNumber: this.clientForm.value.emergencyNumber,
+      clientAddressLatitude: this.clientForm.value.clientAddressLatitude,
+      clientAddressLongitude: this.clientForm.value.clientAddressLongitude,
+    }
+    if (this.clientForm.value.clientAddressLatitude != "" || this.clientForm.value.clientAddressLongitude != "") {
+      if (this.clientForm.valid) {
+        this.clientService.updateClientdetails(this.clientId, data).subscribe(res => {
+          if (res.status) {
+            this.flashMessageService.successMessage("Client Updated Sucessfully!!!");
+          }
+        })
+      }
+      else {
+        this.flashMessageService.errorMessage("Please fill all the required field");
+      }
+    }
+    else if (this.onchangeaddress && !this.showlatti && this.clientForm.value.clientAddressLatitude == "" || this.clientForm.value.clientAddressLongitude == "") {
+      this.flashMessageService.errorMessage("Please select Address From The List");
+    }
   }
 
   // Update Client
   updateClient() {
     this.isClientFormSubmitted = true;
-    this.showError = false;
     var data = this.clientForm.value;
-    console.log("form",data)
-    console.log(this.clientLatitude,"this.clientLatitude")
-    console.log("this.clientLongitude",this.clientLongitude)
- this.setvalidation()
-    data.clientAddressLatitude=this.clientLatitude;
-    data.clientAddressLongitude=this.clientLongitude;
-  
+    this.setvalidation()
+    this.clearvalidator()
+    data.clientAddressLatitude = this.clientLatitude;
+    data.clientAddressLongitude = this.clientLongitude;
     data.startDate = (this.editClientData) ? this.reverseFormatDate(this.clientData.startDate) : this.reverseFormatDate(this.clientForm.value.startDate);
     data.endDate = (this.editClientData) ? this.reverseFormatDate(this.clientData.endDate) : this.reverseFormatDate(this.clientForm.value.endDate);
     for (let i = 0; i < this.sessionArr.value.length; i++) {
@@ -759,18 +1024,26 @@ export class AddEditClientComponent implements OnInit {
       slot: data.slot,
       duration: data.duration,
       startTime: data.startTime,
-      endTime: data.endTime
+      endTime: data.endTime,
+      clientAddressLongitude: data.clientAddressLongitude,
+      clientAddressLatitude: data.clientAddressLatitude,
+      clientHomeBranchLongitude: data.clientHomeBranchLongitude,
+      clientHomeBranchLattitude: data.clientHomeBranchLattitude,
     }
     data.packageId = [packageArr];
-    console.log("data",data)
     this.setvalidation()
-    if(this.clientForm.valid){
-    this.clientService.updateClient(this.clientId, data).subscribe(res => {
-      if (res.status) {
-        this.flashMessageService.successMessage("Client Updated Sucessfully!!!");
-        this.router.navigateByUrl('admin/client');
-      }
-    })
-  }
+    this.setvalidator();
+    this.clearvalidator()
+    if (this.clientForm.valid) {
+      this.clientService.updateClient(this.clientId, data).subscribe(res => {
+        if (res.status) {
+          this.flashMessageService.successMessage("Client Updated Sucessfully!!!");
+          this.router.navigateByUrl('admin/client');
+        }
+      })
+    }
+    else {
+      this.flashMessageService.errorMessage("Please select All The Requried Fields");
+    }
   }
 }

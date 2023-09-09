@@ -33,6 +33,11 @@ export class ClientService {
         return this.clientDataService.updateClient(id, data);
     }
 
+    //Update Client Name And Address separately
+    public updateClientdetails(id, data) {
+        return this.clientDataService.updateClientdetails(id, data);
+    }
+
     //get Details By PackageId
     public getDetailsByPackageId(data) {
         return this.clientDataService.getDetailsByPackageId(data);

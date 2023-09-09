@@ -12,8 +12,8 @@ import { ClientService } from 'src/app/services/client.service';
 })
 
 export class ClientComponent implements OnInit {
-  public dtOptions: DataTables.Settings = {};
-  public dtTrigger: Subject<any> = new Subject<any>();
+  public dtOptionss: DataTables.Settings = {};
+  public dtTriggers: Subject<any> = new Subject<any>();
   public BranchStatus: any = [];
   public ClientDataArr: any = [];
   public ClientStatusEnableAndDisable: any;
@@ -23,7 +23,7 @@ export class ClientComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.dtOptions = {
+    this.dtOptionss = {
       pagingType: 'simple_numbers',
       searching: true,
       lengthChange: true,
@@ -47,7 +47,7 @@ export class ClientComponent implements OnInit {
         this.ClientDataArr = res.data;
         console.log(this.ClientDataArr)
       }
-      this.dtTrigger.next(null);
+      this.dtTriggers.next(null);
     })
   }
 }
