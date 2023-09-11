@@ -43,7 +43,6 @@ export class ClientDataService {
 
     //Update Client
     public updateClient(id, data): Observable<any> {
-        console.log("UpdateL:", data);
         return this.httpClient.put('client/' + id, data).pipe(tap(res => {
             return res;
         }), catchError(error => throwError(error)));
@@ -51,7 +50,6 @@ export class ClientDataService {
 
       //Update Client Name ,Address and Phone Number Separately
       public updateClientdetails(id, data): Observable<any> {
-        console.log("UpdateL:", data);
         return this.httpClient.put('client/updateClientDetails/' + id, data).pipe(tap(res => {
             return res;
         }), catchError(error => throwError(error)));

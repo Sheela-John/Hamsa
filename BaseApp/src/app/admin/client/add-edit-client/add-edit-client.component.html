@@ -52,8 +52,9 @@
                     <div class="col-md-6">
                         <label class="block mb-2 font-bold text-gray-600">Phone Number<span
                                 class="required">*</span></label>
-                        <input type="text" placeholder="Enter Phone Number" maxlength="10" pattern="[0-9]{10}" (keypress)="onKeyUp"
-                            class="border border-gray-300 p-2 w-full rounded" formControlName="phoneNumber">
+                        <input type="text" placeholder="Enter Phone Number" maxlength="10" pattern="[0-9]{10}"
+                            (keypress)="onKeyUp" class="border border-gray-300 p-2 w-full rounded"
+                            formControlName="phoneNumber">
                         <div class="error-msg-area">
                             <div
                                 *ngIf="clientForm.controls['phoneNumber'].errors && (showError|| isClientFormSubmitted) && (!clientForm.controls['phoneNumber'].pristine|| isClientFormSubmitted)">
@@ -61,8 +62,8 @@
                                     Please Enter Phone Number.
                                 </div>
                                 <div [hidden]="clientForm.controls['phoneNumber'].errors.required">
-                                    <div [hidden]="!clientForm.controls['phoneNumber'].errors"> 
-                                    Please Enter Valid Phone Number.</div>
+                                    <div [hidden]="!clientForm.controls['phoneNumber'].errors">
+                                        Please Enter Valid Phone Number.</div>
                                 </div>
                             </div>
                         </div>
@@ -79,8 +80,8 @@
                         <label class="block mb-2 font-bold text-gray-600">Address<span class="required">*</span></label>
                         <textarea class="border border-gray-300 p-2 w-full rounded" rows="7"
                             ngx-google-places-autocomplete [options]='options' formControlName="address"
-                            #placesRef="ngx-places" (onAddressChange)="handleAddressChange($event)"
-                            autocomplete="false" (change)="check()">
+                            #placesRef="ngx-places" (onAddressChange)="handleAddressChange($event)" autocomplete="false"
+                            (change)="check()">
                         </textarea>
                         <div class="error-msg-area">
                             <div *ngIf="clientForm.controls['address'].errors && (!clientForm.controls['address'].pristine|| isClientFormSubmitted)"
@@ -88,10 +89,10 @@
                                 <div [hidden]="!clientForm.controls['address'].errors.required">Please Enter
                                     Address
                                 </div>
-                                <div  *ngIf="clientForm.controls['address'].errors.invalid">Please select from list
-                            
+                                <div *ngIf="clientForm.controls['address'].errors.invalid">Please select from list
+
                                 </div>
-                              
+
                             </div>
                         </div>
                     </div>
@@ -127,8 +128,8 @@
                                 </div>
                             </div>
                         </div>
-                        <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg mt-3 mb-3" *ngIf="show"
-                     (click)="updateClientdetails()">Update</button>
+                        <button class="block float-right bg-teal-400 text-white font-bold p-2 rounded-lg mt-3 mb-3"
+                            *ngIf="show" (click)="updateClientdetails()">Update</button>
                     </div>
                 </div>
                 <div class="row">
@@ -199,8 +200,8 @@
                             <label class="block mb-2 font-bold text-gray-600">No.of Session
                                 <span class="required">*</span>
                             </label>
-                            <input type="text" placeholder="Enter No.of Session" formControlName="noOfSession"  (change)="changeaddsession()"
-                                class="border border-gray-300 p-2 w-full rounded"
+                            <input type="text" placeholder="Enter No.of Session" formControlName="noOfSession"
+                                (change)="changeaddsession()" class="border border-gray-300 p-2 w-full rounded"
                                 (change)="addSessionBasedOnSessionCount($event) ; changeaddsession()">
                             <div class="error-msg-area">
                                 <div *ngIf="clientForm.controls['noOfSession'].errors && (!clientForm.controls['noOfSession'].pristine|| isClientFormSubmitted)"
@@ -216,8 +217,9 @@
                             <label for="days" class="block mb-2 font-bold text-gray-600">Select Days
                                 <span class="required">*</span>
                             </label>
-                            <ng-multiselect-dropdown class="w-full mt-3" formControlName="onWeekDay" (ngModelChange)="onClickWeekDays()"
-                                [placeholder]="'Please Select Days'" [settings]="weekArr" [data]="weekData">
+                            <ng-multiselect-dropdown class="w-full mt-3" formControlName="onWeekDay"
+                                (ngModelChange)="onClickWeekDays()" [placeholder]="'Please Select Days'"
+                                [settings]="weekArr" [data]="weekData">
                             </ng-multiselect-dropdown>
                             <div class="error-msg-area">
                                 <div *ngIf="clientForm.controls['onWeekDay'].errors && (!clientForm.controls['onWeekDay'].pristine|| isClientFormSubmitted)"
@@ -233,7 +235,8 @@
                         <div class="col-md-6">
                             <label class="block mb-2 font-bold text-gray-600">Amount</label>
                             <input type="text" placeholder="Enter Amount"
-                                class="border border-gray-300 p-2 w-full rounded" formControlName="amount"(change)="changeaddsession()">
+                                class="border border-gray-300 p-2 w-full rounded" formControlName="amount"
+                                (change)="changeaddsession()">
                             <div class="error-msg-area">
                                 <div *ngIf="clientForm.controls['amount'].errors && (!clientForm.controls['amount'].pristine|| isClientFormSubmitted)"
                                     class="error-msg">
@@ -246,7 +249,7 @@
                             <label class="block mb-2 font-bold text-gray-600">Staff<span
                                     class="required">*</span></label>
                             <select class="border border-gray-300 p-2 w-full rounded" formControlName="staffId"
-                                (change)="getSlotbasedOnStaff($event); changeaddsession()">
+                                (change)="getSlotbasedOnStaff($event); changestaff()">
                                 <option value="" disabled>--Select--</option>
                                 <option value="{{staff._id}}" *ngFor="let staff of staffList">
                                     {{staff.staffName}}
@@ -267,11 +270,11 @@
                             <label class="block mb-2 font-bold text-gray-600">Start Date<span
                                     class="required">*</span></label>
                             <div class="input-group">
-                                <input type="text" class="form-control data-picker-color user-font" (ngModelChange)=" onClickTheDate()"
-                                    formControlName="startDate" bsDatepicker
+                                <input type="text" class="form-control data-picker-color user-font"
+                                    (ngModelChange)=" onClickTheDate()" formControlName="startDate" bsDatepicker
                                     [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
-                                    (bsValueChange)="onDateChangeStart($event)" (input)="inputdobValidator($event)" 
-                                    placeholder="DD-MM-YYYY"> 
+                                    (bsValueChange)="onDateChangeStart($event)" (input)="inputdobValidator($event)"
+                                    placeholder="DD-MM-YYYY">
                             </div>
                             <div class="error-msg-area">
                                 <div *ngIf="clientForm.controls['startDate'].errors && (!clientForm.controls['startDate'].pristine|| isClientFormSubmitted)"
@@ -286,8 +289,9 @@
                             <label class="block mb-2 font-bold text-gray-600">End Date<span
                                     class="required">*</span></label>
                             <div class="input-group">
-                                <input type="text" class="form-control data-picker-color user-font" (ngModelChange)="onClickTheEndDate()"
-                                    formControlName="endDate" bsDatepicker [minDate]="minDate"
+                                <input type="text" class="form-control data-picker-color user-font"
+                                    (ngModelChange)="onClickTheEndDate()" formControlName="endDate" bsDatepicker
+                                    [minDate]="minDate"
                                     [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
                                     (input)="inputdobValidator($event)" maxlength="10" placeholder="DD-MM-YYYY">
                             </div>
@@ -306,7 +310,8 @@
                             <label for="Branch" class="block mb-2 mt-3 font-bold text-gray-600">Service
                                 <span class="required">*</span>
                             </label>
-                            <select class="border border-gray-300 p-2 w-full rounded" formControlName="serviceId" (change)="changeaddsession()">
+                            <select class="border border-gray-300 p-2 w-full rounded" formControlName="serviceId"
+                                (change)="changeaddsession()">
                                 <option value="" disabled>--select--</option>
                                 <option value="{{service._id}}" *ngFor="let service of serviceList">
                                     {{service.serviceName}}
@@ -364,16 +369,16 @@
                             </label>
                             <select class="border border-gray-300 p-2 w-full rounded" formControlName="slot"
                                 (change)="Slot($event); changeaddsession()">
-                                <option value="" disabled>--select--</option>
+                                <option value="">--select--</option>
                                 <option value="{{slot._id}}" *ngFor="let slot of slots">
                                     {{slot.slotName}}
                                 </option>
                             </select>
                             <div class="error-msg-area">
-                                <div *ngIf="clientForm.controls['slot'].errors && (!clientForm.controls['slot'].pristine|| isClientFormSubmitted)"
+                                <div *ngIf="clientForm.controls['slot'].errors && (!clientForm.controls['slot'].pristine || isClientFormSubmitted)"
                                     class="error-msg">
                                     <div [hidden]="!clientForm.controls['slot'].errors.required">
-                                        Please Select Slot
+                                        Please Select slot
                                     </div>
                                 </div>
                             </div>
@@ -384,8 +389,8 @@
                             </label>
                             <select class="border border-gray-300 p-2 w-full rounded" formControlName="duration"
                                 (change)="onChangeDuration(); changeaddsession()">
-                                <option value="" disabled>--select--</option>
-                                <option value="{{Duration.id}}" *ngFor="let Duration of sessionDuration" >
+                                <option value="">--select--</option>
+                                <option value="{{Duration.id}}" *ngFor="let Duration of sessionDuration">
                                     {{Duration.time}}
                                 </option>
                             </select>
@@ -403,11 +408,12 @@
                         <div class="col-md-6">
                             <div class="input-group">
                                 <label class="block mb-2 mt-3 font-bold text-gray-600">Start Time</label>
-                                <input class="border border-gray-300 p-2 w-full rounded" type="text"  [readonly]="isShowable" (ngModelChange)="onClickTheTime()"
+                                <input class="border border-gray-300 p-2 w-full rounded" type="text"
+                                    [readonly]="isShowable" (ngModelChange)="onClickTheTime()"
                                     placeholder="Select Start Time" formControlName="startTime" [format]="24"
                                     [ngxTimepicker]="startRange" [min]=startTime [max]=endTime>
                                 <ngx-material-timepicker #startRange (opened)="startpickerOpened = true;"
-                                    [minutesGap]="5" (timeSet)="calculateEndTime($event)" [defaultTime]="startTime" >
+                                    [minutesGap]="5" (timeSet)="calculateEndTime($event)" [defaultTime]="startTime">
                                 </ngx-material-timepicker>
                             </div>
                             <div class="error-msg-area">
@@ -422,7 +428,7 @@
                         <div class="col-md-6">
                             <div class="input-group">
                                 <label class="block mb-2 mt-3 font-bold text-gray-600">End Time</label>
-                                <input class="border border-gray-300 p-2 w-full rounded disabled" type="text" 
+                                <input class="border border-gray-300 p-2 w-full rounded disabled" type="text"
                                     placeholder="End Time" formControlName="endTime">
                             </div>
                         </div>

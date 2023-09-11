@@ -109,6 +109,7 @@ export class AddEditClientComponent implements OnInit {
   public count: number = 0;
   public showlatti: boolean = false;
   public onchangeaddress: boolean = false;
+  public setEndTime: string;
 
   constructor(private fb: FormBuilder, private router: Router, public BranchService: BranchService,
     private flashMessageService: FlashMessageService, private assignService: AssignService,
@@ -382,7 +383,7 @@ export class AddEditClientComponent implements OnInit {
 
   // To Show the add session cards based on the values are changed or not
   changeaddsession() {
-    this.showAddSession = false
+    this.showAddSession = false;
   }
 
   // Add Session Array based on Number of session count
@@ -491,8 +492,8 @@ export class AddEditClientComponent implements OnInit {
     var startTime = eve;
     var setHoursInDate = date.setHours(startTime.split(':')[0], startTime.split(':')[1]);
     var findEndTime = new Date(new Date(setHoursInDate).getTime() + duration * 60000);
-    this.endTime = findEndTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-    this.clientForm.controls['endTime'].patchValue(this.endTime);
+    this.setEndTime = findEndTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    this.clientForm.controls['endTime'].patchValue(this.setEndTime);
   }
 
   // Format Date in  DD-MM-YYYY format
@@ -521,17 +522,28 @@ export class AddEditClientComponent implements OnInit {
     return [year, month, day].join('-');
   }
 
-  // On change event for start date
+  // On Change Event For Start Date
   onDateChangeStart(eve) {
     this.editClientData = false;
     this.minDate = eve;
     this.clientForm.controls['endDate'].patchValue('');
   }
 
-  //On change duration empty the start and end time
+  //On Change Duration Empty The Start And End Time
   onChangeDuration() {
     this.clientForm.controls['startTime'].patchValue('');
     this.clientForm.controls['endTime'].patchValue('');
+  }
+
+  //To Empty The Slot Time When They change the staff name
+  changestaff() {
+    if (this.clientId != undefined) {
+      this.showAddSession = false;
+      this.clientForm.controls['startTime'].patchValue('');
+      this.clientForm.controls['endTime'].patchValue('');
+      this.clientForm.controls['slot'].patchValue('');
+      this.clientForm.controls['duration'].patchValue('');
+    }
   }
 
   // while Click The Edit and then change the start date the add session will be hide
@@ -613,8 +625,7 @@ export class AddEditClientComponent implements OnInit {
           startTime: this.clientForm.value.startTime,
           endTime: this.clientForm.value.endTime
         }
-        this.setvalidator();
-        this.clearvalidator()
+
         // if (this.clientForm.value.staffId != '' && this.clientForm.value.typeOfTreatment != '') {
         this.clientService.createSession(data).subscribe(res => {
           if (res.status) {
@@ -695,7 +706,6 @@ export class AddEditClientComponent implements OnInit {
       this.flashMessageService.errorMessage("Please select Address From The List");
       this.showAddSession = false;
     }
-
   }
 
   // When click slot the start and end time will patch in session slot start and end time
