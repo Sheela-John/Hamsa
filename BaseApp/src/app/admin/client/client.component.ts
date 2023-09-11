@@ -45,6 +45,17 @@ export class ClientComponent implements OnInit {
     this.clientService.getAllClients().subscribe(res => {
       if (res.status) {
         this.ClientDataArr = res.data;
+        function compare( a, b ) {
+          if ( a.clientName < b.clientName ){
+            return -1;
+          }
+          if ( a.clientName > b.clientName ){
+            return 1;
+          }
+          return 0;
+        }
+        
+        this.ClientDataArr.sort( compare );
         console.log(this.ClientDataArr)
       }
       this.dtTriggers.next(null);

@@ -67,7 +67,7 @@
                         <div class="error-msg-area">
                             <div *ngIf="staffForm.controls['branchId'].errors && (!staffForm.controls['branchId'].pristine|| isStaffFormSubmitted)"
                                 class="error-msg">
-                                <div [hidden]="!staffForm.controls['branchId'].errors.required">Please Enter Branch Name
+                                <div [hidden]="!staffForm.controls['branchId'].errors.required">Please Choose Branch Name
                                 </div>
                             </div>
                         </div>
@@ -151,7 +151,7 @@
                             <div class="error-msg-area">
                                 <div *ngIf="staffForm.controls['staffRole'].errors && (!staffForm.controls['staffRole'].pristine|| isStaffFormSubmitted)"
                                     class="error-msg">
-                                    <div [hidden]="!staffForm.controls['staffRole'].errors.required">Please Enter Role
+                                    <div [hidden]="!staffForm.controls['staffRole'].errors.required">Please Choose Role
                                     </div>
                                 </div>
                             </div>

@@ -373,6 +373,17 @@ export class ReportComponent implements OnInit {
       console.log("staffL", res);
       if (res.status) {
         this.staffData = res.data;
+        function compare( a, b ) {
+          if ( a.staffName < b.staffName ){
+            return -1;
+          }
+          if ( a.staffName > b.staffName ){
+            return 1;
+          }
+          return 0;
+        }
+        
+        this.staffData.sort( compare );
         console.log(this.staffData, "staffData");
         this.staffList = [];
         this.staffList1 = [];

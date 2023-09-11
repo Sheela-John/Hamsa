@@ -21,32 +21,32 @@
                   </label>
                   <button class="btn btn-primary" type="submit">Filter by ID</button> -->
                 <form [formGroup]="searchForm">
-                    <div class="col-md-12">
-                        <table col-lg-12 class="col-md-12">
+                    <div class="container">
+                        <table  class="row">
                             <thead>
                                 <tr class="text">
-                                    <th class=" p-3 text-left col-md-2 ">
-                                        <ng-multiselect-dropdown [placeholder]="'Client Name'"  id="clientId"  class="text-muted " 
-                                            [settings]="clientId" formControlName="clientId" [data]="clientArr"  >
+                                    <th class="  text-left col-md-2 col-lg-5">
+                                        <ng-multiselect-dropdown [placeholder]="'Client'"  id="clientId"  class="text-muted" 
+                                            [settings]="clientId" formControlName="clientId" [data]="clientArr">
                                         </ng-multiselect-dropdown>
                                     </th>&nbsp;
-                                    <th class="p-3 text-left col-md-2">
-                                        <ng-multiselect-dropdown [placeholder]="'Staff Name'" class="text-muted " 
+                                    <th class=" text-left col-md-2 col-lg-4">
+                                        <ng-multiselect-dropdown [placeholder]="'Staff'" class="text-muted " 
                                             [settings]="staffId" formControlName="staffId" [data]="StaffArr" id="staffId" >
                                         </ng-multiselect-dropdown>
                                     </th>&nbsp;
-                                    <th class="p-3 text-left col-md-2"> <input type="text" class=" data-picker-color "  id="fromDate" 
+                                    <th class=" text-left col-md-2 col-lg-1"> <input type="text" class=" data-picker-color "  id="fromDate" 
                                             formControlName="fromDate" (bsValueChange)="setStartDate($event)"
                                             bsDatepicker
                                             [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
                                             placeholder="From Date"></th>&nbsp;
-                                    <th class="p-3 text-left col-md-2">
+                                    <th class=" text-left col-md-2 col-lg-1">
                                         <input type="text" class="data-picker-color" formControlName="toDate" id="toDate"
                                             (bsValueChange)="setEndDate($event)" [minDate]="minDate" bsDatepicker
                                             [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
                                             placeholder="To Date">
                                     </th> &nbsp;
-                                    <th class="p-3 text-left col-md-2"><button class="btn"
+                                    <th class=" text-left col-md-2 col-lg-1"><button class="btn"
                                             (click)="getAllByFilterSearch()">Shown</button></th>
                                 </tr>
                             </thead>
