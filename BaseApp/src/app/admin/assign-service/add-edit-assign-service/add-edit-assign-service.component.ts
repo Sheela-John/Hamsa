@@ -568,6 +568,7 @@ export class AddEditAssignServiceComponent implements OnInit {
     }
     this.isassignServiceFormSubmitted = true;
     this.isassignServiceClientFormSubmitted = true
+    console.log(this.assignServiceForm)
     if (this.assignServiceForm.valid) {
       if (this.assignServiceClientForm.valid) {
         var formattedDates = this.formattedDate(this.assignServiceForm.value.date)
@@ -593,6 +594,7 @@ export class AddEditAssignServiceComponent implements OnInit {
           startTime: this.slotStartTime,
           endTime: this.slotEndTime
         }
+        console.log(data)
         this.AssignService.createAssignServiceClient(data).subscribe(res => {
           if (res.status) {
             if (this.serviceRequestId != undefined) {
@@ -648,9 +650,10 @@ export class AddEditAssignServiceComponent implements OnInit {
           this.getSlotsForAssignService(data);
           this.dividingSlot(this.assignSercieDataArr.duration)
         }
-        this.clientArr = []
+        
         this.ClientService.getClientById(this.assignSercieDataArr.clientId).subscribe(res => {
           if (res.status) {
+            this.clientArr = [];
             this.clientArr.push({
               _id: res.data._id,
               clientName: res.data.clientName
@@ -742,9 +745,10 @@ export class AddEditAssignServiceComponent implements OnInit {
           this.getSlotsForAssignService(data);
           this.dividingSlot(this.assignSercieDataArr.duration)
         }
-        this.clientArr = []
+       
         this.ClientService.getClientById(this.assignSercieDataArr.clientId).subscribe(res => {
           if (res.status) {
+            this.clientArr = [];
             this.clientArr.push({
               _id: res.data._id,
               clientName: res.data.clientName
@@ -839,6 +843,7 @@ export class AddEditAssignServiceComponent implements OnInit {
           startTime: this.slotStartTime,
           endTime: this.slotEndTime
         }
+        console.log(data)
         this.AssignService.updateAssignService(data, this.assignServiceId).subscribe(res => {
           if (res.status) {
             if (this.serviceRequestId != undefined) {

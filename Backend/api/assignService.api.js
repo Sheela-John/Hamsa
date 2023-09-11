@@ -1155,11 +1155,13 @@ async function getAssignedServicesById(id) {
     log.debug(component, 'Getting AssignService Data by Id');
     log.close();
     let [Err, assignServiceData] = await handle(AssignService.findOne({ '_id': id }).lean());
+    console.log("assignServiceData",assignServiceData)
     let [err, invoice] = await handle(AssignServiceInvoice.findOne({ assignServiceId: id, isDeleted: 0 }))
     console.log(invoice, "invoice");
     let [err1, url] = await handle(getAssignServiceInvoicePresignedUrl(invoice));
     assignServiceData.url = url;
     if (Err) return Promise.reject(Err);
+    console.log("assignServiceData",assignServiceData)
     if (lodash.isEmpty(assignServiceData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
     return Promise.resolve(assignServiceData);
 }
@@ -1223,38 +1225,39 @@ const updateAssignService = async function (datatoupdate) {
     if (err) {
         return Promise.reject(err);
     }
-    for (var i = 0; i < assignData.length; i++) {
-        if (assignData[i].bookedCount > 1) {
-            let [assignErr, assignServiceValue] = await handle(AssignService.find({}).lean());
-            for (var j = 0; j < assignServiceValue.length; j++) {
-                if (assignServiceValue[j].date == new Date(assignData[i].date)) {
-                    if (slotCheck(assignServiceValue[j].startTime) >= slotCheck(assignData[i].startTime) && slotCheck(assignServiceValue[j].endTime) <= slotCheck(assignData[i].endTime)) {
-                        if (typeArray.includes(assignServiceValue[j].typeOfTreatment) && typeArray.includes(assignData[i].typeOfTreatment)) {
-                            count = assignServiceValue[j].bookedCount - 1;
-                            let [assignErr, assignServiceValue1] = await handle(AssignService.findOneAndUpdate({ _id: assignServiceValue[j]._id }, { $set: { bookedCount: count } }, { new: true, useFindAndModify: false }))
-                        }
-                    }
-                }
-            }
-        }
-    }
+    // for (var i = 0; i < assignData.length; i++) {
+    //     if (assignData[i].bookedCount > 1) {
+    //         let [assignErr, assignServiceValue] = await handle(AssignService.find({}).lean());
+    //         for (var j = 0; j < assignServiceValue.length; j++) {
+    //             if (assignServiceValue[j].date == new Date(assignData[i].date)) {
+    //                 console.log("assignServiceValue[j].startTime",assignServiceValue[j].startTime)
+    //                 if (slotCheck(assignServiceValue[j].startTime) >= slotCheck(assignData[i].startTime) && slotCheck(assignServiceValue[j].endTime) <= slotCheck(assignData[i].endTime)) {
+    //                     if (typeArray.includes(assignServiceValue[j].typeOfTreatment) && typeArray.includes(assignData[i].typeOfTreatment)) {
+    //                         count = assignServiceValue[j].bookedCount - 1;
+    //                         let [assignErr, assignServiceValue1] = await handle(AssignService.findOneAndUpdate({ _id: assignServiceValue[j]._id }, { $set: { bookedCount: count } }, { new: true, useFindAndModify: false }))
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
     //console.log("data", datatoupdate)
     let [assignErr, assignServiceValue] = await handle(AssignService.find({}).lean());
-    for (var j = 0; j < assignServiceValue.length; j++) {
-        // console.log("assignServiceValue",assignServiceValue)
-        if (assignServiceValue[j].date == new Date(datatoupdate.date)) {
+    // for (var j = 0; j < assignServiceValue.length; j++) {
+    //     // console.log("assignServiceValue",assignServiceValue)
+    //     if (assignServiceValue[j].date == new Date(datatoupdate.date)) {
            
-            if (slotCheck(assignServiceValue[j].startTime) >= slotCheck(datatoupdate.startTime) && slotCheck(assignServiceValue[j].endTime) <= slotCheck(datatoupdate.endTime)) {
-                if (typeArray.includes(assignServiceValue[j].typeOfTreatment) && typeArray.includes(datatoupdate.typeOfTreatment)) {
-                    console.log("assignServiceValue[j]",assignServiceValue[j].startTime)
-                    count = assignServiceValue[j].bookedCount + 1;
+    //         if (slotCheck(assignServiceValue[j].startTime) >= slotCheck(datatoupdate.startTime) && slotCheck(assignServiceValue[j].endTime) <= slotCheck(datatoupdate.endTime)) {
+    //             if (typeArray.includes(assignServiceValue[j].typeOfTreatment) && typeArray.includes(datatoupdate.typeOfTreatment)) {
+    //                 console.log("assignServiceValue[j]",assignServiceValue[j].startTime)
+    //                 count = assignServiceValue[j].bookedCount + 1;
                    
-                    let [assignErr, assignServiceValue1] = await handle(AssignService.findOneAndUpdate({ _id: assignServiceValue[j]._id }, { $set: { bookedCount: count } }, { new: true, useFindAndModify: false }))
-                }
-            }
-        }
-    }   
-    datatoupdate.bookedCount = count
+    //                 let [assignErr, assignServiceValue1] = await handle(AssignService.findOneAndUpdate({ _id: assignServiceValue[j]._id }, { $set: { bookedCount: count } }, { new: true, useFindAndModify: false }))
+    //             }
+    //         }
+    //     }
+    // }   
+    // datatoupdate.bookedCount = count
     if (datatoupdate.date) {
         datatoupdate.date = new Date(datatoupdate.date)
     }
