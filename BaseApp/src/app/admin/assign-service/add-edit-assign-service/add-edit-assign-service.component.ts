@@ -824,52 +824,57 @@ export class AddEditAssignServiceComponent implements OnInit {
     }
     this.isassignServiceFormSubmitted = true;
     this.isassignServiceClientFormSubmitted = true
-    if (this.assignServiceForm.valid) {
-      if (this.assignServiceClientForm.valid) {
-        var formattedDates = this.formattedDate(this.assignServiceForm.value.date)
-        var data = {
-          staffId: this.assignServiceForm.value.staffId,
-          date: formattedDates,
-          clientId: this.assignServiceClientForm.value.clientId[0]._id,
-          address: this.assignServiceClientForm.value.address,
-          phone: this.assignServiceClientForm.value.phone,
-          serviceId: this.assignServiceClientForm.value.serviceId,
-          opType: this.assignServiceClientForm.value.opType,
-          typeOfTreatment: this.assignServiceClientForm.value.typeOfTreatment,
-          otherBranchAddress: this.assignServiceClientForm.value.otherBranchAddress,
-          otherBranchId: this.assignServiceClientForm.value.otherBranchId,
-          onlineLink: this.assignServiceClientForm.value.onlineLink,
-          duration: this.assignServiceClientForm.value.duration,
-          branchId: this.assignServiceClientForm.value.branchId,
-          branchAddress: this.assignServiceClientForm.value.branchAddress,
-          branchType: this.assignServiceClientForm.value.branchType,
-          slot: this.assignServiceClientForm.value.slot,
-          longitude: this.clientAddressLongitude,
-          latitude: this.clientAddressLatitude,
-          startTime: this.slotStartTime,
-          endTime: this.slotEndTime
-        }
-        console.log(data)
-        this.AssignService.updateAssignService(data, this.assignServiceId).subscribe(res => {
-          if (res.status) {
-            if (this.serviceRequestId != undefined) {
-              var data = {
-                "isAssigned": 1
-              }
-              this.ServiceRequestService.updateServiceRequest(data, this.serviceRequestId).subscribe(res => {
-                if (res.status) {
-                  console.log(res.data, "gggg")
+    if (this.slotStartTime != undefined) {
+      if (this.assignServiceForm.valid) {
+        if (this.assignServiceClientForm.valid) {
+          var formattedDates = this.formattedDate(this.assignServiceForm.value.date)
+          var data = {
+            staffId: this.assignServiceForm.value.staffId,
+            date: formattedDates,
+            clientId: this.assignServiceClientForm.value.clientId[0]._id,
+            address: this.assignServiceClientForm.value.address,
+            phone: this.assignServiceClientForm.value.phone,
+            serviceId: this.assignServiceClientForm.value.serviceId,
+            opType: this.assignServiceClientForm.value.opType,
+            typeOfTreatment: this.assignServiceClientForm.value.typeOfTreatment,
+            otherBranchAddress: this.assignServiceClientForm.value.otherBranchAddress,
+            otherBranchId: this.assignServiceClientForm.value.otherBranchId,
+            onlineLink: this.assignServiceClientForm.value.onlineLink,
+            duration: this.assignServiceClientForm.value.duration,
+            branchId: this.assignServiceClientForm.value.branchId,
+            branchAddress: this.assignServiceClientForm.value.branchAddress,
+            branchType: this.assignServiceClientForm.value.branchType,
+            slot: this.assignServiceClientForm.value.slot,
+            longitude: this.clientAddressLongitude,
+            latitude: this.clientAddressLatitude,
+            startTime: this.slotStartTime,
+            endTime: this.slotEndTime
+          }
+          console.log(data)
+          this.AssignService.updateAssignService(data, this.assignServiceId).subscribe(res => {
+            if (res.status) {
+              if (this.serviceRequestId != undefined) {
+                var data = {
+                  "isAssigned": 1
                 }
-              })
+                this.ServiceRequestService.updateServiceRequest(data, this.serviceRequestId).subscribe(res => {
+                  if (res.status) {
+                    console.log(res.data, "gggg")
+                  }
+                })
+              }
+              this.FlashMessageService.successMessage("Assign service Client updated Successfully", 2);
+              this.router.navigateByUrl("admin/assignService")
             }
-            this.FlashMessageService.successMessage("Assign service Client updated Successfully", 2);
-            this.router.navigateByUrl("admin/assignService")
-          }
-          else {
-            this.FlashMessageService.errorMessage("Assign service Client Updated Failed", 2);
-          }
-        })
+            else {
+              this.FlashMessageService.errorMessage("Assign service Client Updated Failed", 2);
+            }
+          })
+        }
       }
+    }
+    else {
+      this.FlashMessageService.errorMessage("Please Select Your Slot");
     }
   }
 
