@@ -106,8 +106,8 @@ export class AddEditAssignServiceComponent implements OnInit {
   public duration: any;
   public slotId: any;
   public assignId: any;
-  public show:any;
-  public update:boolean=false
+  public show: any;
+  public update: boolean = false
 
   constructor(private fb: FormBuilder, public StaffService: StaffService, public ClientService: ClientService, private route: ActivatedRoute, public ServiceService: ServiceService, public BranchService: BranchService, public AssignService: AssignService, public ServiceRequestService: ServiceRequestService, private FlashMessageService: FlashMessageService, private router: Router, private RoleService: RoleService) {
     this.route.params.subscribe((param) => {
@@ -139,11 +139,11 @@ export class AddEditAssignServiceComponent implements OnInit {
     if (this.serviceRequestId != undefined) {
       this.getServiceRequestById(this.serviceRequestId)
     }
-    if(this.show == 'edit'){
-      this.update=true
+    if (this.show == 'edit') {
+      this.update = true
     }
-    else{
-      this.update=false
+    else {
+      this.update = false
     }
   }
 
@@ -569,52 +569,58 @@ export class AddEditAssignServiceComponent implements OnInit {
     this.isassignServiceFormSubmitted = true;
     this.isassignServiceClientFormSubmitted = true
     console.log(this.assignServiceForm)
-    if (this.assignServiceForm.valid) {
-      if (this.assignServiceClientForm.valid) {
-        var formattedDates = this.formattedDate(this.assignServiceForm.value.date)
-        var data = {
-          staffId: this.assignServiceForm.value.staffId,
-          date: formattedDates,
-          clientId: this.assignServiceClientForm.value.clientId[0]._id,
-          address: this.assignServiceClientForm.value.address,
-          phone: this.assignServiceClientForm.value.phone,
-          serviceId: this.assignServiceClientForm.value.serviceId,
-          opType: this.assignServiceClientForm.value.opType,
-          typeOfTreatment: this.assignServiceClientForm.value.typeOfTreatment,
-          otherBranchAddress: this.assignServiceClientForm.value.otherBranchAddress,
-          otherBranchId: this.assignServiceClientForm.value.otherBranchId,
-          onlineLink: this.assignServiceClientForm.value.onlineLink,
-          duration: this.assignServiceClientForm.value.duration,
-          branchId: this.assignServiceClientForm.value.branchId,
-          branchAddress: this.assignServiceClientForm.value.branchAddress,
-          branchType: this.assignServiceClientForm.value.branchType,
-          slot: this.assignServiceClientForm.value.slot,
-          longitude: this.clientAddressLongitude,
-          latitude: this.clientAddressLatitude,
-          startTime: this.slotStartTime,
-          endTime: this.slotEndTime
-        }
-        console.log(data)
-        this.AssignService.createAssignServiceClient(data).subscribe(res => {
-          if (res.status) {
-            if (this.serviceRequestId != undefined) {
-              var data = {
-                "isAssigned": 1
-              }
-              this.ServiceRequestService.updateServiceRequest(data, this.serviceRequestId).subscribe(res => {
-                if (res.status) {
-                  console.log(res.data, "oooo")
+    if (this.slotStartTime != undefined) {
+      if (this.assignServiceForm.valid) {
+        if (this.assignServiceClientForm.valid) {
+          var formattedDates = this.formattedDate(this.assignServiceForm.value.date)
+          var data = {
+            staffId: this.assignServiceForm.value.staffId,
+            date: formattedDates,
+            clientId: this.assignServiceClientForm.value.clientId[0]._id,
+            address: this.assignServiceClientForm.value.address,
+            phone: this.assignServiceClientForm.value.phone,
+            serviceId: this.assignServiceClientForm.value.serviceId,
+            opType: this.assignServiceClientForm.value.opType,
+            typeOfTreatment: this.assignServiceClientForm.value.typeOfTreatment,
+            otherBranchAddress: this.assignServiceClientForm.value.otherBranchAddress,
+            otherBranchId: this.assignServiceClientForm.value.otherBranchId,
+            onlineLink: this.assignServiceClientForm.value.onlineLink,
+            duration: this.assignServiceClientForm.value.duration,
+            branchId: this.assignServiceClientForm.value.branchId,
+            branchAddress: this.assignServiceClientForm.value.branchAddress,
+            branchType: this.assignServiceClientForm.value.branchType,
+            slot: this.assignServiceClientForm.value.slot,
+            longitude: this.clientAddressLongitude,
+            latitude: this.clientAddressLatitude,
+            startTime: this.slotStartTime,
+            endTime: this.slotEndTime
+          }
+          console.log(this.slotStartTime)
+          console.log(data, 'gyy')
+          this.AssignService.createAssignServiceClient(data).subscribe(res => {
+            if (res.status) {
+              if (this.serviceRequestId != undefined) {
+                var data = {
+                  "isAssigned": 1
                 }
-              })
+                this.ServiceRequestService.updateServiceRequest(data, this.serviceRequestId).subscribe(res => {
+                  if (res.status) {
+                    console.log(res.data, "oooo")
+                  }
+                })
+              }
+              this.FlashMessageService.successMessage("Assign service Client Created Successfully", 2);
+              this.router.navigateByUrl("admin/assignService")
             }
-            this.FlashMessageService.successMessage("Assign service Client Created Successfully", 2);
-            this.router.navigateByUrl("admin/assignService")
-          }
-          else {
-            this.FlashMessageService.errorMessage("Assign service Client Created Failed", 2);
-          }
-        })
+            else {
+              this.FlashMessageService.errorMessage("Assign service Client Created Failed", 2);
+            }
+          })
+        }
       }
+    }
+    else {
+      this.FlashMessageService.errorMessage("Please Select Your Slot");
     }
   }
 
@@ -650,7 +656,7 @@ export class AddEditAssignServiceComponent implements OnInit {
           this.getSlotsForAssignService(data);
           this.dividingSlot(this.assignSercieDataArr.duration)
         }
-        
+
         this.ClientService.getClientById(this.assignSercieDataArr.clientId).subscribe(res => {
           if (res.status) {
             this.clientArr = [];
@@ -745,7 +751,7 @@ export class AddEditAssignServiceComponent implements OnInit {
           this.getSlotsForAssignService(data);
           this.dividingSlot(this.assignSercieDataArr.duration)
         }
-       
+
         this.ClientService.getClientById(this.assignSercieDataArr.clientId).subscribe(res => {
           if (res.status) {
             this.clientArr = [];
