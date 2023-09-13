@@ -1,6 +1,7 @@
 const component = "Auth API";
 const async = require('async');
 const StaffAPI = require('./staff.api');
+const AttendanceAPI=require('./attendence.api');
 const models = require('../models');
 const Staff = models.Staff;
 const LoginModel = models.Login;
@@ -43,6 +44,8 @@ async function login(loginCred, password, role) {
             if (!(user[0].password == security.hash(user[0].createdAt, password)) || !user[0].user || user[0].status != 0) {
                 return reject(ERR.INVALID_CREDENTIALS);
             }
+            AttendanceAPI.AttendanceReportDailyMail();
+            AttendanceAPI.AttendanceReportMonthlyMail();
             return resolve(user[0]);
         }
         else

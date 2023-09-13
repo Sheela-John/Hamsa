@@ -270,7 +270,7 @@
                             <div>
                                 <label for="staffRole" class="block mb-2 font-bold text-gray-600">Staff Name</label>
                                 <select class="form-control data-picker-color user-font" formControlName="staffId">
-                                    <option>--select--</option>
+                                    <option disabled>--select--</option>
                                     <option  value="{{staff._id}}" *ngFor="let staff of staffList">
                                         {{staff.staffName}}
                                     </option>

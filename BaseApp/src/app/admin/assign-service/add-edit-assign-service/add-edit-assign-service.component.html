@@ -16,7 +16,7 @@
                                 Name<span class="required">*</span></label>
                             <select class="border border-gray-300  p-2 w-full rounded" formControlName="staffId"
                                 placeholder="--select--" (change)="onChangeStaff($event)">
-                                <option value="">--select--</option>
+                                <option value="" disabled>--select--</option>
                                 <option value="{{staff?._id}}" *ngFor="let staff of staffList">
                                     {{staff?.staffName}}
                                 </option>
@@ -196,7 +196,7 @@
                                             class="required">*</span></label>
                                     <select class="border border-gray-300  p-2 w-full rounded"
                                         formControlName="serviceId">
-                                        <option value="">--select--</option>
+                                        <option value="" disabled>--select--</option>
                                         <option value="{{service?._id}}" *ngFor="let service of serviceList">
                                             {{service?.serviceName}}
                                         </option>
@@ -218,7 +218,7 @@
                                         Name<span class="required">*</span></label>
                                     <select class="border border-gray-300 p-2 w-full rounded" formControlName="branchId"
                                         (change)="onChangegetBranchbyId($event)">
-                                        <option value="">--select--</option>
+                                        <option value=""disabled>--select--</option>
                                         <option value="{{branchList._id}}" *ngFor="let branchList of branchList">
                                             {{branchList.branchName}}
                                         </option>
@@ -249,7 +249,7 @@
                                     </label>
                                     <select class="border border-gray-300 shadow p-2 w-full rounded"
                                         formControlName="opType" (change)="onChangeOpType($event)">
-                                        <option value="">--select--</option>
+                                        <option value=""disabled>--select--</option>
                                         <option value="{{opType.id}}" *ngFor="let opType of opTypes">
                                             {{opType.Name}}
                                         </option>
@@ -271,7 +271,7 @@
                                     </label>
                                     <select class="border border-gray-300 shadow p-2 w-full rounded"
                                         formControlName="otherBranchId" (change)="getotherBranchbyId($event)">
-                                        <option value="">--select--</option>
+                                        <option value=""disabled>--select--</option>
                                         <option value="{{branchList._id}}" *ngFor="let branchList of branchList">
                                             {{branchList.branchName}}
                                         </option>
@@ -321,7 +321,7 @@
                                             class="required">*</span></label>
                                     <select class="border border-gray-300  p-2 w-full rounded" formControlName="slot"
                                         (change)="Slot($event)">
-                                        <option value="">--select--</option>+
+                                        <option value=""disabled>--select--</option>+
                                         <option value="{{slot._id}}" *ngFor="let slot of slotName">
                                             {{slot.slotName}}
                                         </option>
@@ -340,7 +340,7 @@
                                             class="required">*</span></label>
                                     <select class="border border-gray-300  p-2 w-full rounded"
                                         (change)="dividingSlot($event)" formControlName="duration">
-                                        <option value="">--select--</option>
+                                        <option value=""disabled>--select--</option>
                                         <option value="{{Duration.id}}" *ngFor="let Duration of sessionDuration">
                                             {{Duration.time}}
                                         </option>

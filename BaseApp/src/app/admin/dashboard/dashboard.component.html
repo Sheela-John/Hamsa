@@ -10,7 +10,7 @@
             <div class="col-12 col-md-6 display-block float-right mt-3">
                 <div class="input-group-lg">
                 <select class="form-control data-picker-color user-font" formControlName="staffId" (change)="dash()">
-                    <option value="">--select--</option>
+                    <option value=""disabled>--select--</option>
                         <option *ngFor="let staff of staffList"  value="{{staff._id}}" >
                             {{staff.staffName}}
                         </option>

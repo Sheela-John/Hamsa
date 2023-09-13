@@ -168,7 +168,7 @@
                             Name<span class="required">*</span></label>
                         <select class="border border-gray-300  p-2 w-full rounded"
                             formControlName="branchId" (change)="getBranchbyId($event)">
-                            <option value="">--select--</option>+
+                            <option value="" disabled>--select--</option>+
 
                             <option value="{{branch._id}}" *ngFor="let branch of branchList">
                                 {{branch.branchName}}

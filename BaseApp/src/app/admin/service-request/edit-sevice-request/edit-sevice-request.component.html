@@ -43,7 +43,7 @@
                     <div>
                         <label for="service" class="block mb-2 font-bold text-gray-600 ">Service</label>
                         <select class="border border-gray-300 shadow p-2 w-full rounded" formControlName="service">
-                            <option value="">--select--</option>
+                            <option value="" disabled>--select--</option>
                             <option value="{{serviceList._id}}" *ngFor="let serviceList of serviceList">
                                 {{serviceList.serviceName}}
                             </option>
@@ -61,7 +61,7 @@
                         <label for="staff" class="block mb-2 font-bold text-gray-600 ">Reference By</label>
                         <select class="border border-gray-300 shadow p-2 w-full rounded" formControlName="referenceBy"
                             placeholder="--select--" >
-                            <option value="">--select--</option>
+                            <option value="" disabled>--select--</option>
                             <option value="{{staffList._id}}" *ngFor="let staffList of staffList">
                                 {{staffList.staffName}}
                             </option>
@@ -80,7 +80,7 @@
                     <div>
                         <label for="status" class="block mb-2 font-bold text-gray-600 ">Status</label>
                         <select class="border border-gray-300 shadow p-2 w-full rounded" formControlName="status">
-                            <option value="">--select--</option>
+                            <option value="" disabled>--select--</option>
                             <option value="Completed">Completed</option>
                             <option value="Reshedule">Reshedule</option>
                             <option value="Not Started">Not Started</option>
