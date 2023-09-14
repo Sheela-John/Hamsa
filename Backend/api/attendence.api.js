@@ -165,7 +165,7 @@ const getAttendenceofStaffByDateRangeDetails = async (data) => {
         },
     ]
     let [err, attendenceData] = await handle(Attendence.aggregate(query));
-    console.log("attendenceData",attendenceData)
+    console.log("attendenceData", attendenceData)
     for (var i = 0; i < attendenceData.length; i++) {
         for (var j = 0; j < attendenceData[i].doc.length; j++) {
             var startTime = attendenceData[i].doc[j].startTime.split(':');
@@ -209,105 +209,118 @@ const getAttendenceofStaffByDateRangeDetails = async (data) => {
             let [Err1, travelCountData] = await handle(TravelCount.find({ 'staffId': attendenceData[i].doc[j].staffId, date: (attendenceData[i].doc[j].date) }).sort({ count: 1 }).lean());
             var totalDistance = [];
             var totalDuration = [];
-            if(travelCountData.length!=0)
-            {
-            for (var l = 0; l < travelCountData.length; l++) {
-                let [Err, assignServiceData] = await handle(AssignService.findOne({ '_id': travelCountData[l].assignServiceId }).lean());
-                console.log("travelCountData",travelCountData[l])
-                 console.log("assignServiceData", assignServiceData)
-                 if(assignServiceData)
-                 {
-                if (l == 0) {
-                    let [err, branchData] = await handle(Branch.findOne({ "_id": assignServiceData.branchId }))
-                     console.log("branchData", branchData)
-                    var temp = {
-                        "latitude": branchData.latitude,
-                        "longitude": branchData.longitude,
-                        "elatitude": assignServiceData.slatitude,
-                        "elongitude": assignServiceData.slongitude
+            if (travelCountData.length != 0) {
+                for (var l = 0; l < travelCountData.length; l++) {
+                    let [Err, assignServiceData] = await handle(AssignService.findOne({ '_id': travelCountData[l].assignServiceId }).lean());
+                    console.log("travelCountData", travelCountData[l])
+                    console.log("assignServiceData", assignServiceData)
+                    if (assignServiceData != undefined && assignServiceData != null) {
+                        if (l == 0) {
+                            let [err, branchData] = await handle(Branch.findOne({ "_id": assignServiceData.branchId }))
+                            console.log("branchData", branchData)
+                            var temp = {
+                                "latitude": branchData.latitude,
+                                "longitude": branchData.longitude,
+                                "elatitude": assignServiceData.slatitude,
+                                "elongitude": assignServiceData.slongitude
+                            }
+                            console.log(temp)
+                            var [err3, val] = await handle(travelDistance(temp));
+                            console.log("val", val)
+                            totalDistance.push(val.distance);
+                            console.log()
+                            totalDuration.push(Number((val.duration).split('s')[0]))
+                        }
+
+                        else {
+                            let [Err, assignServiceData1] = await handle(AssignService.findOne({ '_id': travelCountData[l - 1].assignServiceId }).lean());
+                            console.log("assignServiceData1", assignServiceData1)
+                            if (assignServiceData1 != null) {
+                                if (assignServiceData1.slatitude != 0 && assignServiceData1.slongitude != 0 && assignServiceData.slatitude != 0 && assignServiceData.slongitude != 0) {
+                                    var temp = {
+                                        "latitude": assignServiceData1.slatitude,
+                                        "longitude": assignServiceData1.slongitude,
+                                        "elatitude": assignServiceData.slatitude,
+                                        "elongitude": assignServiceData.slongitude
+                                    }
+                                    console.log(temp)
+                                    var [err3, val] = await handle(travelDistance(temp));
+                                    console.log("val1", val)
+                                    totalDistance.push(val.distance);
+                                    totalDuration.push(Number((val.duration).split('s')[0]))
+                                }
+                                else {
+                                    console.log("8888888");
+                                    totalDistance = [];
+                                    totalDuration = [];
+                                }
+                            }
+                            else {
+                                totalDistance = [];
+                                totalDuration = [];
+                            }
+                        }
                     }
-                     console.log(temp)
-                    var [err3, val] = await handle(travelDistance(temp));
-                      console.log("val", val)
-                    totalDistance.push(val.distance);
-                    console.log()
-                    totalDuration.push(Number((val.duration).split('s')[0]))
-                }
-            
-                else {
-                    let [Err, assignServiceData1] = await handle(AssignService.findOne({ '_id': travelCountData[l - 1].assignServiceId }).lean());
-                    var temp = {
-                        "latitude": assignServiceData1.slatitude,
-                        "longitude": assignServiceData1.slongitude,
-                        "elatitude": assignServiceData.slatitude,
-                        "elongitude": assignServiceData.slongitude
+                    else {
+                        console.log("9999999");
+                        totalDistance = [];
+                        totalDuration = [];
                     }
-                    // console.log(temp)
-                    var [err3, val] = await handle(travelDistance(temp));
-                    //   console.log("val1", val)
-                    totalDistance.push(val.distance);
-                    totalDuration.push(Number((val.duration).split('s')[0]))
                 }
             }
-            else
-            {
-                totalDistance=[];
-                totalDuration=[];
+            console.log("asdjaofjwkv.ilvsizvfd")
+            if (totalDistance.length != 0 && totalDuration.length != 0) {
+                console.log("inside if")
+                distance = totalDistance.reduce((a, b) => a + b, 0);
+                duration = totalDuration.reduce((a, b) => a + b, 0);
+
+                attendenceData[i].doc[j].travelDistance = distance.toFixed(2);
+                attendenceData[i].doc[j].travelDuration = (duration / 60).toFixed(2);
             }
+            else {
+                console.log("inside else")
+                attendenceData[i].doc[j].travelDistance = distance;
+                attendenceData[i].doc[j].travelDuration = duration;
             }
-        }
-          if(totalDistance.length!=0 && totalDuration.length!=0)
-          {
-            distance = totalDistance.reduce((a, b) => a + b, 0);
-            duration = totalDuration.reduce((a, b) => a + b, 0);
-          
-            attendenceData[i].doc[j].travelDistance = distance.toFixed(2);
-            attendenceData[i].doc[j].travelDuration = duration / 60;
-          }
-          else{
-            attendenceData[i].doc[j].travelDistance = distance.toFixed(2);
-            attendenceData[i].doc[j].travelDuration = duration ;
-          }
-         // console.log("success3")
+            console.log("success3", attendenceData[i].doc[j].travelDistance, attendenceData[i].doc[j].travelDuration)
             // Calculate totalDuration
             attendenceData[i].doc[j].totalDuration = 0;  // Initialize totalDuration
             for (var k = 0; k < attendenceData[i].doc[j].inTimeArray.length; k++) {
-                if(attendenceData[i].doc[j].outTimeArray.length!=0)
-                {
-                var startTime = attendenceData[i].doc[j].inTimeArray[k].split(':');
-                var endTime = attendenceData[i].doc[j].outTimeArray[k].split(':');
-                var startHr = parseInt(startTime[0], 10);
-                var startMin = parseInt(startTime[1], 10);
-                var endHr = parseInt(endTime[0], 10);
-                var endMin = parseInt(endTime[1], 10);
-                var duration = ((endHr - startHr) * 60) + (endMin - startMin);
-                attendenceData[i].doc[j].totalDuration += duration;
+                if (attendenceData[i].doc[j].outTimeArray.length != 0) {
+                    var startTime = attendenceData[i].doc[j].inTimeArray[k].split(':');
+                    var endTime = attendenceData[i].doc[j].outTimeArray[k].split(':');
+                    var startHr = parseInt(startTime[0], 10);
+                    var startMin = parseInt(startTime[1], 10);
+                    var endHr = parseInt(endTime[0], 10);
+                    var endMin = parseInt(endTime[1], 10);
+                    var duration = ((endHr - startHr) * 60) + (endMin - startMin);
+                    attendenceData[i].doc[j].totalDuration += duration;
                 }
-                else{
+                else {
                     attendenceData[i].doc[j].totalDuration = 0;
                 }
             }
-            if(attendenceData[i].doc[j].totalDuration!=0)
-            {
-            var totalDurationHours = Math.floor(attendenceData[i].doc[j].totalDuration / 60);
-            var totalDurationMinutes = attendenceData[i].doc[j].totalDuration % 60;
-            totalDurationMinutes=String(totalDurationMinutes);
-            totalDurationHours=String(totalDurationHours);
-            attendenceData[i].doc[j].totalDurationFormatted =( (totalDurationHours).length!=2 ? "0"+totalDurationHours :totalDurationHours) + ":" +( (totalDurationMinutes).length!=2 ? "0"+totalDurationMinutes : totalDurationMinutes);
+            if (attendenceData[i].doc[j].totalDuration != 0) {
+                var totalDurationHours = Math.floor(attendenceData[i].doc[j].totalDuration / 60);
+                var totalDurationMinutes = attendenceData[i].doc[j].totalDuration % 60;
+                totalDurationMinutes = String(totalDurationMinutes);
+                totalDurationHours = String(totalDurationHours);
+                attendenceData[i].doc[j].totalDurationFormatted = ((totalDurationHours).length != 2 ? "0" + totalDurationHours : totalDurationHours) + ":" + ((totalDurationMinutes).length != 2 ? "0" + totalDurationMinutes : totalDurationMinutes);
             }
-            else{
-                attendenceData[i].doc[j].totalDurationFormatted="00:00" 
+            else {
+                attendenceData[i].doc[j].totalDurationFormatted = "00:00"
             }
+            console.log("attendenceData[i].doc[j]", attendenceData[i].doc[j])
         }
     }
-    console.log("attendenceData333",attendenceData)
+    console.log("attendenceData333", attendenceData)
     for (var i = 0; i < attendenceData.length; i++) {
         attendenceData[i].doc.sort(GFG_sortFunction);
         function GFG_sortFunction(a, b) {
             return a.date > b.date ? 1 : -1;
         }
     };
-    console.log("attendenceData",attendenceData)
+    console.log("attendenceData", attendenceData)
     if (err) return Promise.reject(err);
     else return Promise.resolve(attendenceData);
 }
@@ -347,10 +360,21 @@ const travelDistance = async (data) => {
             }
             log.debug('Travel Distance response', { attach: response.body }); log.close();
             (async () => {
-                var value = {
-                    duration: response.body.routes[0].duration,
-                    distance: response.body.routes[0].distanceMeters / 1000
+                console.log("response.body.routes[0]", response.body.routes[0])
+                if (response.body.routes[0].distanceMeters) {
+                    var value = {
+                        duration: response.body.routes[0].duration,
+
+                        distance: response.body.routes[0].distanceMeters / 1000
+                    }
                 }
+                else {
+                    var value = {
+                        duration: '0s',
+                        distance: 0
+                    }
+                }
+                console.log("value", value)
                 return resolve(value)
             })();
         });
@@ -379,167 +403,185 @@ async function togetPreviouseCount(data) {
 }
 
 async function AttendanceReportDailyMail() {
-    var schedule=cron.schedule('30 20 * * *', async () => {
-    var from1 = new Date();
-    var to1 = new Date();
-    var from = from1.getFullYear() + "-" + ((from1.getMonth() + 1).length != 2 ? "0" + (from1.getMonth() + 1) : (from1.getMonth() + 1)) + "-" + (from1.getDate().length != 2 ? "0" + from1.getDate() : from1.getDate());
-    var to = to1.getFullYear() + "-" + ((to1.getMonth() + 1).length != 2 ? "0" + (to1.getMonth() + 1) : (to1.getMonth() + 1)) + "-" + (to1.getDate().to1 != 2 ? "0" + to1.getDate() : to1.getDate());
-    console.log("ada")
-    let [err, staffData] = await handle(Staff.find().lean());
-    var attendanceArray = [];
-    console.log(staffData)
-    for (var i = 0; i < staffData.length; i++) {
-        if (staffData[i].role == "PORTAL_STAFF") {
-            var temp = {
-                startDate: from,
-                endDate: to,
-                staffId: (staffData[i]._id).toString()
-            }
-            let [err1, staffAttendanceData] = await handle(getAttendenceofStaffByDateRangeDetails(temp));
-            if (staffAttendanceData.length != 0) {
-                for (var j = 0; j < staffAttendanceData.length; j++) {
-                    for (var k = 0; k < staffAttendanceData[j].doc.length; k++) {
-                        var value = {
-                            Staff_Name: staffAttendanceData[j].doc[k].staffName,
-                            Date: staffAttendanceData[j].doc[k].date,
-                            InTime: staffAttendanceData[j].doc[k].inTime,
-                            OutTime: staffAttendanceData[j].doc[k].outTime,
-                            Travel_Distance: staffAttendanceData[j].doc[k].travelDistance,
-                            Travel_Duration: staffAttendanceData[j].doc[k].travelDuration,
-                            Total_Duration: staffAttendanceData[j].doc[k].totalDurationFormatted,
+    console.log("report mail")
+    var schedule = cron.schedule('30 20 * * *', async () => {
+        var from1 = new Date();
+        var to1 = new Date();
+        var from = from1.getFullYear() + "-" + ((from1.getMonth() + 1).length != 2 ? "0" + (from1.getMonth() + 1) : (from1.getMonth() + 1)) + "-" + (from1.getDate().length != 2 ? "0" + from1.getDate() : from1.getDate());
+        var to = to1.getFullYear() + "-" + ((to1.getMonth() + 1).length != 2 ? "0" + (to1.getMonth() + 1) : (to1.getMonth() + 1)) + "-" + (to1.getDate().to1 != 2 ? "0" + to1.getDate() : to1.getDate());
+        console.log("ada")
+        let [err, staffData] = await handle(Staff.find().lean());
+        var attendanceArray = [];
+        // console.log(staffData)
+        for (var i = 0; i < staffData.length; i++) {
+            console.log("staffData[i].role", staffData[i]._id)
+            if (staffData[i].role == "PORTAL_STAFF") {
+                var temp = {
+                    startDate: from,
+                    endDate: to,
+                    staffId: (staffData[i]._id).toString()
+                }
+                console.log("tep", temp)
+                let [err1, staffAttendanceData] = await handle(getAttendenceofStaffByDateRangeDetails(temp));
+                console.log("staffAttendanceData", staffAttendanceData);
+                if (staffAttendanceData.length != 0 && staffAttendanceData != undefined) {
+                    for (var j = 0; j < staffAttendanceData.length; j++) {
+                        for (var k = 0; k < staffAttendanceData[j].doc.length; k++) {
+                            var value = {
+                                Staff_Name: staffAttendanceData[j].doc[k].staffName,
+                                Date: staffAttendanceData[j].doc[k].date,
+                                InTime: staffAttendanceData[j].doc[k].inTime,
+                                OutTime: staffAttendanceData[j].doc[k].outTime,
+                                Travel_Distance: staffAttendanceData[j].doc[k].travelDistance,
+                                Travel_Duration: staffAttendanceData[j].doc[k].travelDuration,
+                                Total_Duration: staffAttendanceData[j].doc[k].totalDurationFormatted,
+                            }
+                            attendanceArray.push(value)
                         }
-                        attendanceArray.push(value)
                     }
                 }
+                else {
+                    var value = {
+                        Staff_Name: staffData[i].staffName,
+                        Date: new Date(from),
+                        InTime: 0,
+                        OutTime: 0,
+                        Travel_Distance: 0,
+                        Travel_Duration: 0,
+                        Total_Duration: 0,
+                    }
+                    attendanceArray.push(value)
+                }
+
             }
         }
-    }
-    const header = ['Staff Name', 'Date','In Time', 'Out Time',  'Travel Distance', 'Travel Duration', 'Total Working Hours'];
-    const csvFromArrayOfArrays = convertArrayToCSV(attendanceArray, {
-        header,
-        separator: ','
-    });
-    console.log(csvFromArrayOfArrays)
-    sendMail(csvFromArrayOfArrays)
-      })
-      schedule.start();
+        console.log("attendanceArray", attendanceArray)
+        const header = ['Staff Name', 'Date', 'In Time', 'Out Time', 'Travel Distance in KM', 'Travel Duration in Minutes', 'Total Working Hours'];
+        const csvFromArrayOfArrays = convertArrayToCSV(attendanceArray, {
+            header,
+            separator: ','
+        });
+        console.log(csvFromArrayOfArrays)
+        sendMail(csvFromArrayOfArrays)
+    })
+    schedule.start();
 
 }
 function sendMail(csvFromArrayOfArrays) {
     let userName = '';
     console.log("csvFromArrayOfArrays", csvFromArrayOfArrays)
-    var date=new Date();
+    var date = new Date();
     var from = date.getFullYear() + "-" + ((date.getMonth() + 1).length != 2 ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1)) + "-" + (date.getDate().length != 2 ? "0" + date.getDate() : date.getDate());
     var attachments = {
-        filename: "DailyReport-"+from+".csv",
+        filename: "DailyReport-" + from + ".csv",
         content: csvFromArrayOfArrays,
     }
-    var staffData=[];
-    staffData=[{staffName:"Hr",email:"Hr@hamsarehab.com"},{staffName:"Operations",email:"Operations@hamsarehab.com"}]
-    // staffData=[{staffName:"Sheela",email:"sheelak@deemsys.in"}]
+    var staffData = [];
+    staffData = [{ staffName: "Hr", email: "Hr@hamsarehab.com" }, { staffName: "Operations", email: "Operations@hamsarehab.com" }]
+    // staffData = [{ staffName: "Sheela", email: "sheelak@deemsys.in" }]
     staffData.forEach((element) => {
         userName = element.staffName;
-     
-            let subject = "Daily Attendance Report : "+from;
-            html.create({
-                data: {
-                    userName: `${element.staffName}`,
-                },
-                templateName: "attendance_report"
+
+        let subject = "Daily Attendance Report : " + from;
+        html.create({
+            data: {
+                userName: `${element.staffName}`,
             },
-                (err, contents) => {
-                    if (err == null)
+            templateName: "attendance_report"
+        },
+            (err, contents) => {
+                if (err == null)
 
-                        require('../util/email').send(element.email, subject, contents, attachments, () => {
-                       
-                        });
-                    else {
-                       // cb(err);
-                    }
-                })
+                    require('../util/email').send(element.email, subject, contents, attachments, () => {
 
-       
+                    });
+                else {
+                    // cb(err);
+                }
+            })
+
+
     });
 }
 async function AttendanceReportMonthlyMail() {
-    var schedule=cron.schedule('30 20 25 * *', async () => {
-    var from1 = new Date();
-    var to1 = new Date(new Date().setDate(from1.getDate() - 30));
-   
-    var from = from1.getFullYear() + "-" + ((from1.getMonth() + 1).length != 2 ? "0" + (from1.getMonth() + 1) : (from1.getMonth() + 1)) + "-" + (from1.getDate().length != 2 ? "0" + from1.getDate() : from1.getDate());
-    var to = to1.getFullYear() + "-" + ((to1.getMonth() + 1).length != 2 ? "0" + (to1.getMonth() + 1) : (to1.getMonth() + 1)) + "-" + (to1.getDate().to1 != 2 ? "0" + to1.getDate() : to1.getDate());
-    let [err, staffData] = await handle(Staff.find().lean());
-    var attendanceArray = [];
-    for (var i = 0; i < staffData.length; i++) {
-        if (staffData[i].role == "PORTAL_STAFF") {
-            console.log("staffData[i].role",staffData[i].role)
-            var temp = {
-                startDate: to,
-                endDate: from,
-                staffId: (staffData[i]._id).toString()
-            }
-            console.log("temp",temp)
-            let [err1, staffAttendanceData] = await handle(getAttendenceofStaffByDateRangeDetails(temp));
-            if (staffAttendanceData.length != 0) {
-                for (var j = 0; j < staffAttendanceData.length; j++) {
-                    for (var k = 0; k < staffAttendanceData[j].doc.length; k++) {
-                        var value = {
-                            Staff_Name: staffAttendanceData[j].doc[k].staffName,
-                            Date: staffAttendanceData[j].doc[k].date,
-                            InTime: staffAttendanceData[j].doc[k].inTime,
-                            OutTime: staffAttendanceData[j].doc[k].outTime,
-                            Travel_Distance: staffAttendanceData[j].doc[k].travelDistance,
-                            Travel_Duration: staffAttendanceData[j].doc[k].travelDuration,
-                            Total_Duration: staffAttendanceData[j].doc[k].totalDurationFormatted,
+    var schedule = cron.schedule('30 20 25 * *', async () => {
+        var from1 = new Date();
+        var to1 = new Date(new Date().setDate(from1.getDate() - 30));
+
+        var from = from1.getFullYear() + "-" + ((from1.getMonth() + 1).length != 2 ? "0" + (from1.getMonth() + 1) : (from1.getMonth() + 1)) + "-" + (from1.getDate().length != 2 ? "0" + from1.getDate() : from1.getDate());
+        var to = to1.getFullYear() + "-" + ((to1.getMonth() + 1).length != 2 ? "0" + (to1.getMonth() + 1) : (to1.getMonth() + 1)) + "-" + (to1.getDate().to1 != 2 ? "0" + to1.getDate() : to1.getDate());
+        let [err, staffData] = await handle(Staff.find().lean());
+        var attendanceArray = [];
+        for (var i = 0; i < staffData.length; i++) {
+            if (staffData[i].role == "PORTAL_STAFF") {
+                console.log("staffData[i].role", staffData[i].role)
+                var temp = {
+                    startDate: to,
+                    endDate: from,
+                    staffId: (staffData[i]._id).toString()
+                }
+                console.log("temp", temp)
+                let [err1, staffAttendanceData] = await handle(getAttendenceofStaffByDateRangeDetails(temp));
+                if (staffAttendanceData.length != 0) {
+                    for (var j = 0; j < staffAttendanceData.length; j++) {
+                        for (var k = 0; k < staffAttendanceData[j].doc.length; k++) {
+                            var value = {
+                                Staff_Name: staffAttendanceData[j].doc[k].staffName,
+                                Date: staffAttendanceData[j].doc[k].date,
+                                InTime: staffAttendanceData[j].doc[k].inTime,
+                                OutTime: staffAttendanceData[j].doc[k].outTime,
+                                Travel_Distance: staffAttendanceData[j].doc[k].travelDistance,
+                                Travel_Duration: staffAttendanceData[j].doc[k].travelDuration,
+                                Total_Duration: staffAttendanceData[j].doc[k].totalDurationFormatted,
+                            }
+                            attendanceArray.push(value)
                         }
-                        attendanceArray.push(value)
                     }
                 }
             }
         }
-    }
-    const header = ['Staff Name','Date', 'In Time','Out Time',  'Travel Distance', 'Travel Duration', 'Total Working Hours'];
-    const csvFromArrayOfArrays = convertArrayToCSV(attendanceArray, {
-        header,
-        separator: ','
-    });
-    console.log(csvFromArrayOfArrays)
-   sendMailMonth(to,from,csvFromArrayOfArrays)
-     })
-     schedule.start();
+        const header = ['Staff Name', 'Date', 'In Time', 'Out Time', 'Travel Distance in KM ', 'Travel Duration in Minutes', 'Total Working Hours'];
+        const csvFromArrayOfArrays = convertArrayToCSV(attendanceArray, {
+            header,
+            separator: ','
+        });
+        console.log(csvFromArrayOfArrays)
+        sendMailMonth(to, from, csvFromArrayOfArrays)
+    })
+    schedule.start();
 
 }
-function sendMailMonth(from,to,csvFromArrayOfArrays) {
+function sendMailMonth(from, to, csvFromArrayOfArrays) {
 
     let userName = '';
     console.log("csvFromArrayOfArrays", csvFromArrayOfArrays)
     var attachments = {
-        filename: "MonthlyStaffViseReport:"+from+"-"+to+".csv",
+        filename: "MonthlyStaffViseReport:" + from + "-" + to + ".csv",
         content: csvFromArrayOfArrays,
     }
-    var staffData=[];
-   staffData=[{staffName:"Hr",email:"Hr@hamsarehab.com"},{staffName:"Operations",email:"Operations@hamsarehab.com"},{staffName:"Accounts",email:"Accounts@hamsarehab.com"}]
-//  staffData=[{staffName:"Sheela",email:"sheelak@deemsys.in"}] 
- staffData.forEach((element) => {
+    var staffData = [];
+    staffData = [{ staffName: "Hr", email: "Hr@hamsarehab.com" }, { staffName: "Operations", email: "Operations@hamsarehab.com" }, { staffName: "Accounts", email: "Accounts@hamsarehab.com" }]
+    //  staffData=[{staffName:"Sheela",email:"sheelak@deemsys.in"}] 
+    staffData.forEach((element) => {
         userName = element.staffName;
-      
-            let subject = "Monthly Staff Attendance Report : "+from+"-"+to;
-            html.create({
-                data: {
-                    userName: `${element.staffName}`,
-                },
-                templateName: "attendance_report"
-            },
-                (err, contents) => {
-                    if (err == null)
 
-                        require('../util/email').send(element.email, subject, contents, attachments, () => {
-                            //cb(null);
-                        });
-                    else {
-                       // cb(err);
-                    }
-                })
+        let subject = "Monthly Staff Attendance Report : " + from + "-" + to;
+        html.create({
+            data: {
+                userName: `${element.staffName}`,
+            },
+            templateName: "attendance_report"
+        },
+            (err, contents) => {
+                if (err == null)
+
+                    require('../util/email').send(element.email, subject, contents, attachments, () => {
+                        //cb(null);
+                    });
+                else {
+                    // cb(err);
+                }
+            })
     });
 }
 
@@ -556,5 +598,5 @@ module.exports = {
     togetPreviouseCount: togetPreviouseCount,
     getAttendenceofStaffByDateRangeDetails: getAttendenceofStaffByDateRangeDetails,
     AttendanceReportDailyMail: AttendanceReportDailyMail,
-    AttendanceReportMonthlyMail:AttendanceReportMonthlyMail
+    AttendanceReportMonthlyMail: AttendanceReportMonthlyMail
 }
