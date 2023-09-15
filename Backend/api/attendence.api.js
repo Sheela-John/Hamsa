@@ -81,7 +81,7 @@ const UpdateAttendence = async function (datatoupdate) {
             existingAttendenceData.inTimeArray = [];
         }
         existingAttendenceData.inTimeArray.push(datatoupdate.inTime);
-        existingAttendenceData.inTime = datatoupdate.inTime;
+        //existingAttendenceData.inTime = datatoupdate.inTime;
     }
 
     if (datatoupdate.outTime) {
@@ -96,6 +96,7 @@ const UpdateAttendence = async function (datatoupdate) {
     if (datatoupdate.switchStatus) {
         existingAttendenceData.switchStatus = datatoupdate.switchStatus
     }
+    delete datatoupdate.inTime;
     let [attendenceUpdateErr, updatedAttendenceData] = await handle(Attendence.findOneAndUpdate(
         { "_id": AttendenceId },
         { $set: existingAttendenceData },
