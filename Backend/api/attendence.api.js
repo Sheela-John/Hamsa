@@ -407,12 +407,11 @@ async function AttendanceReportDailyMail() {
     var schedule = cron.schedule('30 20 * * *', async () => {
         var from1 = new Date();
         var to1 = new Date();
-        var from = from1.getFullYear() + "-" + ((from1.getMonth() + 1).length != 2 ? "0" + (from1.getMonth() + 1) : (from1.getMonth() + 1)) + "-" + (from1.getDate().length != 2 ? "0" + from1.getDate() : from1.getDate());
-        var to = to1.getFullYear() + "-" + ((to1.getMonth() + 1).length != 2 ? "0" + (to1.getMonth() + 1) : (to1.getMonth() + 1)) + "-" + (to1.getDate().to1 != 2 ? "0" + to1.getDate() : to1.getDate());
+        var from =from1.getFullYear() + "-" + ((from1.getMonth() + 1).length != 2 ? "0" + (from1.getMonth() + 1) : (from1.getMonth() + 1)) + "-" + (from1.getDate().length != 2 ? "0" + from1.getDate() : from1.getDate());
+        var to =to1.getFullYear() + "-" + ((to1.getMonth() + 1).length != 2 ? "0" + (to1.getMonth() + 1) : (to1.getMonth() + 1)) + "-" + (to1.getDate().to1 != 2 ? "0" + to1.getDate() : to1.getDate());
         console.log("ada")
         let [err, staffData] = await handle(Staff.find().lean());
         var attendanceArray = [];
-        // console.log(staffData)
         for (var i = 0; i < staffData.length; i++) {
             console.log("staffData[i].role", staffData[i]._id)
             if (staffData[i].role == "PORTAL_STAFF") {
@@ -477,8 +476,8 @@ function sendMail(csvFromArrayOfArrays) {
         content: csvFromArrayOfArrays,
     }
     var staffData = [];
-    staffData = [{ staffName: "Hr", email: "Hr@hamsarehab.com" }, { staffName: "Operations", email: "Operations@hamsarehab.com" }]
-    // staffData = [{ staffName: "Sheela", email: "sheelak@deemsys.in" }]
+    staffData = [{ staffName: "Hr", email: "Hr@hamsarehab.com",bcc:"arunliviss@deemsys.in"  }, { staffName: "Operations", email: "Operations@hamsarehab.com",bcc:"arunliviss@deemsys.in" }]
+    //staffData = [{ staffName: "Sheela", email: "sheelak@deemsys.in",bcc:"sheeladeemsys@gmail.com" }]
     staffData.forEach((element) => {
         userName = element.staffName;
 
@@ -492,7 +491,7 @@ function sendMail(csvFromArrayOfArrays) {
             (err, contents) => {
                 if (err == null)
 
-                    require('../util/email').send(element.email, subject, contents, attachments, () => {
+                    require('../util/email').send(element.email, element.bcc,subject, contents, attachments, () => {
 
                     });
                 else {
@@ -560,7 +559,7 @@ function sendMailMonth(from, to, csvFromArrayOfArrays) {
         content: csvFromArrayOfArrays,
     }
     var staffData = [];
-    staffData = [{ staffName: "Hr", email: "Hr@hamsarehab.com" }, { staffName: "Operations", email: "Operations@hamsarehab.com" }, { staffName: "Accounts", email: "Accounts@hamsarehab.com" }]
+    staffData = [{ staffName: "Hr", email: "Hr@hamsarehab.com",bcc:"arunliviss@deemsys.in" }, { staffName: "Operations", email: "Operations@hamsarehab.com",bcc:"arunliviss@deemsys.in" }, { staffName: "Accounts", email: "Accounts@hamsarehab.com" ,bcc:"arunliviss@deemsys.in"}]
     //  staffData=[{staffName:"Sheela",email:"sheelak@deemsys.in"}] 
     staffData.forEach((element) => {
         userName = element.staffName;
@@ -575,7 +574,7 @@ function sendMailMonth(from, to, csvFromArrayOfArrays) {
             (err, contents) => {
                 if (err == null)
 
-                    require('../util/email').send(element.email, subject, contents, attachments, () => {
+                    require('../util/email').send(element.email,element.bcc, subject, contents, attachments, () => {
                         //cb(null);
                     });
                 else {
