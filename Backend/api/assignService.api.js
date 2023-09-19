@@ -1151,8 +1151,21 @@ async function getAssignedServicesById(id) {
     let [Err, assignServiceData] = await handle(AssignService.findOne({ '_id': id }).lean());
     console.log("assignServiceData", assignServiceData)
     let [err, invoice] = await handle(AssignServiceInvoice.findOne({ assignServiceId: id, isDeleted: 0 }))
-    let [err1, url] = await handle(getAssignServiceInvoicePresignedUrl(invoice));
-    assignServiceData.url = url;
+    if (assignServiceData.transport != "auto" && assignServiceData.transport) {
+        let [err3, transportData] = await handle(TravelAllowance.findOne({ _id: assignServiceData.transport }).lean());
+        console.log("transportData", transportData)
+        if (transportData) {
+            assignServiceData.travelExpenseMode = transportData.travelExpenseMode;
+        }
+        else {
+            assignServiceData.travelExpenseMode = "Auto";
+        }
+    }
+    if (invoice) {
+        let [err1, url] = await handle(getAssignServiceInvoicePresignedUrl(invoice));
+        assignServiceData.url = url;
+    }
+
     if (Err) return Promise.reject(Err);
     console.log("assignServiceData", assignServiceData)
     if (lodash.isEmpty(assignServiceData)) return Promise.reject(ERR.NO_RECORDS_FOUND);
@@ -1254,6 +1267,7 @@ const updateAssignService = async function (datatoupdate) {
     if (datatoupdate.date) {
         datatoupdate.date = new Date(datatoupdate.date)
     }
+    var val
     let [Err1, travelCountData] = await handle(TravelCount.find({ 'staffId': assign.staffId, date: assign.date }).sort({ count: 1 }).lean());
     for (var l = 0; l < travelCountData.length; l++) {
         if (travelCountData[l].assignServiceId == assignService) {
@@ -1268,6 +1282,8 @@ const updateAssignService = async function (datatoupdate) {
                         "elongitude": assignServiceData.slongitude
                     }
                     var [err3, val1] = await handle(travelDistance(temp));
+                    console.log("aaadad", val1)
+                    val = val1;
                 }
             }
             else {
@@ -1281,17 +1297,22 @@ const updateAssignService = async function (datatoupdate) {
                         "elongitude": assignServiceData.slongitude
                     }
                     var [err3, val1] = await handle(travelDistance(temp));
+                    val = val1;
                 }
             }
             break;
         }
     }
-    if (val1) {
-        if (val1.distance != 0 && val1.distance != undefined && val1.distance != null) {
-            datatoupdate.travelDistanceinKM = (val1.distance) / 1000;
+    console.log("val1", val)
+    if (val) {
+        if (val.distance != 0 && val.distance != undefined && val.distance != null) {
+            console.log("dfdf")
+            datatoupdate.travelDistanceinKM = (val.distance) / 1000;
         }
-        datatoupdate.travelDurationinMinutes = val1.duration;
+        console.log("fsfs")
+        datatoupdate.travelDurationinMinutes = val.duration;
     }
+    console.log(datatoupdate)
     if (assign.latitude && assign.longitude && assign.slatitude && assign.slongitude && assign.elatitude && assign.elongitude) {
         var temp = {
             "latitude": assign.latitude,
@@ -1311,13 +1332,19 @@ const updateAssignService = async function (datatoupdate) {
         datatoupdate.startDistance = startDistance.distance;
         datatoupdate.endDistance = endDistance.distance;
     }
-    if (assign.transport && datatoupdate.transport != "auto") {
-        let [Err4, travelAllowance] = await handle(TravelAllowance.findOne({ '_id': datatoupdate.transport }).lean());
-        // console.log("travelAllowance", travelAllowance.newPerKmCost, assign.travelDistanceinKM * travelAllowance.newPerKmCost);
+    if (assign.transport != "auto") {
+        let [Err4, travelAllowance] = await handle(TravelAllowance.findOne({ '_id': assign.transport }).lean());
         if (travelAllowance) {
             datatoupdate.travelAmount = assign.travelDistanceinKM * travelAllowance.newPerKmCost;
         }
     }
+    if (datatoupdate.transport && datatoupdate.transport != "auto") {
+        let [Err6, travelAllowance1] = await handle(TravelAllowance.findOne({ '_id': datatoupdate.transport }).lean());
+        if (travelAllowance1) {
+            datatoupdate.travelAmount = assign.travelDistanceinKM * travelAllowance1.newPerKmCost;
+        }
+    }
+
     let [Err4, Distance] = await handle(Settings.find({}).lean());
     if (datatoupdate.startDistance > Distance[0].averageDistance) {
         datatoupdate.status = 3;
@@ -1767,8 +1794,6 @@ const travelDistance = async (data) => {
                     distance: response.body.routes[0].distanceMeters
                 }
                 console.log("value", value)
-
-
                 return resolve(value)
 
             })();
