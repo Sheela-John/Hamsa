@@ -16,7 +16,7 @@ const Email = require('../util/email');
 const config = require('config');
 const mongoose = require('mongoose');
 const twilioConfig = require('../services/twilio/twilio');
-
+var status=0;
 /* For error handling in async await function */
 const handle = (promise) => {
     return promise
@@ -43,9 +43,14 @@ async function login(loginCred, password, role) {
             console.log(!(user[0].password == security.hash(user[0].createdAt, password)))
             if (!(user[0].password == security.hash(user[0].createdAt, password)) || !user[0].user || user[0].status != 0) {
                 return reject(ERR.INVALID_CREDENTIALS);
+             }
+            if(status==0)
+            {
+                AttendanceAPI.AttendanceReportDailyMail();
+                AttendanceAPI.AttendanceReportMonthlyMail();
+                status=1;
             }
-            AttendanceAPI.AttendanceReportDailyMail();
-            AttendanceAPI.AttendanceReportMonthlyMail();
+            console.log(status,"status")
             return resolve(user[0]);
         }
         else
