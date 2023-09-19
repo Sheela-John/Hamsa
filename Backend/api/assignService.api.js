@@ -1208,6 +1208,7 @@ const getAssignedServicesofBranchById = async (serviceBranchId) => {
 // }
 const updateAssignService = async function (datatoupdate) {
     var typeArray = [1, 3, 4]; var count = 1;
+    console.log(datatoupdate)
     log.debug(component, 'Update Assinged Service fot Client', { 'attach': datatoupdate }); log.close();
     let assignService = datatoupdate.assignServiceId;
     delete datatoupdate.assignServiceId;
@@ -1249,6 +1250,7 @@ const updateAssignService = async function (datatoupdate) {
     //     }
     // }   
     // datatoupdate.bookedCount = count
+    console.log("data", datatoupdate)
     if (datatoupdate.date) {
         datatoupdate.date = new Date(datatoupdate.date)
     }
@@ -1285,7 +1287,9 @@ const updateAssignService = async function (datatoupdate) {
         }
     }
     if (val1) {
-        datatoupdate.travelDistanceinKM = (val1.distance) / 1000;
+        if (val1.distance != 0 && val1.distance != undefined && val1.distance != null) {
+            datatoupdate.travelDistanceinKM = (val1.distance) / 1000;
+        }
         datatoupdate.travelDurationinMinutes = val1.duration;
     }
     if (assign.latitude && assign.longitude && assign.slatitude && assign.slongitude && assign.elatitude && assign.elongitude) {
@@ -1763,7 +1767,10 @@ const travelDistance = async (data) => {
                     distance: response.body.routes[0].distanceMeters
                 }
                 console.log("value", value)
+
+
                 return resolve(value)
+
             })();
         });
     });
