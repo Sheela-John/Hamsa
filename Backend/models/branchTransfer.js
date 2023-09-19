@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const branchTransferSchema = new mongoose.Schema({
-    branchTransferType: { type: Number },  //0-temporary 1-permanent
+    branchTransferType: { type: Number ,default:1},  //0-temporary 1-permanent
     startDate:{
         type:String
     },
