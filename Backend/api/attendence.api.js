@@ -406,7 +406,7 @@ async function togetPreviouseCount(data) {
 
 async function AttendanceReportDailyMail() {
     console.log("report mail")
-     var schedule = cron.schedule('24 11 * * *', async () => {
+     var schedule = cron.schedule('30 20 * * *', async () => {
          var from1 = new Date();
          var to1 = new Date();
          console.log("from1.getDate().length",(((from1.getMonth() + 1).toString()).length))
@@ -506,7 +506,7 @@ function sendMail(csvFromArrayOfArrays) {
     });
 }
 async function AttendanceReportMonthlyMail() {
-    var schedule = cron.schedule('10 30 20 25 * *', async () => {
+    var schedule = cron.schedule('30 20 25 * *', async () => {
         var from1 = new Date();
         var to1 = new Date(new Date().setDate(from1.getDate() - 30));
 
