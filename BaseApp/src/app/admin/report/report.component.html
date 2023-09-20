@@ -335,15 +335,15 @@
                             <tbody class="flex-1 sm:flex-none scrollmenu" >
                                 <div class="d-flex">
                                     <tr >
-                                        <th class="p-3 text-left head-size">Travel Distance</th>
+                                        <th class="p-3 text-left head-size">Travel Distance<sub>(Km)</sub></th>
                                     </tr>
                                     <td *ngFor="let data of AllData" class="size border-grey-light border hover:bg-gray-100 p-3">{{data.travelDistance}}</td>
                                 </div>
                                 <div class="d-flex">
                                     <tr>
-                                        <th class="p-3 text-left head-size">Travel Duration</th>
+                                        <th class="p-3 text-left head-size">Travel Duration<sub>(M)</sub></th>
                                     </tr>    
-                                    <td *ngFor="let data of AllData" class="size border-grey-light border hover:bg-gray-100 p-3">{{data.travelDistance}}</td>
+                                    <td *ngFor="let data of AllData" class="size border-grey-light border hover:bg-gray-100 p-3">{{data.travelDuration}}</td>
                                 </div>
                                 <div class="d-flex">
                                     <tr>
