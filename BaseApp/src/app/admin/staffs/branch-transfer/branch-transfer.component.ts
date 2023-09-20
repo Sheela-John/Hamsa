@@ -56,6 +56,7 @@ export class BranchTransferComponent implements OnInit {
   endDateData: any;
   public branchTransferType: any;
   staffDataBranch: any;
+  isField: boolean = false;
 
   constructor(private router: Router, private fb: FormBuilder, public staffService: StaffService, public branchTransferService: BranchTransferService, public BranchService: BranchService, private flashMessageService: FlashMessageService, private route: ActivatedRoute) {
     this.route.params.subscribe((param) => {
@@ -69,7 +70,8 @@ export class BranchTransferComponent implements OnInit {
     this.initializeBranchTransferForm();
     console.log("this.StaffId",this.StaffId)
     this.getByStaffId(this.StaffId);
-     this.getAllBranch();
+    this.getAllBranch();
+    //  this.getAllBranch();
     //  // this.getAllBranchInBase4App()
     if (this.routerData != undefined) {
       this.getBranchTranferById(this.routerData)
@@ -124,6 +126,8 @@ export class BranchTransferComponent implements OnInit {
             if (this.routerData==undefined) {
               if (branchValue._id != this.staffDataBranch) {
                 this.branchList.push(branchValue);
+                console.log(this.branchList,"br");
+                
               }
             }
             else {
@@ -164,6 +168,8 @@ export class BranchTransferComponent implements OnInit {
     this.BranchService.getBranchbyId(id).subscribe(res => {
       if (res.status) {
         this.BranchDatavalue = res.data
+        console.log(this.BranchDatavalue,":branch-Transfer");
+        
         this.branchTransferForm.controls['branchAddress'].patchValue(this.BranchDatavalue.branchAddress);
       }
     })
@@ -177,7 +183,7 @@ export class BranchTransferComponent implements OnInit {
 
   handleAddressChange(address: any) {
     this.formattedAddress = address.address_components
-    this.branchTransferForm.controls['branchAddress'].setValue(address.formatted_address)
+    // this.branchTransferForm.controls['branchAddress'].setValue(address.formatted_address)
   }
 
   //branchTypeshow Based on Flied
@@ -201,6 +207,9 @@ export class BranchTransferComponent implements OnInit {
     }
 
   }
+  // display(){
+  //   this.isField=true
+  // }
   formattedDate(date) {
     var d = new Date(date),
       month = '' + (d.getMonth() + 1),
@@ -275,6 +284,8 @@ export class BranchTransferComponent implements OnInit {
   updateBranchTransfer() {
 
     var id = this.routerData
+    console.log(id,"id");
+    
     this.isbranchTransferFormSubmitted = true;
     this.branchTransferForm.value._id = this.routerData;
     this.branchTransferForm.value.startDate = this.sDate;
@@ -282,7 +293,8 @@ export class BranchTransferComponent implements OnInit {
     if (this.branchTransferForm.value.endDate) {
       this.branchTransferForm.value.endDate = this.eDate;
     }
-
+    console.log(this.branchTransferForm.value,"all");
+    
     if (this.branchTransferForm.valid) {
       this.branchTransferService.updateBranchTransferById(this.branchTransferForm.value).subscribe(res => {
         if (res.status) {

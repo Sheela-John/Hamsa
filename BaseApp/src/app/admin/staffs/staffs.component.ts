@@ -32,17 +32,17 @@ export class StaffsComponent implements OnInit {
   public BranchDataArr: any = [];
   public BranchNameArr: any = [];
   public branchid: any;
-  branchId1: any;
-  BranchNameArray: any = [];
+  public branchId1: any;
+  public BranchNameArray: any = [];
   public staffDataArr1: any = [];
-  role: any;
+  public role: any;
   public roleId: any = [];
   public roleName: any = [];
   public addRoleArr: any = [];
   public EndTime: any = [];
   public RoleStatus: any = [];
   public RoleDataArr: any = [];
-  RoleArr: any=[];
+  public RoleArr: any=[];
 
   constructor(private router: Router, public staffService: StaffService, public flashMessageService: FlashMessageService) {
   }

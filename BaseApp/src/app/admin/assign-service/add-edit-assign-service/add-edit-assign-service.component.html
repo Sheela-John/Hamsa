@@ -83,14 +83,14 @@
                                         Number<span class="required">*</span></label>
                                     <input type="text" class="border border-gray-300 p-2 w-full rounded disabled"
                                         formControlName="phone" placeholder="Enter Phone Number">
-                                    <div class="error-msg-area">
+                                    <!-- <div class="error-msg-area">
                                         <div *ngIf="assignServiceClientForm.controls['phone'].errors && (!assignServiceClientForm.controls['phone'].pristine|| isassignServiceClientFormSubmitted)"
                                             class="error-msg">
                                             <div [hidden]="!assignServiceClientForm.controls['phone'].errors.required">
                                                 Please Enter Phone Number
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                             <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
@@ -103,7 +103,7 @@
                                         #placesRef="ngx-places" (onAddressChange)="handleAddressChange($event)"
                                         autocomplete="false">
                                     </textarea>
-                                    <div class="error-msg-area">
+                                    <!-- <div class="error-msg-area">
                                         <div *ngIf="assignServiceClientForm.controls['address'].errors && (!assignServiceClientForm.controls['address'].pristine|| isassignServiceClientFormSubmitted)"
                                             class="error-msg">
                                             <div
@@ -111,7 +111,7 @@
                                                 Please Select Address
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                                 <div>
                                     <label for="name" class="block mb-2 font-bold text-gray-600 ">Type<span

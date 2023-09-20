@@ -49,6 +49,7 @@ export class ViewStaffBranchTransferComponent implements OnInit {
   staffData: any;
   branchTransferData: any = [];
   public formatsDateTest:string= 'dd-MM-yyyy HH:mm';
+  data: any =[];
 
 
 
@@ -98,13 +99,7 @@ export class ViewStaffBranchTransferComponent implements OnInit {
       console.log("this.staffData", this.staffData)
     })
   }
-  getRoleById(id) {
-    this.RoleService.getRolebyId(id).subscribe(res => {
-      if (res.status) {
-        this.roleDatavalue = res.data;
-      }
-    })
-  }
+
   formatDate(date) {
     var d = new Date(date),
       month = '' + (d.getMonth() + 1),
@@ -116,10 +111,36 @@ export class ViewStaffBranchTransferComponent implements OnInit {
       day = '0' + day;
     return [day, month, year].join('-');
   }
+
+  getRoleById(id) {
+    this.RoleService.getRolebyId(id).subscribe(res => {
+      if (res.status) {
+        this.roleDatavalue = res.data;
+      }
+    })
+  }
+  // formatDate(date) {
+  //   var d = new Date(date),
+  //     month = '' + (d.getMonth() + 1),
+  //     day = '' + d.getDate(),
+  //     year = d.getFullYear();
+  //   if (month.length < 2)
+  //     month = '0' + month;
+  //   if (day.length < 2)
+  //     day = '0' + day;
+  //   return [day, month, year].join('-');
+  // }
   async getAllBranchTransferDataForStaff(id) {
     this.branchTransferService.getBranchTransferbyStaffId(id).subscribe(res => {
       if (res.status) {
         this.branchTransferData = res.data;
+        // this.branchTransferData.forEach(ele =>{
+        //   this.data.push({
+        //     date:this.formatDate(ele.startDate)
+        //   })
+        // })
+        // console.log(this.data,":data");
+        
         console.log( this.branchTransferData,' this.branchTransferData')
         for (var i = 0; i < this.branchTransferData.length; i++) {
           this.branchTransferData[i].Type = (this.branchTransferData[i].branchTransferType == 0) ? 'Temporary' : 'Permanent';

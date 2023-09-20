@@ -12,17 +12,23 @@
                 <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3">
                     <div>
                         <label for="name" class="block mb-2 font-bold text-gray-600 ">Select Branch<span class="required">*</span></label>
-                        <div class="flex items-center mr-4" >
+                        <!-- <div class="flex items-center mr-4" > -->
+                        <div class="flex items-center mr-4">
+                            <label class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                <input id="teal-radio" checked type="radio" [value]=1  name="branchTransferType" (change)="branchTypeChange()"
+                                formControlName="branchTransferType" class="w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 focus:ring-teal-500 dark:focus:ring-teal-600 
+                                dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 " > Permanent</label>
+
                             <label for="teal-radio" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
                                 <input id="teal-radio" type="radio" [value]=0 formControlName="branchTransferType"
-                                name="branchTransferType" (change)="branchTypeChange()"
-                                class="w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 focus:ring-teal-500 dark:focus:ring-teal-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                name="branchTransferType" (change)="branchTypeChange()" 
+                                class="w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 focus:ring-teal-500 dark:focus:ring-teal-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 ml-4">
                                 Temporary</label>
                                             
-                            <label class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                            <!-- <label class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
                                 <input id="teal-radio" checked type="radio" checked [value]=1  name="branchTransferType" (change)="branchTypeChange()"
                                 formControlName="branchTransferType" class="w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 focus:ring-teal-500 dark:focus:ring-teal-600 
-                                dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 ml-4"> Permanent</label>
+                                dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 ml-4"> Permanent</label> -->
                         </div>
                         <div class="error-msg-area">
                             <div *ngIf="branchTransferForm.controls['branchTransferType'].errors && (!branchTransferForm.controls['branchTransferType'].pristine|| isbranchTransferFormSubmitted)"
@@ -33,6 +39,7 @@
                             </div>
                         </div>
                     </div>
+                    <!-- <div *ngIf="isField"> -->
                     <div *ngIf="!ishidden">
                         <label for="startDate" class="block mb-2 font-bold text-gray-600">Start Date<span class="required">*</span></label>
                         <input type="text" class="form-control data-picker-color user-font"
@@ -49,6 +56,7 @@
                             </div>
                         </div>
                     </div>
+                    <!-- </div> -->
                     
                     <!-- <div *ngIf="!ishidden">
                         <label for="startDate" class="block mb-2 font-bold text-gray-600">Start Date</label>
@@ -92,7 +100,8 @@
                             </div>
                         </div>
                     </div> -->
-                    <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3" *ngIf="ishidden ">
+                    <!-- <div   *ngIf="isField"> -->
+                    <div  class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3" *ngIf="ishidden ">
                         <div>
                             <label for="startDate" class="block mb-2 font-bold text-gray-600">Start Date<span class="required">*</span></label>
                             <input type="text" class="form-control data-picker-color user-font"
@@ -118,16 +127,17 @@
                             [bsConfig]="{ showWeekNumbers:false ,dateInputFormat: 'DD-MM-YYYY',isAnimated: true}"
                             (bsValueChange)="dateSame1($event)" [minDate]="minDate" (input)="inputdobValidator($event)"
                              placeholder="DD-MM-YYYY">
-                            <div class="error-msg-area">
+                             <div class="error-msg-area">
                                 <div *ngIf="branchTransferForm.controls['endDate'].errors && (!branchTransferForm.controls['endDate'].pristine|| isbranchTransferFormSubmitted)"
                                     class="error-msg">
                                     <div [hidden]="!branchTransferForm.controls['endDate'].errors.required">
                                         Please Enter End Date
                                     </div>
                                 </div>
-                            </div>
+                             </div>
                         </div>
                     </div>
+                    <!-- </div> -->
                 </div>
                 <div class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-3 " *ngIf="isShowTime && ishidden " >
                     <div>
