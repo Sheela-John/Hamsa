@@ -43,12 +43,43 @@ const handle = (promise) => {
 /* Create Services */
 async function create(servicesData) {
     log.debug(component, 'Creating a Services', { 'attach': servicesData }); log.close();
+    let [err1, data] = await handle(checkServicesAvailabilty(servicesData));
+    console.log(data)
+    if (data.length != 0) {
+     return Promise.reject(ERR.SERVICE_ALREADY_EXISTS);
+    }
     var saveModel = new Services(servicesData);
     let [err, servicesDataSaved] = await handle(saveModel.save())
     if (err) return Promise.reject(err);
     else return Promise.resolve(servicesDataSaved)
 }
+async function checkServicesAvailabilty(serviceData) {
+    var query = [];
+    query =
+        [
+            {
+                $match: {
+                    'serviceName': serviceData.serviceName,
+                    'duration':serviceData.duration
+                }
+            }
+        ]
+    return new Promise((resolve, reject) => {
+        Services.aggregate(query).collation({ locale: "en", strength: 2 }).exec((err, service) => {
+            if (err) {
+                log.error(component, { attach: err });
+                log.close();
+                return reject(err);
+            }
+            console.log(service)
+            if (service.length > 0) {
+                return resolve(service);
 
+            }
+            else return resolve([]);
+        })
+    })
+}
 /* To Update Services - API */
 const UpdateServices = async function (datatoupdate) {
     log.debug(component, 'Updating a Services', { 'attach': datatoupdate }); log.close();

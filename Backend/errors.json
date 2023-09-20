@@ -275,5 +275,9 @@
     "NO_OF_SESSION_GREATER_THAN_NO_OF_SLOTS":{
         "code":165,
         "message":"Number of Sessions are greater than number of slots.Please select more days!"
+    },
+    "SERVICE_ALREADY_EXISTS":{
+        "code":166,
+        "message":"Service  Already Exists.Please give new Service "
     }
 }
