@@ -59,7 +59,7 @@ export class BranchTransferComponent implements OnInit {
 
   constructor(private router: Router, private fb: FormBuilder, public staffService: StaffService, public branchTransferService: BranchTransferService, public BranchService: BranchService, private flashMessageService: FlashMessageService, private route: ActivatedRoute) {
     this.route.params.subscribe((param) => {
-      this.StaffId = param['staffId'];
+      this.StaffId = param['id'];
       this.routerData = param['branchTranferId'];
       this.minDate.setDate(this.minDate.getDate());
     })
@@ -67,8 +67,9 @@ export class BranchTransferComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeBranchTransferForm();
+    console.log("this.StaffId",this.StaffId)
     this.getByStaffId(this.StaffId);
-    //  this.getAllBranch();
+     this.getAllBranch();
     //  // this.getAllBranchInBase4App()
     if (this.routerData != undefined) {
       this.getBranchTranferById(this.routerData)
@@ -104,7 +105,7 @@ export class BranchTransferComponent implements OnInit {
       if (res.status) {
         this.staffDataBranch = res.data.branchId;
         console.log("this.staffDataBranch", this.staffDataBranch)
-        this.getAllBranch();
+        // this.getAllBranch();
       }
     })
 
@@ -143,11 +144,11 @@ export class BranchTransferComponent implements OnInit {
         this.branchTransferForm.controls['branchTransferType'].patchValue(this.BranchDatavalue.branchTransferType);
         this.branchTypeChange();
         if (this.BranchDatavalue.branchTransferType == 0) {
-          this.branchTransferForm.controls['startDate'].patchValue(this.formattedDate(this.BranchDatavalue.startDate));
-          this.branchTransferForm.controls['endDate'].patchValue(this.formattedDate(this.BranchDatavalue.endDate));
+          this.branchTransferForm.controls['startDate'].patchValue(this.formatDate(this.BranchDatavalue.startDate));
+          this.branchTransferForm.controls['endDate'].patchValue(this.formatDate(this.BranchDatavalue.endDate));
         }
         else {
-          this.branchTransferForm.controls['startDate'].patchValue(this.formattedDate(this.BranchDatavalue.startDate));
+          this.branchTransferForm.controls['startDate'].patchValue(this.formatDate(this.BranchDatavalue.startDate));
         }
         if (this.BranchDatavalue.startDate == this.BranchDatavalue.endDate) {
           this.branchTransferForm.controls['startTime'].patchValue(this.BranchDatavalue.startTime);
@@ -201,6 +202,17 @@ export class BranchTransferComponent implements OnInit {
 
   }
   formattedDate(date) {
+    var d = new Date(date),
+      month = '' + (d.getMonth() + 1),
+      day = '' + d.getDate(),
+      year = d.getFullYear();
+    if (month.length < 2)
+      month = '0' + month;
+    if (day.length < 2)
+      day = '0' + day;
+    return [year, month, day].join('-');
+  }
+  formatDate(date) {
     var d = new Date(date),
       month = '' + (d.getMonth() + 1),
       day = '' + d.getDate(),
@@ -289,8 +301,9 @@ export class BranchTransferComponent implements OnInit {
     if (this.branchTransferForm.valid) {
 
       // this.branchTransferForm.value.branchTransferType = this.branchTransferType;
-
+console.log("this.StaffId",this.StaffId)
       this.branchTransferForm.value.staffId = this.StaffId;
+      console.log("this.sDate",this.sDate)
       this.branchTransferForm.value.startDate = this.sDate;
       this.branchTransferForm.value.endDate = this.eDate;
       this.branchTransferService.createBranchTransfer(this.branchTransferForm.value).subscribe(res => {

@@ -45,7 +45,15 @@ const handle = (promise) => {
 
 async function create(branchTransferData) {
     console.log('Creating a Branch Transfer', branchTransferData);
+
+    branchTransferData.startDate=new Date(branchTransferData.startDate);
+    console.log(" branchTransferData.startDate", branchTransferData.startDate)
+    if(branchTransferData.endDate)
+    {
+        branchTransferData.endDate=new Date(branchTransferData.endDate);
+    }
     var saveModel = new BranchTransfer(branchTransferData);
+
     let [err, branchTransferDataSaved] = await handle(saveModel.save());
     if (err) {
         console.error('Error saving branchTransferData:', err);

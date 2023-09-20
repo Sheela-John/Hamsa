@@ -105,6 +105,17 @@ export class ViewStaffBranchTransferComponent implements OnInit {
       }
     })
   }
+  formatDate(date) {
+    var d = new Date(date),
+      month = '' + (d.getMonth() + 1),
+      day = '' + d.getDate(),
+      year = d.getFullYear();
+    if (month.length < 2)
+      month = '0' + month;
+    if (day.length < 2)
+      day = '0' + day;
+    return [day, month, year].join('-');
+  }
   async getAllBranchTransferDataForStaff(id) {
     this.branchTransferService.getBranchTransferbyStaffId(id).subscribe(res => {
       if (res.status) {
@@ -112,6 +123,13 @@ export class ViewStaffBranchTransferComponent implements OnInit {
         console.log( this.branchTransferData,' this.branchTransferData')
         for (var i = 0; i < this.branchTransferData.length; i++) {
           this.branchTransferData[i].Type = (this.branchTransferData[i].branchTransferType == 0) ? 'Temporary' : 'Permanent';
+          console.log(this.branchTransferData[i].startDate)
+          this.branchTransferData[i].startDate=this.formatDate(this.branchTransferData[i].startDate);
+          if(this.branchTransferData[i].endDate)
+          {
+            this.branchTransferData[i].endDate=this.formatDate(this.branchTransferData[i].endDate);
+
+          }
 
         }
         console.log("this.branchTransferData", this.branchTransferData)
