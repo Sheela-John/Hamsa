@@ -1307,7 +1307,7 @@ const updateAssignService = async function (datatoupdate) {
     if (val) {
         if (val.distance != 0 && val.distance != undefined && val.distance != null) {
             console.log("dfdf")
-            datatoupdate.travelDistanceinKM = (val.distance) / 1000;
+            datatoupdate.travelDistanceinKM = ((val.distance) / 1000).toFixed(2);
         }
         console.log("fsfs")
         datatoupdate.travelDurationinMinutes = val.duration;
@@ -1332,16 +1332,18 @@ const updateAssignService = async function (datatoupdate) {
         datatoupdate.startDistance = startDistance.distance;
         datatoupdate.endDistance = endDistance.distance;
     }
-    if (assign.transport != "auto") {
-        let [Err4, travelAllowance] = await handle(TravelAllowance.findOne({ '_id': assign.transport }).lean());
-        if (travelAllowance) {
-            datatoupdate.travelAmount = assign.travelDistanceinKM * travelAllowance.newPerKmCost;
-        }
-    }
+    // if (assign.transport != "auto") {
+    //     let [Err4, travelAllowance] = await handle(TravelAllowance.findOne({ '_id': assign.transport }).lean());
+    //     if (travelAllowance) {
+    //         datatoupdate.travelAmount = (assign.travelDistanceinKM * travelAllowance.newPerKmCost).toFixed(2);
+    //     }
+    // }
     if (datatoupdate.transport && datatoupdate.transport != "auto") {
+        console.log("datatoupdate.transport",datatoupdate.transport)
         let [Err6, travelAllowance1] = await handle(TravelAllowance.findOne({ '_id': datatoupdate.transport }).lean());
+        console.log("travelAllowance1",travelAllowance1)
         if (travelAllowance1) {
-            datatoupdate.travelAmount = assign.travelDistanceinKM * travelAllowance1.newPerKmCost;
+            datatoupdate.travelAmount = (datatoupdate.travelDistanceinKM * travelAllowance1.newPerKmCost).toFixed(2);
         }
     }
 
@@ -1364,9 +1366,12 @@ async function getAssignServiceDataByStaffIdAndDate(data) {
             let [err, clientData] = await handle(Client.findOne({ _id: assignServiceData[i].clientId }).lean());
             let [err1, staffData] = await handle(Staff.findOne({ _id: assignServiceData[i].staffId }).lean());
             let [err2, serviceData] = await handle(Service.findOne({ _id: assignServiceData[i].serviceId }).lean());
+            let [err3, branchData] = await handle(Branch.findOne({ _id: assignServiceData[i].branchId }).lean());
+
             assignServiceData[i].clientName = clientData.clientName;
             assignServiceData[i].staffName = staffData.staffName;
             assignServiceData[i].serviceName = serviceData.serviceName;
+            assignServiceData[i].branchName=branchData.branchName;
         }
     }
 
