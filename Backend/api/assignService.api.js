@@ -1794,11 +1794,15 @@ const travelDistance = async (data) => {
 
             (async () => {
                 console.log("res", response.body)
-                var value = {
+                var value;
+                if(response.body.routes[0].duration!=0 &&response.body.routes[0].duration!=undefined )
+                {
+                value = {
                     duration: Math.floor(Number(((response.body.routes[0].duration).toString()).split('s')[0]) / 60),
                     distance: response.body.routes[0].distanceMeters
                 }
-                console.log("value", value)
+                }
+               
                 return resolve(value)
 
             })();
