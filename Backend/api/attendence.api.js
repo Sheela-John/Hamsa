@@ -412,7 +412,7 @@ async function AttendanceReportDailyMail() {
          console.log("from1.getDate().length",(((from1.getMonth() + 1).toString()).length))
          var from = from1.getFullYear() + "-" + (((from1.getMonth() + 1).toString()).length != 2 ? "0" + (from1.getMonth() + 1) : (from1.getMonth() + 1)) + "-" + (((from1.getDate()).toString()).length != 2 ? "0" + from1.getDate() : from1.getDate());
          var to =to1.getFullYear() + "-" + (((to1.getMonth() + 1).toString()).length != 2 ? "0" + (to1.getMonth() + 1) : (to1.getMonth() + 1)) + "-" +( ((to1.getDate()).toString()).length != 2 ? "0"  + to1.getDate() : to1.getDate());
-         console.log("ada",from,to)
+         
          let [err, staffData] = await handle(Staff.find().lean());
          var attendanceArray = [];
          for (var i = 0; i < staffData.length; i++) {
@@ -600,5 +600,6 @@ module.exports = {
     togetPreviouseCount: togetPreviouseCount,
     getAttendenceofStaffByDateRangeDetails: getAttendenceofStaffByDateRangeDetails,
     AttendanceReportDailyMail: AttendanceReportDailyMail,
-    AttendanceReportMonthlyMail: AttendanceReportMonthlyMail
+    AttendanceReportMonthlyMail: AttendanceReportMonthlyMail,
+    
 }
