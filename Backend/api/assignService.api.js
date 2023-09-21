@@ -1368,9 +1368,12 @@ async function getAssignServiceDataByStaffIdAndDate(data) {
             let [err, clientData] = await handle(Client.findOne({ _id: assignServiceData[i].clientId }).lean());
             let [err1, staffData] = await handle(Staff.findOne({ _id: assignServiceData[i].staffId }).lean());
             let [err2, serviceData] = await handle(Service.findOne({ _id: assignServiceData[i].serviceId }).lean());
+            let [err3, branchData] = await handle(Branch.findOne({ _id: assignServiceData[i].branchId }).lean());
+
             assignServiceData[i].clientName = clientData.clientName;
             assignServiceData[i].staffName = staffData.staffName;
             assignServiceData[i].serviceName = serviceData.serviceName;
+            assignServiceData[i].branchName=branchData.branchName;
         }
     }
 
