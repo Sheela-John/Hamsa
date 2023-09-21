@@ -532,17 +532,19 @@ export class ReportComponent implements OnInit {
                   if (data == this.Reverse1formatDate(item.date)) {
                     console.log("hello")
                     this.AllData.splice(index, 1, {
+                     
                       date: this.Reverse1formatDate(item.date),
-                      duration: item.totalDurationFormatted,
-                      earlyBy: item.earlyBy,
+                      staffName: item.staffName,
+                      //earlyBy: item.earlyBy,
+                      startTime: item.startTime,
                       endTime: item.endTime,
                       inTime: item.inTime,
-                      lateBy: item.lateBy,
+                    //  lateBy: item.lateBy,
                       outTime: item.outTime,
-                      staffId: item.staffId,
-                      staffName: item.staffName,
-                      startTime: item.startTime,
-                      totalOT: item.totalOT,
+                    //  staffId: item.staffId,
+                    
+                      duration: item.totalDurationFormatted,
+                     // totalOT: item.totalOT,
                       travelDistance: item.travelDistance,
                       travelDuration: item.travelDuration,
                       // _id: item._id,
@@ -627,7 +629,7 @@ export class ReportComponent implements OnInit {
       showTitle: true,
       title: 'Attendance Report',
       useBom: true,
-      headers: ["Date","Travel Duration","EarlyBy","End Time","In Time","LateBy","Out Time","Staff Name","Start Time","TotalIOT","Travel Distance","Travel Duration"]
+      headers: ["Date","Staff Name","Start Time","End Time","In Time","Out Time","Total Duration","Travel Distance","Travel Duration"]
     };
     new ngxCsv(this.finalData, "Report", options);
   }

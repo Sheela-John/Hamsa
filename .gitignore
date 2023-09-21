@@ -3,3 +3,7 @@ Backend/config
 Backend/node_modules 
 BaseApp/node_modules/.bin/acorn
 BaseApp/node_modules
+*.json
+BaseApp/package.json
+Backend/package-lock.json
+*.json

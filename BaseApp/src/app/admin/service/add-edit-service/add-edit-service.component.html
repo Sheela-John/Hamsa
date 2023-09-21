@@ -28,7 +28,7 @@
                         <label for="duration" class="block mb-2 font-bold text-gray-600 ">Duration
                             <span class="required">*</span>
                         </label>
-                        <input id="duration" type="number" name="duration" placeholder="Enter Duration" min = "15" max = "60"  
+                        <input id="duration" type="number" name="duration" placeholder="Enter Duration" min = 15
                             class="border border-gray-300  p-2 w-full rounded" formControlName="duration">
                         <div class="error-msg-area">
                             <div *ngIf="serviceForm.controls['duration'].errors && (!serviceForm.controls['duration'].pristine || isServiceFormSubmitted)"
